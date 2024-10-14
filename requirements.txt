@@ -1,4 +1,5 @@
 flask==2.0.1
+Werkzeug==2.0.1
 dot2tex
 graphviz
 # Add any other dependencies your project needs:x
