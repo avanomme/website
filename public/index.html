@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFA Generator</title>
+</head>
+<body>
+    <div>
+        <label for="alph">Alphabet:</label>
+        <input type="text" id="alph">
+    </div>
+    <div>
+        <label for="nodes">Nodes:</label>
+        <input type="number" id="nodes">
+    </div>
+    <div>
+        <label for="initial">Initial Node:</label>
+        <input type="text" id="initial">
+    </div>
+    <div>
+        <label for="dead">Dead Node:</label>
+        <input type="text" id="dead">
+    </div>
+    <div>
+        <label for="final">Final Nodes:</label>
+        <input type="text" id="final">
+    </div>
+    <button onclick="generateDot()">Generate DOT</button>
+    <div id="graph"></div>
+
+    <script>
+        function generateDot() {
+            const alph = document.getElementById("alph").value;
+            const nodes = document.getElementById("nodes").value;
+            const initial = document.getElementById("initial").value;
+            const dead = document.getElementById("dead").value;
+            const final = document.getElementById("final").value;
+
+            fetch(`/generate-dot?alph=${alph}&nodes=${nodes}&initial=${initial}&dead=${dead}&final=${final}`)
+                .then(response => response.text())
+                .then(svg => {
+                    document.getElementById("graph").innerHTML = svg;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+    </script>
+</body>
+</html>

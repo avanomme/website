@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build TikZ Script DFA</title>
+</head>
+<body>
+    <h1>Build TikZ Script DFA</h1>
+    <form method="post">
+        <label for="alph">Alphabet (separate with space):</label>
+        <input type="text" id="alph" name="alph"><br>
+
+        <label for="nodes">Number of nodes:</label>
+        <input type="number" id="nodes" name="nodes"><br>
+
+        <label for="initial">Initial node:</label>
+        <input type="text" id="initial" name="initial"><br>
+
+        <label for="dead">Dead node (if any, otherwise leave blank):</label>
+        <input type="text" id="dead" name="dead"><br>
+
+        <label for="final">Final nodes (separate with space):</label>
+        <input type="text" id="final" name="final"><br>
+
+        <div id="transitions"></div>
+
+        <button type="button" onclick="createTransitionTable()">Enter</button>
+        <button type="submit">Generate TikZ</button>
+    </form>
+
+    <h2>TikZ Graph</h2>
+    <pre>{{ tikz_graph }}</pre>
+
+    <script>
+        function createTransitionTable() {
+            const alph = document.getElementById('alph').value.split(' ');
+            const nodes = parseInt(document.getElementById('nodes').value);
+            const transitionsDiv = document.getElementById('transitions');
+            transitionsDiv.innerHTML = '';
+
+            for (let i = 0; i <= nodes; i++) {
+                const node = document.createElement('div');
+                node.innerHTML = `<strong>Node ${i}</strong>`;
+                transitionsDiv.appendChild(node);
+
+                alph.forEach(alph_char => {
+                    const label = document.createElement('label');
+                    label.innerHTML = `${alph_char}: `;
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.name = `transition_${i}_${alph_char}`;
+                    node.appendChild(label);
+                    node.appendChild(input);
+                });
+            }
+        }
+    </script>
+</body>
+</html>
