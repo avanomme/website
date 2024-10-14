@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DFA Generator</title>
+</head>
+<body>
+    <h1>DFA Generator</h1>
+    <form method="POST">
+        <div>
+            <label for="alph">Alphabet:</label>
+            <input type="text" id="alph" name="alph" required>
+        </div>
+        <div>
+            <label for="nodes">Nodes:</label>
+            <input type="number" id="nodes" name="nodes" required>
+        </div>
+        <div>
+            <label for="initial">Initial Node:</label>
+            <input type="text" id="initial" name="initial" required>
+        </div>
+        <div>
+            <label for="dead">Dead Node:</label>
+            <input type="text" id="dead" name="dead">
+        </div>
+        <div>
+            <label for="final">Final Nodes:</label>
+            <input type="text" id="final" name="final" required>
+        </div>
+        <button type="submit">Generate DFA</button>
+    </form>
+    
+    {% if tikz_graph %}
+    <h2>Generated TikZ Graph:</h2>
+    <pre>{{ tikz_graph }}</pre>
+    {% endif %}
+</body>
+</html>
