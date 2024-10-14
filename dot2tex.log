@@ -1,0 +1,2530 @@
+2024-10-14 17:40:20,679 dot2tex INFO ------- Start of run -------
+2024-10-14 17:40:20,679 dot2tex INFO Dot2tex version 2.11.3
+2024-10-14 17:40:20,714 dot2tex INFO System information:
+  Python: sys.version_info(major=3, minor=10, micro=7, releaselevel='final', serial=0) 
+  Platform: macOS-15.1-arm64-arm-64bit
+  Pyparsing: 3.1.4
+2024-10-14 17:40:20,714 dot2tex INFO dot2tex called with: ['/Users/Adam/Library/Python/3.10/bin/dot2tex', '--debug', '--autosize', 'temp.dot']
+2024-10-14 17:40:20,715 dot2tex INFO Program started in /Volumes/AVO SSD/mvo-website-main
+2024-10-14 17:40:20,715 dot2tex DEBUG Attempting to read data from temp.dot
+2024-10-14 17:40:20,718 dot2tex INFO Data read from temp.dot
+2024-10-14 17:40:20,718 dot2tex DEBUG Input data:
+
+digraph DFA {
+    rankdir=LR;
+    node [shape = circle]; 
+    layout=circo;
+
+    0 [label="0"];
+    1 [label="1"];
+    2 [label="2"];
+    3 [label="3"];
+    4 [label="4", shape=doublecircle];
+    5 [label="5"];
+    0 -> 1 [label="0"];
+    0 -> 1 [label="1"];
+    1 -> 2 [label="0"];
+    1 -> 2 [label="1"];
+    2 -> 3 [label="0"];
+    2 -> 3 [label="1"];
+    3 -> 4 [label="0"];
+    3 -> 4 [label="1"];
+    4 -> 4 [label="0"];
+    4 -> 4 [label="1"];
+    5 -> 4 [label="0"];
+    5 -> 4 [label="1"];
+}
+
+2024-10-14 17:40:20,719 dot2tex DEBUG Start conversion
+2024-10-14 17:40:20,821 dot2tex DEBUG Parsed graph:
+digraph DFA{
+    node[shape=circle];
+    0[label=0,shape=circle];
+    1[label=1,shape=circle];
+    2[label=2,shape=circle];
+    3[label=3,shape=circle];
+    4[label=4,shape=doublecircle];
+    5[label=5,shape=circle];
+    0 -> 1 [label=0];
+    0 -> 1 [label=1];
+    1 -> 2 [label=0];
+    1 -> 2 [label=1];
+    2 -> 3 [label=0];
+    2 -> 3 [label=1];
+    3 -> 4 [label=0];
+    3 -> 4 [label=1];
+    4 -> 4 [label=0];
+    4 -> 4 [label=1];
+    5 -> 4 [label=0];
+    5 -> 4 [label=1];
+
+    graph [rankdir=LR,layout=circo];
+}
+2024-10-14 17:40:20,826 dot2tex DEBUG Creating temporary directroy /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2texf2bhe0f0
+2024-10-14 17:40:20,826 dot2tex DEBUG Creating temporary file /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2texf2bhe0f0/dot2tex.tex
+2024-10-14 17:40:20,826 dot2tex DEBUG Code written to /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2texf2bhe0f0/dot2tex.tex
+\documentclass{article}
+\usepackage[x11names, svgnames, rgb]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+\usepackage{amsmath}
+%
+\usepackage[active,auctex]{preview}
+%
+%
+
+%
+
+\begin{document}
+\pagestyle{empty}
+%
+%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {2};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {3};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {4};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {5};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+
+%
+%
+
+%
+\end{document}
+%
+
+
+
+2024-10-14 17:40:20,826 dot2tex DEBUG Running command: latex -interaction=nonstopmode /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2texf2bhe0f0/dot2tex.tex
+2024-10-14 17:40:21,754 dot2tex DEBUG stdout from latex
+ b"This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=latex)\n restricted \\write18 enabled.\nentering extended mode\n(/var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2texf2bhe0f0/dot2tex.tex\nLaTeX2e <2023-11-01> patch level 1\nL3 programming layer <2024-02-20>\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/article.cls\nDocument Class: article 2023/05/17 v1.4n Standard LaTeX document class\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/size10.clo))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/xcolor.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/color.cfg)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-def/dvips.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/mathcolor.ltx))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/x11nam.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/svgnam.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/inputenc.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-comm\non.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-late\nx.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.\ntex (/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/pgf.revision.tex))\n) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty\n (/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphicx.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/keyval.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphics.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/trig.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)))\n (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.cod\ne.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code\n.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibra\nryfiltered.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-dvi\nps.def\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-com\nmon-postscript.def)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoft\npath.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprot\nocol.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.cod\ne.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.\ntex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathparser.cod\ne.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\ncode.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nbasic.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\ntrigonometric.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nrandom.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\ncomparison.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nbase.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nround.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nmisc.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nintegerarithmetics.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.\ntex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code\n.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoin\nts.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath\nconstruct.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath\nusage.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescop\nes.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregrap\nhicstate.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran\nsformations.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequic\nk.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobje\ncts.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath\nprocessing.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearro\nws.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshad\ne.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimag\ne.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexte\nrnal.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelaye\nrs.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran\nsparency.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatt\nerns.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.\ncode.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleshape\ns.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.\ncode.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve\nrsion-0-65.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve\nrsion-1-18.sty))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgffor.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code\n.tex)) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/math/pgfmath.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)\n)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgffor.code.\ntex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tik\nz.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibrarypl\nothandlers.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmodulematri\nx.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarytopaths.code.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarysnakes.code.tex\n\nPackage pgf Warning: Snakes have been superseded by decorations. Please use the\n decoration libraries instead of the snakes library on input line 14.\n\n\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.pathmorphing.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduledecor\nations.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/\npgflibrarydecorations.pathmorphing.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.pathreplacing.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/\npgflibrarydecorations.pathreplacing.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.shapes.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/\npgflibrarydecorations.shapes.code.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryarrows.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibraryar\nrows.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.geometric.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.geometric.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.misc.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.misc.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.symbols.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.symbols.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.arrows.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.arrows.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.callouts.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.callouts.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.multipart.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.multipart.code.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsmath.sty\nFor additional information on amsmath, use the `?' option.\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amstext.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsgen.sty))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsbsy.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsopn.sty))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/preview.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.def\nNo auxiliary output files.\n\n\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.cfg)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/l3backend/l3backend-dvips.de\nf)\nNo file dot2tex.aux.\nPreview: Fontsize 10pt\n! Preview: Snippet 1 started.\n<-><->\n      \nl.18 \\begin{preview}\n                    %\n! Preview: Snippet 1 ended.(859202+0x764540).\n<-><->\n      \nl.20 \\end{preview}\n                  %\n[1]\n! Preview: Snippet 2 started.\n<-><->\n      \nl.21 \\begin{preview}\n                    %\n! Preview: Snippet 2 ended.(859202+0x764540).\n<-><->\n      \nl.23 \\end{preview}\n                  %\n[2]\n! Preview: Snippet 3 started.\n<-><->\n      \nl.24 \\begin{preview}\n                    %\n! Preview: Snippet 3 ended.(859202+0x764540).\n<-><->\n      \nl.26 \\end{preview}\n                  %\n[3]\n! Preview: Snippet 4 started.\n<-><->\n      \nl.27 \\begin{preview}\n                    %\n! Preview: Snippet 4 ended.(859202+0x764540).\n<-><->\n      \nl.29 \\end{preview}\n                  %\n[4]\n! Preview: Snippet 5 started.\n<-><->\n      \nl.30 \\begin{preview}\n                    %\n! Preview: Snippet 5 ended.(859202+0x764540).\n<-><->\n      \nl.32 \\end{preview}\n                  %\n[5]\n! Preview: Snippet 6 started.\n<-><->\n      \nl.33 \\begin{preview}\n                    %\n! Preview: Snippet 6 ended.(859202+0x764540).\n<-><->\n      \nl.35 \\end{preview}\n                  %\n[6]\n! Preview: Snippet 7 started.\n<-><->\n      \nl.36 \\begin{preview}\n                    %\n! Preview: Snippet 7 ended.(859202+0x764540).\n<-><->\n      \nl.38 \\end{preview}\n                  %\n[7]\n! Preview: Snippet 8 started.\n<-><->\n      \nl.39 \\begin{preview}\n                    %\n! Preview: Snippet 8 ended.(859202+0x764540).\n<-><->\n      \nl.41 \\end{preview}\n                  %\n[8]\n! Preview: Snippet 9 started.\n<-><->\n      \nl.42 \\begin{preview}\n                    %\n! Preview: Snippet 9 ended.(859202+0x764540).\n<-><->\n      \nl.44 \\end{preview}\n                  %\n[9]\n! Preview: Snippet 10 started.\n<-><->\n      \nl.45 \\begin{preview}\n                    %\n! Preview: Snippet 10 ended.(859202+0x764540).\n<-><->\n      \nl.47 \\end{preview}\n                  %\n[10]\n! Preview: Snippet 11 started.\n<-><->\n      \nl.48 \\begin{preview}\n                    %\n! Preview: Snippet 11 ended.(859202+0x764540).\n<-><->\n      \nl.50 \\end{preview}\n                  %\n[11]\n! Preview: Snippet 12 started.\n<-><->\n      \nl.51 \\begin{preview}\n                    %\n! Preview: Snippet 12 ended.(859202+0x764540).\n<-><->\n      \nl.53 \\end{preview}\n                  %\n[12]\n! Preview: Snippet 13 started.\n<-><->\n      \nl.54 \\begin{preview}\n                    %\n! Preview: Snippet 13 ended.(859202+0x764540).\n<-><->\n      \nl.56 \\end{preview}\n                  %\n[13]\n! Preview: Snippet 14 started.\n<-><->\n      \nl.57 \\begin{preview}\n                    %\n! Preview: Snippet 14 ended.(859202+0x764540).\n<-><->\n      \nl.59 \\end{preview}\n                  %\n[14]\n! Preview: Snippet 15 started.\n<-><->\n      \nl.60 \\begin{preview}\n                    %\n! Preview: Snippet 15 ended.(859202+0x764540).\n<-><->\n      \nl.62 \\end{preview}\n                  %\n[15]\n! Preview: Snippet 16 started.\n<-><->\n      \nl.63 \\begin{preview}\n                    %\n! Preview: Snippet 16 ended.(859202+0x764540).\n<-><->\n      \nl.65 \\end{preview}\n                  %\n[16]\n! Preview: Snippet 17 started.\n<-><->\n      \nl.66 \\begin{preview}\n                    %\n! Preview: Snippet 17 ended.(859202+0x764540).\n<-><->\n      \nl.68 \\end{preview}\n                  %\n[17]\n! Preview: Snippet 18 started.\n<-><->\n      \nl.69 \\begin{preview}\n                    %\n! Preview: Snippet 18 ended.(859202+0x764540).\n<-><->\n      \nl.71 \\end{preview}\n                  %\n[18] )\n(see the transcript file for additional information)\nOutput written on dot2tex.dvi (18 pages, 16644 bytes).\nTranscript written on dot2tex.log.\n"
+2024-10-14 17:40:21,755 dot2tex DEBUG Logfile from LaTeX run: 
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=latex 2024.10.12)  14 OCT 2024 17:40
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**/var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2texf2bhe0f0/dot2tex.tex
+(/var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2texf2bhe0f0/dot2tex.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count188
+\c@section=\count189
+\c@subsection=\count190
+\c@subsubsection=\count191
+\c@paragraph=\count192
+\c@subparagraph=\count193
+\c@figure=\count194
+\c@table=\count195
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\bibindent=\dimen140
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: dvips.def on input line 274.
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-def/dvips.def
+File: dvips.def 2022/09/22 v3.1e Graphics/color driver for dvips
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1350.
+Package xcolor Info: Model `RGB' extended on input line 1366.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1368.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1372.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/x11nam.def
+File: x11nam.def 2023/11/15 v3.01 Predefined colors according to Unix/X11 (UK)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/svgnam.def
+File: svgnam.def 2023/11/15 v3.01 Predefined colors according to SVG 1.1 (UK)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2021/02/14 v1.3d Input encoding file
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-comm
+on.tex
+\pgfutil@everybye=\toks19
+\pgfutil@tempdima=\dimen141
+\pgfutil@tempdimb=\dimen142
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-late
+x.def
+\pgfutil@abb=\box51
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.
+tex (/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
+))
+Package: pgf 2023-01-15 v3.1.10 (3.1.10)
+ (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty 
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks20
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 107.
+)
+\Gin@req@height=\dimen143
+\Gin@req@width=\dimen144
+) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.cod
+e.tex
+Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex
+\pgfkeys@pathtoks=\toks21
+\pgfkeys@temptoks=\toks22
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibra
+ryfiltered.code.tex
+\pgfkeys@tmptoks=\toks23
+))
+\pgf@x=\dimen145
+\pgf@y=\dimen146
+\pgf@xa=\dimen147
+\pgf@ya=\dimen148
+\pgf@xb=\dimen149
+\pgf@yb=\dimen150
+\pgf@xc=\dimen151
+\pgf@yc=\dimen152
+\pgf@xd=\dimen153
+\pgf@yd=\dimen154
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count196
+\c@pgf@countb=\count197
+\c@pgf@countc=\count198
+\c@pgf@countd=\count199
+\t@pgf@toka=\toks24
+\t@pgf@tokb=\toks25
+\t@pgf@tokc=\toks26
+\pgf@sys@id@count=\count266
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
+)
+Driver file for pgf: pgfsys-dvips.def
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-dvi
+ps.def
+File: pgfsys-dvips.def 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-com
+mon-postscript.def
+File: pgfsys-common-postscript.def 2023-01-15 v3.1.10 (3.1.10)
+\pgf@objectcount=\count267
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoft
+path.code.tex
+File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfsyssoftpath@smallbuffer@items=\count268
+\pgfsyssoftpath@bigbuffer@items=\count269
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprot
+ocol.code.tex
+File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.cod
+e.tex
+Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathparser.cod
+e.tex
+\pgfmath@dimen=\dimen155
+\pgfmath@count=\count270
+\pgfmath@box=\box52
+\pgfmath@toks=\toks27
+\pgfmath@stack@operand=\toks28
+\pgfmath@stack@operation=\toks29
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+basic.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+trigonometric.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+random.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+comparison.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+base.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+round.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+misc.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+integerarithmetics.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code
+.tex
+\c@pgfmathroundto@lastzeros=\count271
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoin
+ts.code.tex
+File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@picminx=\dimen156
+\pgf@picmaxx=\dimen157
+\pgf@picminy=\dimen158
+\pgf@picmaxy=\dimen159
+\pgf@pathminx=\dimen160
+\pgf@pathmaxx=\dimen161
+\pgf@pathminy=\dimen162
+\pgf@pathmaxy=\dimen163
+\pgf@xx=\dimen164
+\pgf@xy=\dimen165
+\pgf@yx=\dimen166
+\pgf@yy=\dimen167
+\pgf@zx=\dimen168
+\pgf@zy=\dimen169
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+construct.code.tex
+File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@path@lastx=\dimen170
+\pgf@path@lasty=\dimen171
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+usage.code.tex
+File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@shorten@end@additional=\dimen172
+\pgf@shorten@start@additional=\dimen173
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescop
+es.code.tex
+File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfpic=\box53
+\pgf@hbox=\box54
+\pgf@layerbox@main=\box55
+\pgf@picture@serial@count=\count272
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregrap
+hicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgflinewidth=\dimen174
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sformations.code.tex
+File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@pt@x=\dimen175
+\pgf@pt@y=\dimen176
+\pgf@pt@temp=\dimen177
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequic
+k.code.tex
+File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobje
+cts.code.tex
+File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+processing.code.tex
+File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearro
+ws.code.tex
+File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowsep=\dimen178
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshad
+e.code.tex
+File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@max=\dimen179
+\pgf@sys@shading@range@num=\count273
+\pgf@shadingcount=\count274
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimag
+e.code.tex
+File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexte
+rnal.code.tex
+File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfexternal@startupbox=\box56
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelaye
+rs.code.tex
+File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sparency.code.tex
+File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatt
+erns.code.tex
+File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.
+code.tex
+File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleshape
+s.code.tex
+File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodeparttextbox=\box57
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.
+code.tex
+File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-0-65.sty
+Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
+\pgf@nodesepstart=\dimen180
+\pgf@nodesepend=\dimen181
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-1-18.sty
+Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex)) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgffor.code.
+tex
+Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
+\pgffor@iter=\dimen182
+\pgffor@skip=\dimen183
+\pgffor@stack=\toks30
+\pgffor@toks=\toks31
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tik
+z.code.tex
+Package: tikz 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibrarypl
+othandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@plot@mark@count=\count275
+\pgfplotmarksize=\dimen184
+)
+\tikz@lastx=\dimen185
+\tikz@lasty=\dimen186
+\tikz@lastxsaved=\dimen187
+\tikz@lastysaved=\dimen188
+\tikz@lastmovetox=\dimen189
+\tikz@lastmovetoy=\dimen190
+\tikzleveldistance=\dimen191
+\tikzsiblingdistance=\dimen192
+\tikz@figbox=\box58
+\tikz@figbox@bg=\box59
+\tikz@tempbox=\box60
+\tikz@tempbox@bg=\box61
+\tikztreelevel=\count276
+\tikznumberofchildren=\count277
+\tikznumberofcurrentchild=\count278
+\tikz@fig@count=\count279
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmodulematri
+x.code.tex
+File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfmatrixcurrentrow=\count280
+\pgfmatrixcurrentcolumn=\count281
+\pgf@matrix@numberofcolumns=\count282
+)
+\tikz@expandcount=\count283
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarysnakes.code.tex
+File: tikzlibrarysnakes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+
+Package pgf Warning: Snakes have been superseded by decorations. Please use the
+ decoration libraries instead of the snakes library on input line 14.
+
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.pathmorphing.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduledecor
+ations.code.tex
+\pgfdecoratedcompleteddistance=\dimen193
+\pgfdecoratedremainingdistance=\dimen194
+\pgfdecoratedinputsegmentcompleteddistance=\dimen195
+\pgfdecoratedinputsegmentremainingdistance=\dimen196
+\pgf@decorate@distancetomove=\dimen197
+\pgf@decorate@repeatstate=\count284
+\pgfdecorationsegmentamplitude=\dimen198
+\pgfdecorationsegmentlength=\dimen199
+)
+\tikz@lib@dec@box=\box62
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/
+pgflibrarydecorations.pathmorphing.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.pathreplacing.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/
+pgflibrarydecorations.pathreplacing.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.shapes.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/
+pgflibrarydecorations.shapes.code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryarrows.code.tex
+File: tikzlibraryarrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibraryar
+rows.code.tex
+File: pgflibraryarrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\arrowsize=\dimen256
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.code.tex
+File: tikzlibraryshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.geometric.code.tex
+File: tikzlibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.geometric.code.tex
+File: pgflibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.misc.code.tex
+File: tikzlibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.misc.code.tex
+File: pgflibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.symbols.code.tex
+File: tikzlibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.symbols.code.tex
+File: pgflibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.arrows.code.tex
+File: tikzlibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.arrows.code.tex
+File: pgflibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.callouts.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.callouts.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.multipart.code.tex
+File: tikzlibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.multipart.code.tex
+File: pgflibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodepartlowerbox=\box63
+\pgfnodeparttwobox=\box64
+\pgfnodepartthreebox=\box65
+\pgfnodepartfourbox=\box66
+\pgfnodeparttwentybox=\box67
+\pgfnodepartnineteenbox=\box68
+\pgfnodeparteighteenbox=\box69
+\pgfnodepartseventeenbox=\box70
+\pgfnodepartsixteenbox=\box71
+\pgfnodepartfifteenbox=\box72
+\pgfnodepartfourteenbox=\box73
+\pgfnodepartthirteenbox=\box74
+\pgfnodeparttwelvebox=\box75
+\pgfnodepartelevenbox=\box76
+\pgfnodeparttenbox=\box77
+\pgfnodepartninebox=\box78
+\pgfnodeparteightbox=\box79
+\pgfnodepartsevenbox=\box80
+\pgfnodepartsixbox=\box81
+\pgfnodepartfivebox=\box82
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2023/05/13 v2.17o AMS math features
+\@mathmargin=\skip50
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks32
+\ex@=\dimen257
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen258
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2022/04/08 v2.04 operator names
+)
+\inf@bad=\count285
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count286
+\leftroot@=\count287
+LaTeX Info: Redefining \overline on input line 399.
+LaTeX Info: Redefining \colon on input line 410.
+\classnum@=\count288
+\DOTSCASE@=\count289
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box83
+\strutbox@=\box84
+LaTeX Info: Redefining \big on input line 722.
+LaTeX Info: Redefining \Big on input line 723.
+LaTeX Info: Redefining \bigg on input line 724.
+LaTeX Info: Redefining \Bigg on input line 725.
+\big@size=\dimen259
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count290
+LaTeX Info: Redefining \bmod on input line 905.
+LaTeX Info: Redefining \pmod on input line 910.
+LaTeX Info: Redefining \smash on input line 940.
+LaTeX Info: Redefining \relbar on input line 970.
+LaTeX Info: Redefining \Relbar on input line 971.
+\c@MaxMatrixCols=\count291
+\dotsspace@=\muskip16
+\c@parentequation=\count292
+\dspbrk@lvl=\count293
+\tag@help=\toks33
+\row@=\count294
+\column@=\count295
+\maxfields@=\count296
+\andhelp@=\toks34
+\eqnshift@=\dimen260
+\alignsep@=\dimen261
+\tagshift@=\dimen262
+\tagwidth@=\dimen263
+\totwidth@=\dimen264
+\lineht@=\dimen265
+\@envbody=\toks35
+\multlinegap=\skip51
+\multlinetaggap=\skip52
+\mathdisplay@stack=\toks36
+LaTeX Info: Redefining \[ on input line 2953.
+LaTeX Info: Redefining \] on input line 2954.
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/preview.sty
+Package: preview 2024/06/30 14.0.6 (AUCTeX/preview-latex)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.def
+No auxiliary output files.
+
+
+\hbadness=\count297
+\hfuzz=\dimen266
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.cfg))
+\pr@snippet=\count298
+\pr@box=\box85
+\pr@output=\toks37
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/l3backend/l3backend-dvips.de
+f
+File: l3backend-dvips.def 2024-02-20 L3 backend support: dvips
+\l__pdf_internal_box=\box86
+\g__pdf_backend_object_int=\count299
+\l__pdf_backend_content_box=\box87
+\l__pdf_backend_model_box=\box88
+\g__pdf_backend_annotation_int=\count300
+\g__pdf_backend_link_int=\count301
+\g__pdf_backend_link_sf_int=\count302
+)
+No file dot2tex.aux.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+Preview: Fontsize 10pt
+! Preview: Snippet 1 started.
+<-><->
+      
+l.18 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 1 ended.(859202+0x764540).
+<-><->
+      
+l.20 \end{preview}
+                  %
+Not a real error.
+
+[1]
+! Preview: Snippet 2 started.
+<-><->
+      
+l.21 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 2 ended.(859202+0x764540).
+<-><->
+      
+l.23 \end{preview}
+                  %
+Not a real error.
+
+[2]
+! Preview: Snippet 3 started.
+<-><->
+      
+l.24 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 3 ended.(859202+0x764540).
+<-><->
+      
+l.26 \end{preview}
+                  %
+Not a real error.
+
+[3]
+! Preview: Snippet 4 started.
+<-><->
+      
+l.27 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 4 ended.(859202+0x764540).
+<-><->
+      
+l.29 \end{preview}
+                  %
+Not a real error.
+
+[4]
+! Preview: Snippet 5 started.
+<-><->
+      
+l.30 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 5 ended.(859202+0x764540).
+<-><->
+      
+l.32 \end{preview}
+                  %
+Not a real error.
+
+[5]
+! Preview: Snippet 6 started.
+<-><->
+      
+l.33 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 6 ended.(859202+0x764540).
+<-><->
+      
+l.35 \end{preview}
+                  %
+Not a real error.
+
+[6]
+! Preview: Snippet 7 started.
+<-><->
+      
+l.36 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 7 ended.(859202+0x764540).
+<-><->
+      
+l.38 \end{preview}
+                  %
+Not a real error.
+
+[7]
+! Preview: Snippet 8 started.
+<-><->
+      
+l.39 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 8 ended.(859202+0x764540).
+<-><->
+      
+l.41 \end{preview}
+                  %
+Not a real error.
+
+[8]
+! Preview: Snippet 9 started.
+<-><->
+      
+l.42 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 9 ended.(859202+0x764540).
+<-><->
+      
+l.44 \end{preview}
+                  %
+Not a real error.
+
+[9]
+! Preview: Snippet 10 started.
+<-><->
+      
+l.45 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 10 ended.(859202+0x764540).
+<-><->
+      
+l.47 \end{preview}
+                  %
+Not a real error.
+
+[10]
+! Preview: Snippet 11 started.
+<-><->
+      
+l.48 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 11 ended.(859202+0x764540).
+<-><->
+      
+l.50 \end{preview}
+                  %
+Not a real error.
+
+[11]
+! Preview: Snippet 12 started.
+<-><->
+      
+l.51 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 12 ended.(859202+0x764540).
+<-><->
+      
+l.53 \end{preview}
+                  %
+Not a real error.
+
+[12]
+! Preview: Snippet 13 started.
+<-><->
+      
+l.54 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 13 ended.(859202+0x764540).
+<-><->
+      
+l.56 \end{preview}
+                  %
+Not a real error.
+
+[13]
+! Preview: Snippet 14 started.
+<-><->
+      
+l.57 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 14 ended.(859202+0x764540).
+<-><->
+      
+l.59 \end{preview}
+                  %
+Not a real error.
+
+[14]
+! Preview: Snippet 15 started.
+<-><->
+      
+l.60 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 15 ended.(859202+0x764540).
+<-><->
+      
+l.62 \end{preview}
+                  %
+Not a real error.
+
+[15]
+! Preview: Snippet 16 started.
+<-><->
+      
+l.63 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 16 ended.(859202+0x764540).
+<-><->
+      
+l.65 \end{preview}
+                  %
+Not a real error.
+
+[16]
+! Preview: Snippet 17 started.
+<-><->
+      
+l.66 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 17 ended.(859202+0x764540).
+<-><->
+      
+l.68 \end{preview}
+                  %
+Not a real error.
+
+[17]
+! Preview: Snippet 18 started.
+<-><->
+      
+l.69 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 18 ended.(859202+0x764540).
+<-><->
+      
+l.71 \end{preview}
+                  %
+Not a real error.
+
+[18]
+ ***********
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+ ***********
+ ) 
+Here is how much of TeX's memory you used:
+ 15740 strings out of 475568
+ 356087 string characters out of 5777914
+ 1926184 words of memory out of 5000000
+ 37634 multiletter control sequences out of 15000+600000
+ 558069 words of font info for 36 fonts, out of 8000000 for 9000
+ 319 hyphenation exceptions out of 8191
+ 102i,5n,107p,490b,547s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+Output written on dot2tex.dvi (18 pages, 16644 bytes).
+
+2024-10-14 17:40:21,756 dot2tex DEBUG Texdimdata: [('1', '859202', '0', '764540'), ('2', '859202', '0', '764540'), ('3', '859202', '0', '764540'), ('4', '859202', '0', '764540'), ('5', '859202', '0', '764540'), ('6', '859202', '0', '764540'), ('7', '859202', '0', '764540'), ('8', '859202', '0', '764540'), ('9', '859202', '0', '764540'), ('10', '859202', '0', '764540'), ('11', '859202', '0', '764540'), ('12', '859202', '0', '764540'), ('13', '859202', '0', '764540'), ('14', '859202', '0', '764540'), ('15', '859202', '0', '764540'), ('16', '859202', '0', '764540'), ('17', '859202', '0', '764540'), ('18', '859202', '0', '764540')]
+2024-10-14 17:40:21,757 dot2tex DEBUG Temporary directory and files deleted
+2024-10-14 17:40:21,758 dot2tex DEBUG Output:
+digraph DFA{
+    node[shape=circle];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+
+    graph [rankdir=LR,layout=circo,d2toutputformat=pgf];
+}
+2024-10-14 17:40:21,759 dot2tex DEBUG Start conversion
+2024-10-14 17:40:22,069 dot2tex DEBUG Parsed graph:
+digraph DFA{
+    node[shape=circle];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+    graph[rankdir=LR,layout=circo,d2toutputformat=pgf];
+
+    graph [rankdir=LR,layout=circo,d2toutputformat=pgf];
+}
+2024-10-14 17:40:22,069 dot2tex INFO Trying to create xdotdata
+2024-10-14 17:40:22,070 dot2tex DEBUG Creating xdot data with: "/opt/homebrew/bin/dot" -Txdot  /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/tmp5uz77rn1
+2024-10-14 17:40:22,571 dot2tex DEBUG Graphviz STDERR b'Warning: cell size too small for content\nin label of edge 0 -> 1\nWarning: cell size too small for content\nin label of edge 0 -> 1\nWarning: cell size too small for content\nin label of edge 1 -> 2\nWarning: cell size too small for content\nin label of edge 1 -> 2\nWarning: cell size too small for content\nin label of edge 2 -> 3\nWarning: cell size too small for content\nin label of edge 2 -> 3\nWarning: cell size too small for content\nin label of edge 3 -> 4\nWarning: cell size too small for content\nin label of edge 3 -> 4\nWarning: cell size too small for content\nin label of edge 4 -> 4\nWarning: cell size too small for content\nin label of edge 4 -> 4\nWarning: cell size too small for content\nin label of edge 5 -> 4\nWarning: cell size too small for content\nin label of edge 5 -> 4\n'
+2024-10-14 17:40:22,571 dot2tex DEBUG xdotdata:
+b'digraph DFA {\n\tgraph [_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",\n\t\tbb="0,0,692,62",\n\t\td2toutputformat=pgf,\n\t\tlayout=circo,\n\t\trankdir=LR,\n\t\txdotversion=1.7\n\t];\n\tnode [label="\\N",\n\t\tshape=circle\n\t];\n\t0\t[_draw_="c 7 -#000000 e 27 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 27 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="27,31",\n\t\ttexlbl=0,\n\t\twidth=0.75];\n\t1\t[_draw_="c 7 -#000000 e 153 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 153 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="153,31",\n\t\ttexlbl=1,\n\t\twidth=0.75];\n\t0 -> 1\t[_draw_="c 7 -#000000 B 4 53.72 36.64 71.51 37.87 95.16 38.08 114.91 37.26 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 115.01 40.76 124.81 36.72 114.63 33.77 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 39.65 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="75.816,45.947",\n\t\tpos="e,126.32,36.633 53.721,36.636 71.512,37.873 95.159,38.08 114.91,37.257",\n\t\ttexlbl=0];\n\t0 -> 1\t[_draw_="c 7 -#000000 B 4 53.72 25.36 71.51 24.13 95.16 23.92 114.91 24.74 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 114.63 28.23 124.81 25.28 115.01 21.24 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 9.75 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="75.816,16.053",\n\t\tpos="e,126.32,25.367 53.721,25.364 71.512,24.127 95.159,23.92 114.91,24.743",\n\t\ttexlbl=1];\n\t2\t[_draw_="c 7 -#000000 e 279 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 279 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="279,31",\n\t\ttexlbl=2,\n\t\twidth=0.75];\n\t1 -> 2\t[_draw_="c 7 -#000000 B 4 179.72 36.64 197.51 37.87 221.16 38.08 240.91 37.26 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 241.01 40.76 250.81 36.72 240.63 33.77 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 39.65 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="201.82,45.947",\n\t\tpos="e,252.32,36.633 179.72,36.636 197.51,37.873 221.16,38.08 240.91,37.257",\n\t\ttexlbl=0];\n\t1 -> 2\t[_draw_="c 7 -#000000 B 4 179.72 25.36 197.51 24.13 221.16 23.92 240.91 24.74 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 240.63 28.23 250.81 25.28 241.01 21.24 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 9.75 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="201.82,16.053",\n\t\tpos="e,252.32,25.367 179.72,25.364 197.51,24.127 221.16,23.92 240.91,24.743",\n\t\ttexlbl=1];\n\t3\t[_draw_="c 7 -#000000 e 405 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 405 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="405,31",\n\t\ttexlbl=3,\n\t\twidth=0.75];\n\t2 -> 3\t[_draw_="c 7 -#000000 B 4 305.72 36.64 323.51 37.87 347.16 38.08 366.91 37.26 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 367.01 40.76 376.81 36.72 366.63 33.77 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 39.65 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="327.82,45.947",\n\t\tpos="e,378.32,36.633 305.72,36.636 323.51,37.873 347.16,38.08 366.91,37.257",\n\t\ttexlbl=0];\n\t2 -> 3\t[_draw_="c 7 -#000000 B 4 305.72 25.36 323.51 24.13 347.16 23.92 366.91 24.74 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 366.63 28.23 376.81 25.28 367.01 21.24 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 9.75 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="327.82,16.053",\n\t\tpos="e,378.32,25.367 305.72,25.364 323.51,24.127 347.16,23.92 366.91,24.743",\n\t\ttexlbl=1];\n\t4\t[_draw_="c 7 -#000000 e 535 31 27 27 c 7 -#000000 e 535 31 31 31 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 535 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.86111,\n\t\tlabel=" ",\n\t\tpos="535,31",\n\t\tshape=doublecircle,\n\t\ttexlbl=4,\n\t\twidth=0.86111];\n\t3 -> 4\t[_draw_="c 7 -#000000 B 4 431.62 36.57 449.26 37.81 472.76 38.07 492.91 37.36 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.97 40.86 502.8 36.9 492.64 33.87 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 39.67 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="453.76,45.967",\n\t\tpos="e,504.31,36.833 431.62,36.571 449.26,37.807 472.76,38.071 492.91,37.363",\n\t\ttexlbl=0];\n\t3 -> 4\t[_draw_="c 7 -#000000 B 4 431.62 25.43 449.26 24.19 472.76 23.93 492.91 24.64 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.64 28.13 502.8 25.1 492.97 21.14 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 9.73 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="453.76,16.033",\n\t\tpos="e,504.31,25.167 431.62,25.429 449.26,24.193 472.76,23.929 492.91,24.637",\n\t\ttexlbl=1];\n\t4 -> 4\t[_draw_="c 7 -#000000 B 7 566.1 34.37 576.09 34.34 584 33.21 584 31 584 29.75 581.5 28.85 577.53 28.3 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.8 24.81 567.61 27.71 577.39 31.8 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 589.5 24.7 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="592.5,31",\n\t\tpos="e,566.1,27.626 566.1,34.374 576.09,34.34 584,33.215 584,31 584,29.754 581.5,28.853 577.53,28.297",\n\t\ttexlbl=0];\n\t4 -> 4\t[_draw_="c 7 -#000000 B 7 565.67 37.3 584.33 38.76 602 36.66 602 31 602 26.49 590.78 24.24 576.78 24.25 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 20.74 567.18 24.64 577.31 27.73 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 607.5 24.7 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="610.5,31",\n\t\tpos="e,565.67,24.699 565.67,37.301 584.33,38.761 602,36.66 602,31 602,26.49 590.78,24.24 576.78,24.25",\n\t\ttexlbl=1];\n\t5\t[_draw_="c 7 -#000000 e 665 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 665 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="665,31",\n\t\ttexlbl=5,\n\t\twidth=0.75];\n\t5 -> 4\t[_draw_="c 7 -#000000 B 4 638.38 25.43 620.74 24.19 597.24 23.93 577.09 24.64 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 21.14 567.2 25.1 577.36 28.13 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 9.73 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="616.24,16.033",\n\t\tpos="e,565.69,25.167 638.38,25.429 620.74,24.193 597.24,23.929 577.09,24.637",\n\t\ttexlbl=0];\n\t5 -> 4\t[_draw_="c 7 -#000000 B 4 638.38 36.57 620.74 37.81 597.24 38.07 577.09 37.36 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.36 33.87 567.2 36.9 577.03 40.86 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 39.67 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="616.24,45.967",\n\t\tpos="e,565.69,36.833 638.38,36.571 620.74,37.807 597.24,38.071 577.09,37.363",\n\t\ttexlbl=1];\n}\n'
+2024-10-14 17:40:22,979 dot2tex DEBUG Parsed graph:
+digraph DFA{
+    graph[_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+    node[label="\N",shape=circle];
+    0[_draw_="c 7 -#000000 e 27 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 27 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="27,31",texlbl=0,width=0.75,shape=circle];
+    1[_draw_="c 7 -#000000 e 153 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 153 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="153,31",texlbl=1,width=0.75,shape=circle];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 36.64 71.51 37.87 95.16 38.08 114.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 115.01 40.76 124.81 36.72 114.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,45.947",pos="e,126.32,36.633 53.721,36.636 71.512,37.873 95.159,38.08 114.91,37.257",texlbl=0];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 25.36 71.51 24.13 95.16 23.92 114.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 114.63 28.23 124.81 25.28 115.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,16.053",pos="e,126.32,25.367 53.721,25.364 71.512,24.127 95.159,23.92 114.91,24.743",texlbl=1];
+    2[_draw_="c 7 -#000000 e 279 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 279 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="279,31",texlbl=2,width=0.75,shape=circle];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 36.64 197.51 37.87 221.16 38.08 240.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 241.01 40.76 250.81 36.72 240.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,45.947",pos="e,252.32,36.633 179.72,36.636 197.51,37.873 221.16,38.08 240.91,37.257",texlbl=0];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 25.36 197.51 24.13 221.16 23.92 240.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 240.63 28.23 250.81 25.28 241.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,16.053",pos="e,252.32,25.367 179.72,25.364 197.51,24.127 221.16,23.92 240.91,24.743",texlbl=1];
+    3[_draw_="c 7 -#000000 e 405 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 405 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="405,31",texlbl=3,width=0.75,shape=circle];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 36.64 323.51 37.87 347.16 38.08 366.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 367.01 40.76 376.81 36.72 366.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,45.947",pos="e,378.32,36.633 305.72,36.636 323.51,37.873 347.16,38.08 366.91,37.257",texlbl=0];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 25.36 323.51 24.13 347.16 23.92 366.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 366.63 28.23 376.81 25.28 367.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,16.053",pos="e,378.32,25.367 305.72,25.364 323.51,24.127 347.16,23.92 366.91,24.743",texlbl=1];
+    4[_draw_="c 7 -#000000 e 535 31 27 27 c 7 -#000000 e 535 31 31 31 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 535 25.95 0 3.75 1 -  ",fixedsize=true,height=0.86111,label=" ",pos="535,31",shape=doublecircle,texlbl=4,width=0.86111];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 36.57 449.26 37.81 472.76 38.07 492.91 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.97 40.86 502.8 36.9 492.64 33.87 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,45.967",pos="e,504.31,36.833 431.62,36.571 449.26,37.807 472.76,38.071 492.91,37.363",texlbl=0];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 25.43 449.26 24.19 472.76 23.93 492.91 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.64 28.13 502.8 25.1 492.97 21.14 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,16.033",pos="e,504.31,25.167 431.62,25.429 449.26,24.193 472.76,23.929 492.91,24.637",texlbl=1];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 566.1 34.37 576.09 34.34 584 33.21 584 31 584 29.75 581.5 28.85 577.53 28.3 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.8 24.81 567.61 27.71 577.39 31.8 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 589.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="592.5,31",pos="e,566.1,27.626 566.1,34.374 576.09,34.34 584,33.215 584,31 584,29.754 581.5,28.853 577.53,28.297",texlbl=0];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 565.67 37.3 584.33 38.76 602 36.66 602 31 602 26.49 590.78 24.24 576.78 24.25 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 20.74 567.18 24.64 577.31 27.73 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 607.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="610.5,31",pos="e,565.67,24.699 565.67,37.301 584.33,38.761 602,36.66 602,31 602,26.49 590.78,24.24 576.78,24.25",texlbl=1];
+    5[_draw_="c 7 -#000000 e 665 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 665 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="665,31",texlbl=5,width=0.75,shape=circle];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 25.43 620.74 24.19 597.24 23.93 577.09 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 21.14 567.2 25.1 577.36 28.13 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,16.033",pos="e,565.69,25.167 638.38,25.429 620.74,24.193 597.24,23.929 577.09,24.637",texlbl=0];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 36.57 620.74 37.81 597.24 38.07 577.09 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.36 33.87 567.2 36.9 577.03 40.86 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,45.967",pos="e,565.69,36.833 638.38,36.571 620.74,37.807 597.24,38.071 577.09,37.363",texlbl=1];
+
+    graph [_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+}
+2024-10-14 17:40:22,983 dot2tex DEBUG dotparsing graph:
+digraph DFA{
+    graph[_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+    node[label="\N",shape=circle];
+    0[_draw_="c 7 -#000000 e 27 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 27 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="27,31",texlbl=0,width=0.75,shape=circle];
+    1[_draw_="c 7 -#000000 e 153 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 153 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="153,31",texlbl=1,width=0.75,shape=circle];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 36.64 71.51 37.87 95.16 38.08 114.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 115.01 40.76 124.81 36.72 114.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,45.947",pos="e,126.32,36.633 53.721,36.636 71.512,37.873 95.159,38.08 114.91,37.257",texlbl=0];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 25.36 71.51 24.13 95.16 23.92 114.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 114.63 28.23 124.81 25.28 115.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,16.053",pos="e,126.32,25.367 53.721,25.364 71.512,24.127 95.159,23.92 114.91,24.743",texlbl=1];
+    2[_draw_="c 7 -#000000 e 279 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 279 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="279,31",texlbl=2,width=0.75,shape=circle];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 36.64 197.51 37.87 221.16 38.08 240.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 241.01 40.76 250.81 36.72 240.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,45.947",pos="e,252.32,36.633 179.72,36.636 197.51,37.873 221.16,38.08 240.91,37.257",texlbl=0];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 25.36 197.51 24.13 221.16 23.92 240.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 240.63 28.23 250.81 25.28 241.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,16.053",pos="e,252.32,25.367 179.72,25.364 197.51,24.127 221.16,23.92 240.91,24.743",texlbl=1];
+    3[_draw_="c 7 -#000000 e 405 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 405 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="405,31",texlbl=3,width=0.75,shape=circle];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 36.64 323.51 37.87 347.16 38.08 366.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 367.01 40.76 376.81 36.72 366.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,45.947",pos="e,378.32,36.633 305.72,36.636 323.51,37.873 347.16,38.08 366.91,37.257",texlbl=0];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 25.36 323.51 24.13 347.16 23.92 366.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 366.63 28.23 376.81 25.28 367.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,16.053",pos="e,378.32,25.367 305.72,25.364 323.51,24.127 347.16,23.92 366.91,24.743",texlbl=1];
+    4[_draw_="c 7 -#000000 e 535 31 27 27 c 7 -#000000 e 535 31 31 31 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 535 25.95 0 3.75 1 -  ",fixedsize=true,height=0.86111,label=" ",pos="535,31",shape=doublecircle,texlbl=4,width=0.86111];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 36.57 449.26 37.81 472.76 38.07 492.91 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.97 40.86 502.8 36.9 492.64 33.87 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,45.967",pos="e,504.31,36.833 431.62,36.571 449.26,37.807 472.76,38.071 492.91,37.363",texlbl=0];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 25.43 449.26 24.19 472.76 23.93 492.91 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.64 28.13 502.8 25.1 492.97 21.14 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,16.033",pos="e,504.31,25.167 431.62,25.429 449.26,24.193 472.76,23.929 492.91,24.637",texlbl=1];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 566.1 34.37 576.09 34.34 584 33.21 584 31 584 29.75 581.5 28.85 577.53 28.3 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.8 24.81 567.61 27.71 577.39 31.8 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 589.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="592.5,31",pos="e,566.1,27.626 566.1,34.374 576.09,34.34 584,33.215 584,31 584,29.754 581.5,28.853 577.53,28.297",texlbl=0];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 565.67 37.3 584.33 38.76 602 36.66 602 31 602 26.49 590.78 24.24 576.78 24.25 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 20.74 567.18 24.64 577.31 27.73 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 607.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="610.5,31",pos="e,565.67,24.699 565.67,37.301 584.33,38.761 602,36.66 602,31 602,26.49 590.78,24.24 576.78,24.25",texlbl=1];
+    5[_draw_="c 7 -#000000 e 665 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 665 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="665,31",texlbl=5,width=0.75,shape=circle];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 25.43 620.74 24.19 597.24 23.93 577.09 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 21.14 567.2 25.1 577.36 28.13 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,16.033",pos="e,565.69,25.167 638.38,25.429 620.74,24.193 597.24,23.929 577.09,24.637",texlbl=0];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 36.57 620.74 37.81 597.24 38.07 577.09 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.36 33.87 567.2 36.9 577.03 40.86 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,45.967",pos="e,565.69,36.833 638.38,36.571 620.74,37.807 597.24,38.071 577.09,37.363",texlbl=1];
+
+    graph [_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+}
+2024-10-14 17:40:22,990 dot2tex DEBUG Output after preprocessing:
+\documentclass{article}
+\usepackage[x11names, svgnames, rgb]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+\usepackage{amsmath}
+%
+%
+
+%
+
+%
+
+\begin{document}
+\pagestyle{empty}
+%
+%
+%
+
+\enlargethispage{100cm}
+% Start of code
+% \begin{tikzpicture}[anchor=mid,>=latex',line join=bevel,]
+\begin{tikzpicture}[>=latex',line join=bevel,]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: 0 -> 1
+  \draw [->] (53.721bp,36.636bp) .. controls (71.512bp,37.873bp) and (95.159bp,38.08bp)  .. (126.32bp,36.633bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (75.816bp,45.947bp) node {0};
+  % Edge: 0 -> 1
+  \draw [->] (53.721bp,25.364bp) .. controls (71.512bp,24.127bp) and (95.159bp,23.92bp)  .. (126.32bp,25.367bp);
+  \draw (75.816bp,16.053bp) node {1};
+  % Edge: 1 -> 2
+  \draw [->] (179.72bp,36.636bp) .. controls (197.51bp,37.873bp) and (221.16bp,38.08bp)  .. (252.32bp,36.633bp);
+  \draw (201.82bp,45.947bp) node {0};
+  % Edge: 1 -> 2
+  \draw [->] (179.72bp,25.364bp) .. controls (197.51bp,24.127bp) and (221.16bp,23.92bp)  .. (252.32bp,25.367bp);
+  \draw (201.82bp,16.053bp) node {1};
+  % Edge: 2 -> 3
+  \draw [->] (305.72bp,36.636bp) .. controls (323.51bp,37.873bp) and (347.16bp,38.08bp)  .. (378.32bp,36.633bp);
+  \draw (327.82bp,45.947bp) node {0};
+  % Edge: 2 -> 3
+  \draw [->] (305.72bp,25.364bp) .. controls (323.51bp,24.127bp) and (347.16bp,23.92bp)  .. (378.32bp,25.367bp);
+  \draw (327.82bp,16.053bp) node {1};
+  % Edge: 3 -> 4
+  \draw [->] (431.62bp,36.571bp) .. controls (449.26bp,37.807bp) and (472.76bp,38.071bp)  .. (504.31bp,36.833bp);
+  \draw (453.76bp,45.967bp) node {0};
+  % Edge: 3 -> 4
+  \draw [->] (431.62bp,25.429bp) .. controls (449.26bp,24.193bp) and (472.76bp,23.929bp)  .. (504.31bp,25.167bp);
+  \draw (453.76bp,16.033bp) node {1};
+  % Edge: 4 -> 4
+  \draw [->] (566.1bp,34.374bp) .. controls (576.09bp,34.34bp) and (584.0bp,33.215bp)  .. (584.0bp,31.0bp) .. controls (584.0bp,29.754bp) and (581.5bp,28.853bp)  .. (566.1bp,27.626bp);
+  \draw (592.5bp,31.0bp) node {0};
+  % Edge: 4 -> 4
+  \draw [->] (565.67bp,37.301bp) .. controls (584.33bp,38.761bp) and (602.0bp,36.66bp)  .. (602.0bp,31.0bp) .. controls (602.0bp,26.49bp) and (590.78bp,24.24bp)  .. (565.67bp,24.699bp);
+  \draw (610.5bp,31.0bp) node {1};
+  % Edge: 5 -> 4
+  \draw [->] (638.38bp,25.429bp) .. controls (620.74bp,24.193bp) and (597.24bp,23.929bp)  .. (565.69bp,25.167bp);
+  \draw (616.24bp,16.033bp) node {0};
+  % Edge: 5 -> 4
+  \draw [->] (638.38bp,36.571bp) .. controls (620.74bp,37.807bp) and (597.24bp,38.071bp)  .. (565.69bp,36.833bp);
+  \draw (616.24bp,45.967bp) node {1};
+  % Node: 0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (27.0bp,31.0bp) node {0};
+\end{scope}
+  % Node: 1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (153.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (153.0bp,31.0bp) node {1};
+\end{scope}
+  % Node: 2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (279.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (279.0bp,31.0bp) node {2};
+\end{scope}
+  % Node: 3
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (405.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (405.0bp,31.0bp) node {3};
+\end{scope}
+  % Node: 4
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (535.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (535.0bp,31.0bp) ellipse (31.0bp and 31.0bp);
+  \draw (535.0bp,31.0bp) node {4};
+\end{scope}
+  % Node: 5
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (665.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (665.0bp,31.0bp) node {5};
+\end{scope}
+%
+\end{tikzpicture}
+% End of code
+
+%
+\end{document}
+%
+
+
+
+2024-10-14 17:40:22,990 dot2tex INFO ------- End of run -------
+2024-10-14 17:43:22,957 dot2tex INFO ------- Start of run -------
+2024-10-14 17:43:22,960 dot2tex INFO Dot2tex version 2.11.3
+2024-10-14 17:43:23,013 dot2tex INFO System information:
+  Python: sys.version_info(major=3, minor=10, micro=7, releaselevel='final', serial=0) 
+  Platform: macOS-15.1-arm64-arm-64bit
+  Pyparsing: 3.1.4
+2024-10-14 17:43:23,014 dot2tex INFO dot2tex called with: ['/Users/Adam/Library/Python/3.10/bin/dot2tex', '--debug', '--autosize', 'temp.dot']
+2024-10-14 17:43:23,014 dot2tex INFO Program started in /Volumes/AVO SSD/mvo-website-main
+2024-10-14 17:43:23,015 dot2tex DEBUG Attempting to read data from temp.dot
+2024-10-14 17:43:23,016 dot2tex INFO Data read from temp.dot
+2024-10-14 17:43:23,016 dot2tex DEBUG Input data:
+
+digraph DFA {
+    rankdir=LR;
+    node [shape = circle]; 
+    layout=circo;
+
+    0 [label="0"];
+    1 [label="1"];
+    2 [label="2"];
+    3 [label="3"];
+    4 [label="4", shape=doublecircle];
+    5 [label="5"];
+    0 -> 1 [label="0"];
+    0 -> 1 [label="1"];
+    1 -> 2 [label="0"];
+    1 -> 2 [label="1"];
+    2 -> 3 [label="0"];
+    2 -> 3 [label="1"];
+    3 -> 4 [label="0"];
+    3 -> 4 [label="1"];
+    4 -> 4 [label="0"];
+    4 -> 4 [label="1"];
+    5 -> 4 [label="0"];
+    5 -> 4 [label="1"];
+}
+
+2024-10-14 17:43:23,017 dot2tex DEBUG Start conversion
+2024-10-14 17:43:23,179 dot2tex DEBUG Parsed graph:
+digraph DFA{
+    node[shape=circle];
+    0[label=0,shape=circle];
+    1[label=1,shape=circle];
+    2[label=2,shape=circle];
+    3[label=3,shape=circle];
+    4[label=4,shape=doublecircle];
+    5[label=5,shape=circle];
+    0 -> 1 [label=0];
+    0 -> 1 [label=1];
+    1 -> 2 [label=0];
+    1 -> 2 [label=1];
+    2 -> 3 [label=0];
+    2 -> 3 [label=1];
+    3 -> 4 [label=0];
+    3 -> 4 [label=1];
+    4 -> 4 [label=0];
+    4 -> 4 [label=1];
+    5 -> 4 [label=0];
+    5 -> 4 [label=1];
+
+    graph [rankdir=LR,layout=circo];
+}
+2024-10-14 17:43:23,185 dot2tex DEBUG Creating temporary directroy /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2tex3vpvg3fi
+2024-10-14 17:43:23,185 dot2tex DEBUG Creating temporary file /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2tex3vpvg3fi/dot2tex.tex
+2024-10-14 17:43:23,186 dot2tex DEBUG Code written to /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2tex3vpvg3fi/dot2tex.tex
+\documentclass{article}
+\usepackage[x11names, svgnames, rgb]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+\usepackage{amsmath}
+%
+\usepackage[active,auctex]{preview}
+%
+%
+
+%
+
+\begin{document}
+\pagestyle{empty}
+%
+%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {2};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {3};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {4};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {5};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {0};%
+\end{preview}%
+\begin{preview}%
+\tikz \node {1};%
+\end{preview}%
+
+%
+%
+
+%
+\end{document}
+%
+
+
+
+2024-10-14 17:43:23,186 dot2tex DEBUG Running command: latex -interaction=nonstopmode /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2tex3vpvg3fi/dot2tex.tex
+2024-10-14 17:43:24,409 dot2tex DEBUG stdout from latex
+ b"This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=latex)\n restricted \\write18 enabled.\nentering extended mode\n(/var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2tex3vpvg3fi/dot2tex.tex\nLaTeX2e <2023-11-01> patch level 1\nL3 programming layer <2024-02-20>\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/article.cls\nDocument Class: article 2023/05/17 v1.4n Standard LaTeX document class\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/size10.clo))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/xcolor.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/color.cfg)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-def/dvips.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/mathcolor.ltx))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/x11nam.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/svgnam.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/inputenc.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-comm\non.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-late\nx.def)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.\ntex (/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/pgf.revision.tex))\n) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty\n (/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphicx.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/keyval.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphics.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/trig.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/graphics.cfg)))\n (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.cod\ne.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code\n.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibra\nryfiltered.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-dvi\nps.def\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-com\nmon-postscript.def)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoft\npath.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprot\nocol.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.cod\ne.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.\ntex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathparser.cod\ne.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\ncode.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nbasic.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\ntrigonometric.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nrandom.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\ncomparison.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nbase.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nround.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nmisc.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.\nintegerarithmetics.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.\ntex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code\n.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoin\nts.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath\nconstruct.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath\nusage.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescop\nes.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregrap\nhicstate.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran\nsformations.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequic\nk.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobje\ncts.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath\nprocessing.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearro\nws.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshad\ne.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimag\ne.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexte\nrnal.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelaye\nrs.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran\nsparency.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatt\nerns.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.\ncode.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleshape\ns.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.\ncode.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve\nrsion-0-65.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve\nrsion-1-18.sty))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgffor.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code\n.tex)) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/math/pgfmath.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)\n)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgffor.code.\ntex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tik\nz.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibrarypl\nothandlers.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmodulematri\nx.code.tex)\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarytopaths.code.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarysnakes.code.tex\n\nPackage pgf Warning: Snakes have been superseded by decorations. Please use the\n decoration libraries instead of the snakes library on input line 14.\n\n\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.pathmorphing.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduledecor\nations.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/\npgflibrarydecorations.pathmorphing.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.pathreplacing.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/\npgflibrarydecorations.pathreplacing.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibrarydecorations.shapes.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/\npgflibrarydecorations.shapes.code.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryarrows.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibraryar\nrows.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.geometric.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.geometric.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.misc.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.misc.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.symbols.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.symbols.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.arrows.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.arrows.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.callouts.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.callouts.code.tex))\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib\nraries/tikzlibraryshapes.multipart.code.tex\n(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli\nbraryshapes.multipart.code.tex)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsmath.sty\nFor additional information on amsmath, use the `?' option.\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amstext.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsgen.sty))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsbsy.sty)\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsopn.sty))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/preview.sty\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.def\nNo auxiliary output files.\n\n\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.cfg)))\n(/usr/local/texlive/2024basic/texmf-dist/tex/latex/l3backend/l3backend-dvips.de\nf)\nNo file dot2tex.aux.\nPreview: Fontsize 10pt\n! Preview: Snippet 1 started.\n<-><->\n      \nl.18 \\begin{preview}\n                    %\n! Preview: Snippet 1 ended.(859202+0x764540).\n<-><->\n      \nl.20 \\end{preview}\n                  %\n[1]\n! Preview: Snippet 2 started.\n<-><->\n      \nl.21 \\begin{preview}\n                    %\n! Preview: Snippet 2 ended.(859202+0x764540).\n<-><->\n      \nl.23 \\end{preview}\n                  %\n[2]\n! Preview: Snippet 3 started.\n<-><->\n      \nl.24 \\begin{preview}\n                    %\n! Preview: Snippet 3 ended.(859202+0x764540).\n<-><->\n      \nl.26 \\end{preview}\n                  %\n[3]\n! Preview: Snippet 4 started.\n<-><->\n      \nl.27 \\begin{preview}\n                    %\n! Preview: Snippet 4 ended.(859202+0x764540).\n<-><->\n      \nl.29 \\end{preview}\n                  %\n[4]\n! Preview: Snippet 5 started.\n<-><->\n      \nl.30 \\begin{preview}\n                    %\n! Preview: Snippet 5 ended.(859202+0x764540).\n<-><->\n      \nl.32 \\end{preview}\n                  %\n[5]\n! Preview: Snippet 6 started.\n<-><->\n      \nl.33 \\begin{preview}\n                    %\n! Preview: Snippet 6 ended.(859202+0x764540).\n<-><->\n      \nl.35 \\end{preview}\n                  %\n[6]\n! Preview: Snippet 7 started.\n<-><->\n      \nl.36 \\begin{preview}\n                    %\n! Preview: Snippet 7 ended.(859202+0x764540).\n<-><->\n      \nl.38 \\end{preview}\n                  %\n[7]\n! Preview: Snippet 8 started.\n<-><->\n      \nl.39 \\begin{preview}\n                    %\n! Preview: Snippet 8 ended.(859202+0x764540).\n<-><->\n      \nl.41 \\end{preview}\n                  %\n[8]\n! Preview: Snippet 9 started.\n<-><->\n      \nl.42 \\begin{preview}\n                    %\n! Preview: Snippet 9 ended.(859202+0x764540).\n<-><->\n      \nl.44 \\end{preview}\n                  %\n[9]\n! Preview: Snippet 10 started.\n<-><->\n      \nl.45 \\begin{preview}\n                    %\n! Preview: Snippet 10 ended.(859202+0x764540).\n<-><->\n      \nl.47 \\end{preview}\n                  %\n[10]\n! Preview: Snippet 11 started.\n<-><->\n      \nl.48 \\begin{preview}\n                    %\n! Preview: Snippet 11 ended.(859202+0x764540).\n<-><->\n      \nl.50 \\end{preview}\n                  %\n[11]\n! Preview: Snippet 12 started.\n<-><->\n      \nl.51 \\begin{preview}\n                    %\n! Preview: Snippet 12 ended.(859202+0x764540).\n<-><->\n      \nl.53 \\end{preview}\n                  %\n[12]\n! Preview: Snippet 13 started.\n<-><->\n      \nl.54 \\begin{preview}\n                    %\n! Preview: Snippet 13 ended.(859202+0x764540).\n<-><->\n      \nl.56 \\end{preview}\n                  %\n[13]\n! Preview: Snippet 14 started.\n<-><->\n      \nl.57 \\begin{preview}\n                    %\n! Preview: Snippet 14 ended.(859202+0x764540).\n<-><->\n      \nl.59 \\end{preview}\n                  %\n[14]\n! Preview: Snippet 15 started.\n<-><->\n      \nl.60 \\begin{preview}\n                    %\n! Preview: Snippet 15 ended.(859202+0x764540).\n<-><->\n      \nl.62 \\end{preview}\n                  %\n[15]\n! Preview: Snippet 16 started.\n<-><->\n      \nl.63 \\begin{preview}\n                    %\n! Preview: Snippet 16 ended.(859202+0x764540).\n<-><->\n      \nl.65 \\end{preview}\n                  %\n[16]\n! Preview: Snippet 17 started.\n<-><->\n      \nl.66 \\begin{preview}\n                    %\n! Preview: Snippet 17 ended.(859202+0x764540).\n<-><->\n      \nl.68 \\end{preview}\n                  %\n[17]\n! Preview: Snippet 18 started.\n<-><->\n      \nl.69 \\begin{preview}\n                    %\n! Preview: Snippet 18 ended.(859202+0x764540).\n<-><->\n      \nl.71 \\end{preview}\n                  %\n[18] )\n(see the transcript file for additional information)\nOutput written on dot2tex.dvi (18 pages, 16644 bytes).\nTranscript written on dot2tex.log.\n"
+2024-10-14 17:43:24,411 dot2tex DEBUG Logfile from LaTeX run: 
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=latex 2024.10.12)  14 OCT 2024 17:43
+entering extended mode
+ restricted \write18 enabled.
+ %&-line parsing enabled.
+**/var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2tex3vpvg3fi/dot2tex.tex
+(/var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/dot2tex3vpvg3fi/dot2tex.tex
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2023/05/17 v1.4n Standard LaTeX document class
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/size10.clo
+File: size10.clo 2023/05/17 v1.4n Standard LaTeX file (size option)
+)
+\c@part=\count188
+\c@section=\count189
+\c@subsection=\count190
+\c@subsubsection=\count191
+\c@paragraph=\count192
+\c@subparagraph=\count193
+\c@figure=\count194
+\c@table=\count195
+\abovecaptionskip=\skip48
+\belowcaptionskip=\skip49
+\bibindent=\dimen140
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/xcolor.sty
+Package: xcolor 2023/11/15 v3.01 LaTeX color extensions (UK)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/color.cfg
+File: color.cfg 2016/01/02 v1.6 sample color configuration
+)
+Package xcolor Info: Driver file: dvips.def on input line 274.
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-def/dvips.def
+File: dvips.def 2022/09/22 v3.1e Graphics/color driver for dvips
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/mathcolor.ltx)
+Package xcolor Info: Model `cmy' substituted by `cmy0' on input line 1350.
+Package xcolor Info: Model `RGB' extended on input line 1366.
+Package xcolor Info: Model `HTML' substituted by `rgb' on input line 1368.
+Package xcolor Info: Model `Hsb' substituted by `hsb' on input line 1369.
+Package xcolor Info: Model `tHsb' substituted by `hsb' on input line 1370.
+Package xcolor Info: Model `HSB' substituted by `hsb' on input line 1371.
+Package xcolor Info: Model `Gray' substituted by `gray' on input line 1372.
+Package xcolor Info: Model `wave' substituted by `hsb' on input line 1373.
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/x11nam.def
+File: x11nam.def 2023/11/15 v3.01 Predefined colors according to Unix/X11 (UK)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/xcolor/svgnam.def
+File: svgnam.def 2023/11/15 v3.01 Predefined colors according to SVG 1.1 (UK)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2021/02/14 v1.3d Input encoding file
+\inpenc@prehook=\toks17
+\inpenc@posthook=\toks18
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-comm
+on.tex
+\pgfutil@everybye=\toks19
+\pgfutil@tempdima=\dimen141
+\pgfutil@tempdimb=\dimen142
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfutil-late
+x.def
+\pgfutil@abb=\box51
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfrcs.code.
+tex (/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/pgf.revision.tex)
+Package: pgfrcs 2023-01-15 v3.1.10 (3.1.10)
+))
+Package: pgf 2023-01-15 v3.1.10 (3.1.10)
+ (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty 
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2021/09/16 v1.2d Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2022/05/29 v1.15 key=value parser (DPC)
+\KV@toks@=\toks20
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2022/03/10 v1.4e Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 2021/08/11 v1.11 sin cos tan (DPC)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/graphics-cfg/graphics.cfg
+File: graphics.cfg 2016/06/04 v1.11 sample graphics configuration
+)
+Package graphics Info: Driver file: dvips.def on input line 107.
+)
+\Gin@req@height=\dimen143
+\Gin@req@width=\dimen144
+) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.cod
+e.tex
+Package: pgfsys 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex
+\pgfkeys@pathtoks=\toks21
+\pgfkeys@temptoks=\toks22
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeyslibra
+ryfiltered.code.tex
+\pgfkeys@tmptoks=\toks23
+))
+\pgf@x=\dimen145
+\pgf@y=\dimen146
+\pgf@xa=\dimen147
+\pgf@ya=\dimen148
+\pgf@xb=\dimen149
+\pgf@yb=\dimen150
+\pgf@xc=\dimen151
+\pgf@yc=\dimen152
+\pgf@xd=\dimen153
+\pgf@yd=\dimen154
+\w@pgf@writea=\write3
+\r@pgf@reada=\read2
+\c@pgf@counta=\count196
+\c@pgf@countb=\count197
+\c@pgf@countc=\count198
+\c@pgf@countd=\count199
+\t@pgf@toka=\toks24
+\t@pgf@tokb=\toks25
+\t@pgf@tokc=\toks26
+\pgf@sys@id@count=\count266
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
+File: pgf.cfg 2023-01-15 v3.1.10 (3.1.10)
+)
+Driver file for pgf: pgfsys-dvips.def
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-dvi
+ps.def
+File: pgfsys-dvips.def 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsys-com
+mon-postscript.def
+File: pgfsys-common-postscript.def 2023-01-15 v3.1.10 (3.1.10)
+\pgf@objectcount=\count267
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsyssoft
+path.code.tex
+File: pgfsyssoftpath.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfsyssoftpath@smallbuffer@items=\count268
+\pgfsyssoftpath@bigbuffer@items=\count269
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/systemlayer/pgfsysprot
+ocol.code.tex
+File: pgfsysprotocol.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcore.cod
+e.tex
+Package: pgfcore 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathutil.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathparser.cod
+e.tex
+\pgfmath@dimen=\dimen155
+\pgfmath@count=\count270
+\pgfmath@box=\box52
+\pgfmath@toks=\toks27
+\pgfmath@stack@operand=\toks28
+\pgfmath@stack@operation=\toks29
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+basic.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+trigonometric.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+random.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+comparison.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+base.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+round.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+misc.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.
+integerarithmetics.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathcalc.code.
+tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code
+.tex
+\c@pgfmathroundto@lastzeros=\count271
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfint.code.tex)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoin
+ts.code.tex
+File: pgfcorepoints.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@picminx=\dimen156
+\pgf@picmaxx=\dimen157
+\pgf@picminy=\dimen158
+\pgf@picmaxy=\dimen159
+\pgf@pathminx=\dimen160
+\pgf@pathmaxx=\dimen161
+\pgf@pathminy=\dimen162
+\pgf@pathmaxy=\dimen163
+\pgf@xx=\dimen164
+\pgf@xy=\dimen165
+\pgf@yx=\dimen166
+\pgf@yy=\dimen167
+\pgf@zx=\dimen168
+\pgf@zy=\dimen169
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+construct.code.tex
+File: pgfcorepathconstruct.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@path@lastx=\dimen170
+\pgf@path@lasty=\dimen171
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+usage.code.tex
+File: pgfcorepathusage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@shorten@end@additional=\dimen172
+\pgf@shorten@start@additional=\dimen173
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorescop
+es.code.tex
+File: pgfcorescopes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfpic=\box53
+\pgf@hbox=\box54
+\pgf@layerbox@main=\box55
+\pgf@picture@serial@count=\count272
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoregrap
+hicstate.code.tex
+File: pgfcoregraphicstate.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgflinewidth=\dimen174
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sformations.code.tex
+File: pgfcoretransformations.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@pt@x=\dimen175
+\pgf@pt@y=\dimen176
+\pgf@pt@temp=\dimen177
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorequic
+k.code.tex
+File: pgfcorequick.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreobje
+cts.code.tex
+File: pgfcoreobjects.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepath
+processing.code.tex
+File: pgfcorepathprocessing.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorearro
+ws.code.tex
+File: pgfcorearrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfarrowsep=\dimen178
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreshad
+e.code.tex
+File: pgfcoreshade.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@max=\dimen179
+\pgf@sys@shading@range@num=\count273
+\pgf@shadingcount=\count274
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreimag
+e.code.tex
+File: pgfcoreimage.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoreexte
+rnal.code.tex
+File: pgfcoreexternal.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfexternal@startupbox=\box56
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorelaye
+rs.code.tex
+File: pgfcorelayers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcoretran
+sparency.code.tex
+File: pgfcoretransparency.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepatt
+erns.code.tex
+File: pgfcorepatterns.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/basiclayer/pgfcorerdf.
+code.tex
+File: pgfcorerdf.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleshape
+s.code.tex
+File: pgfmoduleshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodeparttextbox=\box57
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduleplot.
+code.tex
+File: pgfmoduleplot.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-0-65.sty
+Package: pgfcomp-version-0-65 2023-01-15 v3.1.10 (3.1.10)
+\pgf@nodesepstart=\dimen180
+\pgf@nodesepend=\dimen181
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/compatibility/pgfcomp-ve
+rsion-1-18.sty
+Package: pgfcomp-version-1-18 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgffor.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/utilities/pgfkeys.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code
+.tex)) (/usr/local/texlive/2024basic/texmf-dist/tex/latex/pgf/math/pgfmath.sty
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/utilities/pgffor.code.
+tex
+Package: pgffor 2023-01-15 v3.1.10 (3.1.10)
+\pgffor@iter=\dimen182
+\pgffor@skip=\dimen183
+\pgffor@stack=\toks30
+\pgffor@toks=\toks31
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tik
+z.code.tex
+Package: tikz 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibrarypl
+othandlers.code.tex
+File: pgflibraryplothandlers.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgf@plot@mark@count=\count275
+\pgfplotmarksize=\dimen184
+)
+\tikz@lastx=\dimen185
+\tikz@lasty=\dimen186
+\tikz@lastxsaved=\dimen187
+\tikz@lastysaved=\dimen188
+\tikz@lastmovetox=\dimen189
+\tikz@lastmovetoy=\dimen190
+\tikzleveldistance=\dimen191
+\tikzsiblingdistance=\dimen192
+\tikz@figbox=\box58
+\tikz@figbox@bg=\box59
+\tikz@tempbox=\box60
+\tikz@tempbox@bg=\box61
+\tikztreelevel=\count276
+\tikznumberofchildren=\count277
+\tikznumberofcurrentchild=\count278
+\tikz@fig@count=\count279
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmodulematri
+x.code.tex
+File: pgfmodulematrix.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfmatrixcurrentrow=\count280
+\pgfmatrixcurrentcolumn=\count281
+\pgf@matrix@numberofcolumns=\count282
+)
+\tikz@expandcount=\count283
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarytopaths.code.tex
+File: tikzlibrarytopaths.code.tex 2023-01-15 v3.1.10 (3.1.10)
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarysnakes.code.tex
+File: tikzlibrarysnakes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+
+Package pgf Warning: Snakes have been superseded by decorations. Please use the
+ decoration libraries instead of the snakes library on input line 14.
+
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.pathmorphing.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/modules/pgfmoduledecor
+ations.code.tex
+\pgfdecoratedcompleteddistance=\dimen193
+\pgfdecoratedremainingdistance=\dimen194
+\pgfdecoratedinputsegmentcompleteddistance=\dimen195
+\pgfdecoratedinputsegmentremainingdistance=\dimen196
+\pgf@decorate@distancetomove=\dimen197
+\pgf@decorate@repeatstate=\count284
+\pgfdecorationsegmentamplitude=\dimen198
+\pgfdecorationsegmentlength=\dimen199
+)
+\tikz@lib@dec@box=\box62
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/
+pgflibrarydecorations.pathmorphing.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.pathreplacing.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/
+pgflibrarydecorations.pathreplacing.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibrarydecorations.shapes.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/decorations/
+pgflibrarydecorations.shapes.code.tex)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryarrows.code.tex
+File: tikzlibraryarrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/pgflibraryar
+rows.code.tex
+File: pgflibraryarrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\arrowsize=\dimen256
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.code.tex
+File: tikzlibraryshapes.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.geometric.code.tex
+File: tikzlibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.geometric.code.tex
+File: pgflibraryshapes.geometric.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.misc.code.tex
+File: tikzlibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.misc.code.tex
+File: pgflibraryshapes.misc.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.symbols.code.tex
+File: tikzlibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.symbols.code.tex
+File: pgflibraryshapes.symbols.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.arrows.code.tex
+File: tikzlibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.arrows.code.tex
+File: pgflibraryshapes.arrows.code.tex 2023-01-15 v3.1.10 (3.1.10)
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.callouts.code.tex
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.callouts.code.tex))
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/frontendlayer/tikz/lib
+raries/tikzlibraryshapes.multipart.code.tex
+File: tikzlibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/generic/pgf/libraries/shapes/pgfli
+braryshapes.multipart.code.tex
+File: pgflibraryshapes.multipart.code.tex 2023-01-15 v3.1.10 (3.1.10)
+\pgfnodepartlowerbox=\box63
+\pgfnodeparttwobox=\box64
+\pgfnodepartthreebox=\box65
+\pgfnodepartfourbox=\box66
+\pgfnodeparttwentybox=\box67
+\pgfnodepartnineteenbox=\box68
+\pgfnodeparteighteenbox=\box69
+\pgfnodepartseventeenbox=\box70
+\pgfnodepartsixteenbox=\box71
+\pgfnodepartfifteenbox=\box72
+\pgfnodepartfourteenbox=\box73
+\pgfnodepartthirteenbox=\box74
+\pgfnodeparttwelvebox=\box75
+\pgfnodepartelevenbox=\box76
+\pgfnodeparttenbox=\box77
+\pgfnodepartninebox=\box78
+\pgfnodeparteightbox=\box79
+\pgfnodepartsevenbox=\box80
+\pgfnodepartsixbox=\box81
+\pgfnodepartfivebox=\box82
+)))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2023/05/13 v2.17o AMS math features
+\@mathmargin=\skip50
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2021/08/26 v2.01 AMS text
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0 generic functions
+\@emptytoks=\toks32
+\ex@=\dimen257
+))
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d Bold Symbols
+\pmbraise@=\dimen258
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 2022/04/08 v2.04 operator names
+)
+\inf@bad=\count285
+LaTeX Info: Redefining \frac on input line 234.
+\uproot@=\count286
+\leftroot@=\count287
+LaTeX Info: Redefining \overline on input line 399.
+LaTeX Info: Redefining \colon on input line 410.
+\classnum@=\count288
+\DOTSCASE@=\count289
+LaTeX Info: Redefining \ldots on input line 496.
+LaTeX Info: Redefining \dots on input line 499.
+LaTeX Info: Redefining \cdots on input line 620.
+\Mathstrutbox@=\box83
+\strutbox@=\box84
+LaTeX Info: Redefining \big on input line 722.
+LaTeX Info: Redefining \Big on input line 723.
+LaTeX Info: Redefining \bigg on input line 724.
+LaTeX Info: Redefining \Bigg on input line 725.
+\big@size=\dimen259
+LaTeX Font Info:    Redeclaring font encoding OML on input line 743.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 744.
+\macc@depth=\count290
+LaTeX Info: Redefining \bmod on input line 905.
+LaTeX Info: Redefining \pmod on input line 910.
+LaTeX Info: Redefining \smash on input line 940.
+LaTeX Info: Redefining \relbar on input line 970.
+LaTeX Info: Redefining \Relbar on input line 971.
+\c@MaxMatrixCols=\count291
+\dotsspace@=\muskip16
+\c@parentequation=\count292
+\dspbrk@lvl=\count293
+\tag@help=\toks33
+\row@=\count294
+\column@=\count295
+\maxfields@=\count296
+\andhelp@=\toks34
+\eqnshift@=\dimen260
+\alignsep@=\dimen261
+\tagshift@=\dimen262
+\tagwidth@=\dimen263
+\totwidth@=\dimen264
+\lineht@=\dimen265
+\@envbody=\toks35
+\multlinegap=\skip51
+\multlinetaggap=\skip52
+\mathdisplay@stack=\toks36
+LaTeX Info: Redefining \[ on input line 2953.
+LaTeX Info: Redefining \] on input line 2954.
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/preview.sty
+Package: preview 2024/06/30 14.0.6 (AUCTeX/preview-latex)
+
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.def
+No auxiliary output files.
+
+
+\hbadness=\count297
+\hfuzz=\dimen266
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/preview/prauctex.cfg))
+\pr@snippet=\count298
+\pr@box=\box85
+\pr@output=\toks37
+)
+(/usr/local/texlive/2024basic/texmf-dist/tex/latex/l3backend/l3backend-dvips.de
+f
+File: l3backend-dvips.def 2024-02-20 L3 backend support: dvips
+\l__pdf_internal_box=\box86
+\g__pdf_backend_object_int=\count299
+\l__pdf_backend_content_box=\box87
+\l__pdf_backend_model_box=\box88
+\g__pdf_backend_annotation_int=\count300
+\g__pdf_backend_link_int=\count301
+\g__pdf_backend_link_sf_int=\count302
+)
+No file dot2tex.aux.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+Preview: Fontsize 10pt
+! Preview: Snippet 1 started.
+<-><->
+      
+l.18 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 1 ended.(859202+0x764540).
+<-><->
+      
+l.20 \end{preview}
+                  %
+Not a real error.
+
+[1]
+! Preview: Snippet 2 started.
+<-><->
+      
+l.21 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 2 ended.(859202+0x764540).
+<-><->
+      
+l.23 \end{preview}
+                  %
+Not a real error.
+
+[2]
+! Preview: Snippet 3 started.
+<-><->
+      
+l.24 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 3 ended.(859202+0x764540).
+<-><->
+      
+l.26 \end{preview}
+                  %
+Not a real error.
+
+[3]
+! Preview: Snippet 4 started.
+<-><->
+      
+l.27 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 4 ended.(859202+0x764540).
+<-><->
+      
+l.29 \end{preview}
+                  %
+Not a real error.
+
+[4]
+! Preview: Snippet 5 started.
+<-><->
+      
+l.30 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 5 ended.(859202+0x764540).
+<-><->
+      
+l.32 \end{preview}
+                  %
+Not a real error.
+
+[5]
+! Preview: Snippet 6 started.
+<-><->
+      
+l.33 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 6 ended.(859202+0x764540).
+<-><->
+      
+l.35 \end{preview}
+                  %
+Not a real error.
+
+[6]
+! Preview: Snippet 7 started.
+<-><->
+      
+l.36 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 7 ended.(859202+0x764540).
+<-><->
+      
+l.38 \end{preview}
+                  %
+Not a real error.
+
+[7]
+! Preview: Snippet 8 started.
+<-><->
+      
+l.39 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 8 ended.(859202+0x764540).
+<-><->
+      
+l.41 \end{preview}
+                  %
+Not a real error.
+
+[8]
+! Preview: Snippet 9 started.
+<-><->
+      
+l.42 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 9 ended.(859202+0x764540).
+<-><->
+      
+l.44 \end{preview}
+                  %
+Not a real error.
+
+[9]
+! Preview: Snippet 10 started.
+<-><->
+      
+l.45 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 10 ended.(859202+0x764540).
+<-><->
+      
+l.47 \end{preview}
+                  %
+Not a real error.
+
+[10]
+! Preview: Snippet 11 started.
+<-><->
+      
+l.48 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 11 ended.(859202+0x764540).
+<-><->
+      
+l.50 \end{preview}
+                  %
+Not a real error.
+
+[11]
+! Preview: Snippet 12 started.
+<-><->
+      
+l.51 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 12 ended.(859202+0x764540).
+<-><->
+      
+l.53 \end{preview}
+                  %
+Not a real error.
+
+[12]
+! Preview: Snippet 13 started.
+<-><->
+      
+l.54 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 13 ended.(859202+0x764540).
+<-><->
+      
+l.56 \end{preview}
+                  %
+Not a real error.
+
+[13]
+! Preview: Snippet 14 started.
+<-><->
+      
+l.57 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 14 ended.(859202+0x764540).
+<-><->
+      
+l.59 \end{preview}
+                  %
+Not a real error.
+
+[14]
+! Preview: Snippet 15 started.
+<-><->
+      
+l.60 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 15 ended.(859202+0x764540).
+<-><->
+      
+l.62 \end{preview}
+                  %
+Not a real error.
+
+[15]
+! Preview: Snippet 16 started.
+<-><->
+      
+l.63 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 16 ended.(859202+0x764540).
+<-><->
+      
+l.65 \end{preview}
+                  %
+Not a real error.
+
+[16]
+! Preview: Snippet 17 started.
+<-><->
+      
+l.66 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 17 ended.(859202+0x764540).
+<-><->
+      
+l.68 \end{preview}
+                  %
+Not a real error.
+
+[17]
+! Preview: Snippet 18 started.
+<-><->
+      
+l.69 \begin{preview}
+                    %
+Not a real error.
+
+! Preview: Snippet 18 ended.(859202+0x764540).
+<-><->
+      
+l.71 \end{preview}
+                  %
+Not a real error.
+
+[18]
+ ***********
+LaTeX2e <2023-11-01> patch level 1
+L3 programming layer <2024-02-20>
+ ***********
+ ) 
+Here is how much of TeX's memory you used:
+ 15740 strings out of 475568
+ 356087 string characters out of 5777914
+ 1926184 words of memory out of 5000000
+ 37634 multiletter control sequences out of 15000+600000
+ 558069 words of font info for 36 fonts, out of 8000000 for 9000
+ 319 hyphenation exceptions out of 8191
+ 102i,5n,107p,490b,547s stack positions out of 10000i,1000n,20000p,200000b,200000s
+
+Output written on dot2tex.dvi (18 pages, 16644 bytes).
+
+2024-10-14 17:43:24,411 dot2tex DEBUG Texdimdata: [('1', '859202', '0', '764540'), ('2', '859202', '0', '764540'), ('3', '859202', '0', '764540'), ('4', '859202', '0', '764540'), ('5', '859202', '0', '764540'), ('6', '859202', '0', '764540'), ('7', '859202', '0', '764540'), ('8', '859202', '0', '764540'), ('9', '859202', '0', '764540'), ('10', '859202', '0', '764540'), ('11', '859202', '0', '764540'), ('12', '859202', '0', '764540'), ('13', '859202', '0', '764540'), ('14', '859202', '0', '764540'), ('15', '859202', '0', '764540'), ('16', '859202', '0', '764540'), ('17', '859202', '0', '764540'), ('18', '859202', '0', '764540')]
+2024-10-14 17:43:24,412 dot2tex DEBUG Temporary directory and files deleted
+2024-10-14 17:43:24,413 dot2tex DEBUG Output:
+digraph DFA{
+    node[shape=circle];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+
+    graph [rankdir=LR,layout=circo,d2toutputformat=pgf];
+}
+2024-10-14 17:43:24,413 dot2tex DEBUG Start conversion
+2024-10-14 17:43:24,689 dot2tex DEBUG Parsed graph:
+digraph DFA{
+    node[shape=circle];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    0 -> 1 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    1 -> 2 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    2 -> 3 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    3 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    4 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=0];
+    5 -> 4 [label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,texlbl=1];
+    0[label=" ",shape=circle,texlbl=0,width=0.75,height=0.75,fixedsize=true];
+    1[label=" ",shape=circle,texlbl=1,width=0.75,height=0.75,fixedsize=true];
+    2[label=" ",shape=circle,texlbl=2,width=0.75,height=0.75,fixedsize=true];
+    3[label=" ",shape=circle,texlbl=3,width=0.75,height=0.75,fixedsize=true];
+    4[label=" ",shape=doublecircle,texlbl=4,width=0.75,height=0.75,fixedsize=true];
+    5[label=" ",shape=circle,texlbl=5,width=0.75,height=0.75,fixedsize=true];
+    graph[rankdir=LR,layout=circo,d2toutputformat=pgf];
+
+    graph [rankdir=LR,layout=circo,d2toutputformat=pgf];
+}
+2024-10-14 17:43:24,690 dot2tex INFO Trying to create xdotdata
+2024-10-14 17:43:24,692 dot2tex DEBUG Creating xdot data with: "/opt/homebrew/bin/dot" -Txdot  /var/folders/gt/sh86vjgj6d16fdrrcz474z5w0000gp/T/tmpyfk0pvz5
+2024-10-14 17:43:25,187 dot2tex DEBUG Graphviz STDERR b'Warning: cell size too small for content\nin label of edge 0 -> 1\nWarning: cell size too small for content\nin label of edge 0 -> 1\nWarning: cell size too small for content\nin label of edge 1 -> 2\nWarning: cell size too small for content\nin label of edge 1 -> 2\nWarning: cell size too small for content\nin label of edge 2 -> 3\nWarning: cell size too small for content\nin label of edge 2 -> 3\nWarning: cell size too small for content\nin label of edge 3 -> 4\nWarning: cell size too small for content\nin label of edge 3 -> 4\nWarning: cell size too small for content\nin label of edge 4 -> 4\nWarning: cell size too small for content\nin label of edge 4 -> 4\nWarning: cell size too small for content\nin label of edge 5 -> 4\nWarning: cell size too small for content\nin label of edge 5 -> 4\n'
+2024-10-14 17:43:25,189 dot2tex DEBUG xdotdata:
+b'digraph DFA {\n\tgraph [_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",\n\t\tbb="0,0,692,62",\n\t\td2toutputformat=pgf,\n\t\tlayout=circo,\n\t\trankdir=LR,\n\t\txdotversion=1.7\n\t];\n\tnode [label="\\N",\n\t\tshape=circle\n\t];\n\t0\t[_draw_="c 7 -#000000 e 27 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 27 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="27,31",\n\t\ttexlbl=0,\n\t\twidth=0.75];\n\t1\t[_draw_="c 7 -#000000 e 153 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 153 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="153,31",\n\t\ttexlbl=1,\n\t\twidth=0.75];\n\t0 -> 1\t[_draw_="c 7 -#000000 B 4 53.72 36.64 71.51 37.87 95.16 38.08 114.91 37.26 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 115.01 40.76 124.81 36.72 114.63 33.77 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 39.65 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="75.816,45.947",\n\t\tpos="e,126.32,36.633 53.721,36.636 71.512,37.873 95.159,38.08 114.91,37.257",\n\t\ttexlbl=0];\n\t0 -> 1\t[_draw_="c 7 -#000000 B 4 53.72 25.36 71.51 24.13 95.16 23.92 114.91 24.74 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 114.63 28.23 124.81 25.28 115.01 21.24 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 9.75 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="75.816,16.053",\n\t\tpos="e,126.32,25.367 53.721,25.364 71.512,24.127 95.159,23.92 114.91,24.743",\n\t\ttexlbl=1];\n\t2\t[_draw_="c 7 -#000000 e 279 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 279 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="279,31",\n\t\ttexlbl=2,\n\t\twidth=0.75];\n\t1 -> 2\t[_draw_="c 7 -#000000 B 4 179.72 36.64 197.51 37.87 221.16 38.08 240.91 37.26 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 241.01 40.76 250.81 36.72 240.63 33.77 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 39.65 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="201.82,45.947",\n\t\tpos="e,252.32,36.633 179.72,36.636 197.51,37.873 221.16,38.08 240.91,37.257",\n\t\ttexlbl=0];\n\t1 -> 2\t[_draw_="c 7 -#000000 B 4 179.72 25.36 197.51 24.13 221.16 23.92 240.91 24.74 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 240.63 28.23 250.81 25.28 241.01 21.24 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 9.75 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="201.82,16.053",\n\t\tpos="e,252.32,25.367 179.72,25.364 197.51,24.127 221.16,23.92 240.91,24.743",\n\t\ttexlbl=1];\n\t3\t[_draw_="c 7 -#000000 e 405 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 405 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="405,31",\n\t\ttexlbl=3,\n\t\twidth=0.75];\n\t2 -> 3\t[_draw_="c 7 -#000000 B 4 305.72 36.64 323.51 37.87 347.16 38.08 366.91 37.26 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 367.01 40.76 376.81 36.72 366.63 33.77 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 39.65 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="327.82,45.947",\n\t\tpos="e,378.32,36.633 305.72,36.636 323.51,37.873 347.16,38.08 366.91,37.257",\n\t\ttexlbl=0];\n\t2 -> 3\t[_draw_="c 7 -#000000 B 4 305.72 25.36 323.51 24.13 347.16 23.92 366.91 24.74 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 366.63 28.23 376.81 25.28 367.01 21.24 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 9.75 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="327.82,16.053",\n\t\tpos="e,378.32,25.367 305.72,25.364 323.51,24.127 347.16,23.92 366.91,24.743",\n\t\ttexlbl=1];\n\t4\t[_draw_="c 7 -#000000 e 535 31 27 27 c 7 -#000000 e 535 31 31 31 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 535 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.86111,\n\t\tlabel=" ",\n\t\tpos="535,31",\n\t\tshape=doublecircle,\n\t\ttexlbl=4,\n\t\twidth=0.86111];\n\t3 -> 4\t[_draw_="c 7 -#000000 B 4 431.62 36.57 449.26 37.81 472.76 38.07 492.91 37.36 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.97 40.86 502.8 36.9 492.64 33.87 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 39.67 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="453.76,45.967",\n\t\tpos="e,504.31,36.833 431.62,36.571 449.26,37.807 472.76,38.071 492.91,37.363",\n\t\ttexlbl=0];\n\t3 -> 4\t[_draw_="c 7 -#000000 B 4 431.62 25.43 449.26 24.19 472.76 23.93 492.91 24.64 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.64 28.13 502.8 25.1 492.97 21.14 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 9.73 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="453.76,16.033",\n\t\tpos="e,504.31,25.167 431.62,25.429 449.26,24.193 472.76,23.929 492.91,24.637",\n\t\ttexlbl=1];\n\t4 -> 4\t[_draw_="c 7 -#000000 B 7 566.1 34.37 576.09 34.34 584 33.21 584 31 584 29.75 581.5 28.85 577.53 28.3 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.8 24.81 567.61 27.71 577.39 31.8 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 589.5 24.7 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="592.5,31",\n\t\tpos="e,566.1,27.626 566.1,34.374 576.09,34.34 584,33.215 584,31 584,29.754 581.5,28.853 577.53,28.297",\n\t\ttexlbl=0];\n\t4 -> 4\t[_draw_="c 7 -#000000 B 7 565.67 37.3 584.33 38.76 602 36.66 602 31 602 26.49 590.78 24.24 576.78 24.25 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 20.74 567.18 24.64 577.31 27.73 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 607.5 24.7 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="610.5,31",\n\t\tpos="e,565.67,24.699 565.67,37.301 584.33,38.761 602,36.66 602,31 602,26.49 590.78,24.24 576.78,24.25",\n\t\ttexlbl=1];\n\t5\t[_draw_="c 7 -#000000 e 665 31 27 27 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 665 25.95 0 3.75 1 -  ",\n\t\tfixedsize=true,\n\t\theight=0.75,\n\t\tlabel=" ",\n\t\tpos="665,31",\n\t\ttexlbl=5,\n\t\twidth=0.75];\n\t5 -> 4\t[_draw_="c 7 -#000000 B 4 638.38 25.43 620.74 24.19 597.24 23.93 577.09 24.64 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 21.14 567.2 25.1 577.36 28.13 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 9.73 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="616.24,16.033",\n\t\tpos="e,565.69,25.167 638.38,25.429 620.74,24.193 597.24,23.929 577.09,24.637",\n\t\ttexlbl=0];\n\t5 -> 4\t[_draw_="c 7 -#000000 B 4 638.38 36.57 620.74 37.81 597.24 38.07 577.09 37.36 ",\n\t\t_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.36 33.87 567.2 36.9 577.03 40.86 ",\n\t\t_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 39.67 -1 6 1 -a ",\n\t\tlabel=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,\n\t\tlp="616.24,45.967",\n\t\tpos="e,565.69,36.833 638.38,36.571 620.74,37.807 597.24,38.071 577.09,37.363",\n\t\ttexlbl=1];\n}\n'
+2024-10-14 17:43:25,531 dot2tex DEBUG Parsed graph:
+digraph DFA{
+    graph[_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+    node[label="\N",shape=circle];
+    0[_draw_="c 7 -#000000 e 27 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 27 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="27,31",texlbl=0,width=0.75,shape=circle];
+    1[_draw_="c 7 -#000000 e 153 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 153 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="153,31",texlbl=1,width=0.75,shape=circle];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 36.64 71.51 37.87 95.16 38.08 114.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 115.01 40.76 124.81 36.72 114.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,45.947",pos="e,126.32,36.633 53.721,36.636 71.512,37.873 95.159,38.08 114.91,37.257",texlbl=0];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 25.36 71.51 24.13 95.16 23.92 114.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 114.63 28.23 124.81 25.28 115.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,16.053",pos="e,126.32,25.367 53.721,25.364 71.512,24.127 95.159,23.92 114.91,24.743",texlbl=1];
+    2[_draw_="c 7 -#000000 e 279 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 279 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="279,31",texlbl=2,width=0.75,shape=circle];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 36.64 197.51 37.87 221.16 38.08 240.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 241.01 40.76 250.81 36.72 240.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,45.947",pos="e,252.32,36.633 179.72,36.636 197.51,37.873 221.16,38.08 240.91,37.257",texlbl=0];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 25.36 197.51 24.13 221.16 23.92 240.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 240.63 28.23 250.81 25.28 241.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,16.053",pos="e,252.32,25.367 179.72,25.364 197.51,24.127 221.16,23.92 240.91,24.743",texlbl=1];
+    3[_draw_="c 7 -#000000 e 405 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 405 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="405,31",texlbl=3,width=0.75,shape=circle];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 36.64 323.51 37.87 347.16 38.08 366.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 367.01 40.76 376.81 36.72 366.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,45.947",pos="e,378.32,36.633 305.72,36.636 323.51,37.873 347.16,38.08 366.91,37.257",texlbl=0];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 25.36 323.51 24.13 347.16 23.92 366.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 366.63 28.23 376.81 25.28 367.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,16.053",pos="e,378.32,25.367 305.72,25.364 323.51,24.127 347.16,23.92 366.91,24.743",texlbl=1];
+    4[_draw_="c 7 -#000000 e 535 31 27 27 c 7 -#000000 e 535 31 31 31 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 535 25.95 0 3.75 1 -  ",fixedsize=true,height=0.86111,label=" ",pos="535,31",shape=doublecircle,texlbl=4,width=0.86111];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 36.57 449.26 37.81 472.76 38.07 492.91 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.97 40.86 502.8 36.9 492.64 33.87 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,45.967",pos="e,504.31,36.833 431.62,36.571 449.26,37.807 472.76,38.071 492.91,37.363",texlbl=0];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 25.43 449.26 24.19 472.76 23.93 492.91 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.64 28.13 502.8 25.1 492.97 21.14 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,16.033",pos="e,504.31,25.167 431.62,25.429 449.26,24.193 472.76,23.929 492.91,24.637",texlbl=1];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 566.1 34.37 576.09 34.34 584 33.21 584 31 584 29.75 581.5 28.85 577.53 28.3 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.8 24.81 567.61 27.71 577.39 31.8 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 589.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="592.5,31",pos="e,566.1,27.626 566.1,34.374 576.09,34.34 584,33.215 584,31 584,29.754 581.5,28.853 577.53,28.297",texlbl=0];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 565.67 37.3 584.33 38.76 602 36.66 602 31 602 26.49 590.78 24.24 576.78 24.25 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 20.74 567.18 24.64 577.31 27.73 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 607.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="610.5,31",pos="e,565.67,24.699 565.67,37.301 584.33,38.761 602,36.66 602,31 602,26.49 590.78,24.24 576.78,24.25",texlbl=1];
+    5[_draw_="c 7 -#000000 e 665 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 665 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="665,31",texlbl=5,width=0.75,shape=circle];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 25.43 620.74 24.19 597.24 23.93 577.09 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 21.14 567.2 25.1 577.36 28.13 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,16.033",pos="e,565.69,25.167 638.38,25.429 620.74,24.193 597.24,23.929 577.09,24.637",texlbl=0];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 36.57 620.74 37.81 597.24 38.07 577.09 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.36 33.87 567.2 36.9 577.03 40.86 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,45.967",pos="e,565.69,36.833 638.38,36.571 620.74,37.807 597.24,38.071 577.09,37.363",texlbl=1];
+
+    graph [_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+}
+2024-10-14 17:43:25,533 dot2tex DEBUG dotparsing graph:
+digraph DFA{
+    graph[_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+    node[label="\N",shape=circle];
+    0[_draw_="c 7 -#000000 e 27 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 27 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="27,31",texlbl=0,width=0.75,shape=circle];
+    1[_draw_="c 7 -#000000 e 153 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 153 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="153,31",texlbl=1,width=0.75,shape=circle];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 36.64 71.51 37.87 95.16 38.08 114.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 115.01 40.76 124.81 36.72 114.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,45.947",pos="e,126.32,36.633 53.721,36.636 71.512,37.873 95.159,38.08 114.91,37.257",texlbl=0];
+    0 -> 1 [_draw_="c 7 -#000000 B 4 53.72 25.36 71.51 24.13 95.16 23.92 114.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 114.63 28.23 124.81 25.28 115.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 72.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="75.816,16.053",pos="e,126.32,25.367 53.721,25.364 71.512,24.127 95.159,23.92 114.91,24.743",texlbl=1];
+    2[_draw_="c 7 -#000000 e 279 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 279 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="279,31",texlbl=2,width=0.75,shape=circle];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 36.64 197.51 37.87 221.16 38.08 240.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 241.01 40.76 250.81 36.72 240.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,45.947",pos="e,252.32,36.633 179.72,36.636 197.51,37.873 221.16,38.08 240.91,37.257",texlbl=0];
+    1 -> 2 [_draw_="c 7 -#000000 B 4 179.72 25.36 197.51 24.13 221.16 23.92 240.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 240.63 28.23 250.81 25.28 241.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 198.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="201.82,16.053",pos="e,252.32,25.367 179.72,25.364 197.51,24.127 221.16,23.92 240.91,24.743",texlbl=1];
+    3[_draw_="c 7 -#000000 e 405 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 405 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="405,31",texlbl=3,width=0.75,shape=circle];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 36.64 323.51 37.87 347.16 38.08 366.91 37.26 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 367.01 40.76 376.81 36.72 366.63 33.77 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 39.65 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,45.947",pos="e,378.32,36.633 305.72,36.636 323.51,37.873 347.16,38.08 366.91,37.257",texlbl=0];
+    2 -> 3 [_draw_="c 7 -#000000 B 4 305.72 25.36 323.51 24.13 347.16 23.92 366.91 24.74 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 366.63 28.23 376.81 25.28 367.01 21.24 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 324.82 9.75 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="327.82,16.053",pos="e,378.32,25.367 305.72,25.364 323.51,24.127 347.16,23.92 366.91,24.743",texlbl=1];
+    4[_draw_="c 7 -#000000 e 535 31 27 27 c 7 -#000000 e 535 31 31 31 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 535 25.95 0 3.75 1 -  ",fixedsize=true,height=0.86111,label=" ",pos="535,31",shape=doublecircle,texlbl=4,width=0.86111];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 36.57 449.26 37.81 472.76 38.07 492.91 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.97 40.86 502.8 36.9 492.64 33.87 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,45.967",pos="e,504.31,36.833 431.62,36.571 449.26,37.807 472.76,38.071 492.91,37.363",texlbl=0];
+    3 -> 4 [_draw_="c 7 -#000000 B 4 431.62 25.43 449.26 24.19 472.76 23.93 492.91 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 492.64 28.13 502.8 25.1 492.97 21.14 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 450.76 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="453.76,16.033",pos="e,504.31,25.167 431.62,25.429 449.26,24.193 472.76,23.929 492.91,24.637",texlbl=1];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 566.1 34.37 576.09 34.34 584 33.21 584 31 584 29.75 581.5 28.85 577.53 28.3 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.8 24.81 567.61 27.71 577.39 31.8 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 589.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="592.5,31",pos="e,566.1,27.626 566.1,34.374 576.09,34.34 584,33.215 584,31 584,29.754 581.5,28.853 577.53,28.297",texlbl=0];
+    4 -> 4 [_draw_="c 7 -#000000 B 7 565.67 37.3 584.33 38.76 602 36.66 602 31 602 26.49 590.78 24.24 576.78 24.25 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 20.74 567.18 24.64 577.31 27.73 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 607.5 24.7 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="610.5,31",pos="e,565.67,24.699 565.67,37.301 584.33,38.761 602,36.66 602,31 602,26.49 590.78,24.24 576.78,24.25",texlbl=1];
+    5[_draw_="c 7 -#000000 e 665 31 27 27 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 665 25.95 0 3.75 1 -  ",fixedsize=true,height=0.75,label=" ",pos="665,31",texlbl=5,width=0.75,shape=circle];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 25.43 620.74 24.19 597.24 23.93 577.09 24.64 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.03 21.14 567.2 25.1 577.36 28.13 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 9.73 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,16.033",pos="e,565.69,25.167 638.38,25.429 620.74,24.193 597.24,23.929 577.09,24.637",texlbl=0];
+    5 -> 4 [_draw_="c 7 -#000000 B 4 638.38 36.57 620.74 37.81 597.24 38.07 577.09 37.36 ",_hdraw_="S 5 -solid c 7 -#000000 C 7 -#000000 P 3 577.36 33.87 567.2 36.9 577.03 40.86 ",_ldraw_="F 14 11 -Times-Roman c 7 -#000000 T 613.24 39.67 -1 6 1 -a ",label=<<table border="0" cellborder="0" cellpadding="0"><tr><td fixedsize="true" width="13.062372466527568" height="14.501403808807153">a</td></tr></table>>,lp="616.24,45.967",pos="e,565.69,36.833 638.38,36.571 620.74,37.807 597.24,38.071 577.09,37.363",texlbl=1];
+
+    graph [_draw_="c 9 -#fffffe00 C 7 -#ffffff P 4 0 0 0 62 692 62 692 0 ",bb="0,0,692,62",d2toutputformat=pgf,layout=circo,rankdir=LR,xdotversion=1.7];
+}
+2024-10-14 17:43:25,537 dot2tex DEBUG Output after preprocessing:
+\documentclass{article}
+\usepackage[x11names, svgnames, rgb]{xcolor}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+\usetikzlibrary{snakes,arrows,shapes}
+\usepackage{amsmath}
+%
+%
+
+%
+
+%
+
+\begin{document}
+\pagestyle{empty}
+%
+%
+%
+
+\enlargethispage{100cm}
+% Start of code
+% \begin{tikzpicture}[anchor=mid,>=latex',line join=bevel,]
+\begin{tikzpicture}[>=latex',line join=bevel,]
+  \pgfsetlinewidth{1bp}
+%%
+\pgfsetcolor{black}
+  % Edge: 0 -> 1
+  \draw [->] (53.721bp,36.636bp) .. controls (71.512bp,37.873bp) and (95.159bp,38.08bp)  .. (126.32bp,36.633bp);
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (75.816bp,45.947bp) node {0};
+  % Edge: 0 -> 1
+  \draw [->] (53.721bp,25.364bp) .. controls (71.512bp,24.127bp) and (95.159bp,23.92bp)  .. (126.32bp,25.367bp);
+  \draw (75.816bp,16.053bp) node {1};
+  % Edge: 1 -> 2
+  \draw [->] (179.72bp,36.636bp) .. controls (197.51bp,37.873bp) and (221.16bp,38.08bp)  .. (252.32bp,36.633bp);
+  \draw (201.82bp,45.947bp) node {0};
+  % Edge: 1 -> 2
+  \draw [->] (179.72bp,25.364bp) .. controls (197.51bp,24.127bp) and (221.16bp,23.92bp)  .. (252.32bp,25.367bp);
+  \draw (201.82bp,16.053bp) node {1};
+  % Edge: 2 -> 3
+  \draw [->] (305.72bp,36.636bp) .. controls (323.51bp,37.873bp) and (347.16bp,38.08bp)  .. (378.32bp,36.633bp);
+  \draw (327.82bp,45.947bp) node {0};
+  % Edge: 2 -> 3
+  \draw [->] (305.72bp,25.364bp) .. controls (323.51bp,24.127bp) and (347.16bp,23.92bp)  .. (378.32bp,25.367bp);
+  \draw (327.82bp,16.053bp) node {1};
+  % Edge: 3 -> 4
+  \draw [->] (431.62bp,36.571bp) .. controls (449.26bp,37.807bp) and (472.76bp,38.071bp)  .. (504.31bp,36.833bp);
+  \draw (453.76bp,45.967bp) node {0};
+  % Edge: 3 -> 4
+  \draw [->] (431.62bp,25.429bp) .. controls (449.26bp,24.193bp) and (472.76bp,23.929bp)  .. (504.31bp,25.167bp);
+  \draw (453.76bp,16.033bp) node {1};
+  % Edge: 4 -> 4
+  \draw [->] (566.1bp,34.374bp) .. controls (576.09bp,34.34bp) and (584.0bp,33.215bp)  .. (584.0bp,31.0bp) .. controls (584.0bp,29.754bp) and (581.5bp,28.853bp)  .. (566.1bp,27.626bp);
+  \draw (592.5bp,31.0bp) node {0};
+  % Edge: 4 -> 4
+  \draw [->] (565.67bp,37.301bp) .. controls (584.33bp,38.761bp) and (602.0bp,36.66bp)  .. (602.0bp,31.0bp) .. controls (602.0bp,26.49bp) and (590.78bp,24.24bp)  .. (565.67bp,24.699bp);
+  \draw (610.5bp,31.0bp) node {1};
+  % Edge: 5 -> 4
+  \draw [->] (638.38bp,25.429bp) .. controls (620.74bp,24.193bp) and (597.24bp,23.929bp)  .. (565.69bp,25.167bp);
+  \draw (616.24bp,16.033bp) node {0};
+  % Edge: 5 -> 4
+  \draw [->] (638.38bp,36.571bp) .. controls (620.74bp,37.807bp) and (597.24bp,38.071bp)  .. (565.69bp,36.833bp);
+  \draw (616.24bp,45.967bp) node {1};
+  % Node: 0
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (27.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (27.0bp,31.0bp) node {0};
+\end{scope}
+  % Node: 1
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (153.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (153.0bp,31.0bp) node {1};
+\end{scope}
+  % Node: 2
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (279.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (279.0bp,31.0bp) node {2};
+\end{scope}
+  % Node: 3
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (405.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (405.0bp,31.0bp) node {3};
+\end{scope}
+  % Node: 4
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (535.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (535.0bp,31.0bp) ellipse (31.0bp and 31.0bp);
+  \draw (535.0bp,31.0bp) node {4};
+\end{scope}
+  % Node: 5
+\begin{scope}
+  \definecolor{strokecol}{rgb}{0.0,0.0,0.0};
+  \pgfsetstrokecolor{strokecol}
+  \draw (665.0bp,31.0bp) ellipse (27.0bp and 27.0bp);
+  \draw (665.0bp,31.0bp) node {5};
+\end{scope}
+%
+\end{tikzpicture}
+% End of code
+
+%
+\end{document}
+%
+
+
+
+2024-10-14 17:43:25,538 dot2tex INFO ------- End of run -------

@@ -18,7 +18,6 @@ def generate_dot(alph, nodes, initial, dead, final, transitions):
 digraph DFA {{
     rankdir=LR;
     node [shape = circle]; 
-
     {initial_node} [label="{initial_node}"];
 """
 
@@ -39,16 +38,36 @@ digraph DFA {{
     return dot_graph
 
 def generate_tikz(dot_graph):
-    with open("temp.dot", "w") as file:
+    dot_file_path = "temp.dot"
+    tikz_file_path = "temp.tikz"
+
+    # Save the DOT graph to a file
+    with open(dot_file_path, "w") as file:
         file.write(dot_graph)
 
     try:
-        result = subprocess.run(["dot2tex", "--autosize", "temp.dot"], capture_output=True, text=True)
-        tikz_graph = result.stdout
+        result = subprocess.run(
+            ["dot2tex", "--autosize", dot_file_path], 
+            capture_output=True, text=True
+        )
+        tikz_graph_content = result.stdout
+
+        # Wrap the TikZ content with \resizebox
+        tikz_graph = tikz_graph_content.replace(
+            r"\begin{tikzpicture}",
+            r"\resizebox{\textwidth}{!}{\begin{tikzpicture}"
+        ).replace(
+            r"\end{tikzpicture}",
+            r"\end{tikzpicture}}"
+        )
+
+        # Save the TikZ graph to a file for inspection
+        with open(tikz_file_path, "w") as tikz_file:
+            tikz_file.write(tikz_graph)
+
     except FileNotFoundError:
         tikz_graph = "dot2tex is not installed or not found in PATH."
 
-    os.remove("temp.dot")
     return tikz_graph
 
 @app.route('/dfa.html', methods=['GET', 'POST'])
