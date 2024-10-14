@@ -4,36 +4,68 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DFA Generator</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <h1>DFA Generator</h1>
-    <form method="POST">
-        <div>
-            <label for="alph">Alphabet:</label>
-            <input type="text" id="alph" name="alph" required>
-        </div>
-        <div>
-            <label for="nodes">Nodes:</label>
-            <input type="number" id="nodes" name="nodes" required>
-        </div>
-        <div>
-            <label for="initial">Initial Node:</label>
-            <input type="text" id="initial" name="initial" required>
-        </div>
-        <div>
-            <label for="dead">Dead Node:</label>
-            <input type="text" id="dead" name="dead">
-        </div>
-        <div>
-            <label for="final">Final Nodes:</label>
-            <input type="text" id="final" name="final" required>
-        </div>
-        <button type="submit">Generate DFA</button>
+    <form id="dfa-form" method="POST">
+        <label for="alphabet">Alphabet (separated by spaces):</label>
+        <input type="text" id="alphabet" name="alphabet" required><br><br>
+
+        <label for="states">Number of States:</label>
+        <input type="number" id="states" name="states" min="1" required><br><br>
+
+        <label for="initial">Initial State:</label>
+        <input type="number" id="initial" name="initial" min="0" required><br><br>
+
+        <label for="dead">Dead State (optional):</label>
+        <input type="number" id="dead" name="dead" min="0"><br><br>
+
+        <label for="final">Final States (separated by spaces):</label>
+        <input type="text" id="final" name="final" required><br><br>
+
+        <button type="button" id="generate-table">Generate Table</button>
     </form>
-    
-    {% if tikz_graph %}
-    <h2>Generated TikZ Graph:</h2>
-    <pre>{{ tikz_graph }}</pre>
-    {% endif %}
+
+    <div id="transition-table"></div>
+
+    <button type="button" id="generate-tikz" style="display: none;">Generate TikZ</button>
+
+    <div id="tikz-output"></div>
+
+    <script>
+        $(document).ready(function() {
+            $('#generate-table').click(function() {
+                var alphabet = $('#alphabet').val().split(' ');
+                var states = parseInt($('#states').val());
+                var initial = parseInt($('#initial').val());
+                var dead = $('#dead').val() ? parseInt($('#dead').val()) : null;
+                var final = $('#final').val().split(' ').map(Number);
+
+                var table = '<table border="1"><tr><th>State</th>';
+                alphabet.forEach(function(symbol) {
+                    table += '<th>' + symbol + '</th>';
+                });
+                table += '</tr>';
+
+                for (var i = 0; i < states; i++) {
+                    table += '<tr>';
+                    table += '<td>' + (i === initial ? '→' : '') + i + (final.includes(i) ? '*' : '') + '</td>';
+                    alphabet.forEach(function(symbol) {
+                        table += '<td><input type="number" name="transition_' + i + '_' + symbol + '" min="0" max="' + (states - 1) + '"></td>';
+                    });
+                    table += '</tr>';
+                }
+                table += '</table>';
+
+                $('#transition-table').html(table);
+                $('#generate-tikz').show();
+            });
+
+            $('#generate-tikz').click(function() {
+                $('#dfa-form').submit();
+            });
+        });
+    </script>
 </body>
 </html>

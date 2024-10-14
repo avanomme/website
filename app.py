@@ -1,41 +1,32 @@
-from flask import Flask, render_template, request, send_from_directory
+from flask import Flask, render_template, request, jsonify
 import subprocess
-import os
 
 app = Flask(__name__)
 
-def generate_dot(alph, nodes, initial, dead, final, transitions):
-    alph_array = alph.split()
-    nodes_array = [str(i) for i in range(int(nodes) + 1)]
-    initial_node = initial.strip()
-    final_nodes_array = final.split()
+def generate_dot(alphabet, states, initial, dead, final, transitions):
+    dot = "digraph DFA {\n"
+    dot += "    rankdir=LR;\n"
+    dot += "    node [shape = circle];\n\n"
 
-    if dead.strip():
-        dead_node = dead.strip()
-        nodes_array[int(dead_node)] = 'd'
+    for i in range(states):
+        if i in final:
+            dot += f'    {i} [label="{i}", shape=doublecircle];\n'
+        else:
+            dot += f'    {i} [label="{i}"];\n'
 
-    dot_graph = f"""
-digraph DFA {{
-    rankdir=LR;
-    node [shape = circle]; 
-    {initial_node} [label="{initial_node}"];
-"""
+    if dead is not None:
+        dot += f'    {dead} [label="d"];\n'
 
-    for node in nodes_array:
-        if node != initial_node:
-            if node in final_nodes_array:
-                dot_graph += f'    {node} [label="{node}", shape=doublecircle];\n'
-            else:
-                dot_graph += f'    {node} [label="{node}"];\n'
+    dot += f'\n    {initial} [style=filled,fillcolor=lightgray];\n\n'
 
-    for node in transitions:
-        for alphs in transitions[node]:
-            target_node = transitions[node][alphs]
-            dot_graph += f'    {node} -> {target_node} [label="{alphs}"];\n'
+    for i in range(states):
+        for symbol in alphabet:
+            target = transitions.get(f"{i}_{symbol}")
+            if target is not None:
+                dot += f'    {i} -> {target} [label="{symbol}"];\n'
 
-    dot_graph += "}\n"
-
-    return dot_graph
+    dot += "}"
+    return dot
 
 def generate_tikz(dot_graph):
     try:
@@ -50,34 +41,29 @@ def generate_tikz(dot_graph):
 
 @app.route('/')
 def index():
-    return render_template('index.html', tikz_graph='')
+    return render_template('index.html')
 
 @app.route('/dfa.html', methods=['GET', 'POST'])
 def dfa():
     if request.method == 'POST':
-        alph = request.form['alph']
-        nodes = request.form['nodes']
-        initial = request.form['initial']
-        dead = request.form['dead']
-        final = request.form['final']
+        alphabet = request.form['alphabet'].split()
+        states = int(request.form['states'])
+        initial = int(request.form['initial'])
+        dead = int(request.form['dead']) if request.form['dead'] else None
+        final = list(map(int, request.form['final'].split()))
+
         transitions = {}
+        for i in range(states):
+            for symbol in alphabet:
+                key = f"transition_{i}_{symbol}"
+                if key in request.form:
+                    transitions[f"{i}_{symbol}"] = request.form[key]
 
-        for i in range(int(nodes) + 1):
-            node = str(i)
-            transitions[node] = {}
-            for alph_char in alph.split():
-                transitions[node][alph_char] = request.form.get(f'transition_{node}_{alph_char}', '')
-
-        dot_graph = generate_dot(alph, nodes, initial, dead, final, transitions)
+        dot_graph = generate_dot(alphabet, states, initial, dead, final, transitions)
         tikz_graph = generate_tikz(dot_graph)
-        return render_template('dfa.html', tikz_graph=tikz_graph)
+        return jsonify({"tikz": tikz_graph})
 
     return render_template('dfa.html')
 
-@app.route('/favicon.ico')
-def favicon():
-    return send_from_directory('static', 'favicon.ico')
-
 if __name__ == '__main__':
     app.run(debug=True)
-
