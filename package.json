@@ -3,6 +3,7 @@
     "@viz-js/viz": "^3.9.0",
     "express": "^4.21.1",
     "flask": "^0.2.10",
+    "python-shell": "^5.0.0",
     "viz.js": "^2.1.2"
   },
   "devDependencies": {
