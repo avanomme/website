@@ -2,7 +2,12 @@ const { PythonShell } = require('python-shell');
 const path = require('path');
 
 export default function handler(req, res) {
-    // Input to be processed by dot2tex (this could be a LaTeX or dot input)
+    // Check if the method is POST
+    if (req.method !== 'POST') {
+        return res.status(405).json({ message: 'Method Not Allowed. Use POST' });
+    }
+
+    // Input to be processed by dot2tex
     const dotInput = req.body.input || 'digraph G { a -> b; }';  // Example input
 
     // Path to the Python script that runs dot2tex
