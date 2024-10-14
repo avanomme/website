@@ -16,7 +16,7 @@ def generate_dot(alph, nodes, initial, dead, final, transitions):
 
     dot_graph = f"""
 digraph DFA {{
-    rankdir=LR;
+    rankdir=LR; 
     node [shape = circle]; 
 
     {initial_node} [label="{initial_node}"];
@@ -51,8 +51,8 @@ def generate_tikz(dot_graph):
     os.remove("temp.dot")
     return tikz_graph
 
-@app.route('/dfa.html', methods=['GET', 'POST'])
-def dfa():
+@app.route('/', methods=['GET', 'POST'])
+def index():
     if request.method == 'POST':
         alph = request.form['alph']
         nodes = request.form['nodes']
