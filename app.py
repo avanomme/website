@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
 import subprocess
-import os
 
 app = Flask(__name__)
 
@@ -38,17 +37,12 @@ digraph DFA {{
     return dot_graph
 
 def generate_tikz(dot_graph):
-    dot_file_path = "temp.dot"
-    tikz_file_path = "temp.tikz"
-
-    # Save the DOT graph to a file
-    with open(dot_file_path, "w") as file:
-        file.write(dot_graph)
-
     try:
         result = subprocess.run(
-            ["dot2tex", "--autosize", dot_file_path], 
-            capture_output=True, text=True
+            ["dot2tex", "--autosize"], 
+            input=dot_graph, 
+            capture_output=True, 
+            text=True
         )
         tikz_graph_content = result.stdout
 
@@ -60,10 +54,6 @@ def generate_tikz(dot_graph):
             r"\end{tikzpicture}",
             r"\end{tikzpicture}}"
         )
-
-        # Save the TikZ graph to a file for inspection
-        with open(tikz_file_path, "w") as tikz_file:
-            tikz_file.write(tikz_graph)
 
     except FileNotFoundError:
         tikz_graph = "dot2tex is not installed or not found in PATH."
