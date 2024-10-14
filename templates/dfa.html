@@ -29,9 +29,12 @@
 
     <div id="transition-table"></div>
 
-    <button type="button" id="generate-tikz" style="display: none;">Generate TikZ</button>
+    <button type="button" id="generate-tikz" style="display: none;">Generate Graph</button>
 
-    <div id="tikz-output"></div>
+    <div id="output">
+        <h2>Output:</h2>
+        <pre id="output-content"></pre>
+    </div>
 
     <script>
         $(document).ready(function() {
@@ -63,7 +66,21 @@
             });
 
             $('#generate-tikz').click(function() {
-                $('#dfa-form').submit();
+                $.ajax({
+                    url: '/dfa.html',
+                    method: 'POST',
+                    data: $('#dfa-form').serialize(),
+                    success: function(response) {
+                        if (response.error) {
+                            $('#output-content').text('Error: ' + response.error + '\n\nDOT representation:\n' + response.dot);
+                        } else {
+                            $('#output-content').text(response.tikz);
+                        }
+                    },
+                    error: function() {
+                        $('#output-content').text('An error occurred while processing your request.');
+                    }
+                });
             });
         });
     </script>

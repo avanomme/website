@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, jsonify
 import subprocess
-import shutil
 
 app = Flask(__name__)
 
@@ -30,16 +29,15 @@ def generate_dot(alphabet, states, initial, dead, final, transitions):
     return dot
 
 def generate_tikz(dot_graph):
-    if not shutil.which('dot2tex'):
-        return None, "Error: dot2tex is not installed or not found in PATH."
-
     try:
         result = subprocess.run(["dot2tex", "--autosize"], input=dot_graph, capture_output=True, text=True, check=True)
-        return result.stdout, None
-    except subprocess.CalledProcessError as e:
-        return None, f"Error: dot2tex command failed. {e}"
-    except Exception as e:
-        return None, f"Error: An unexpected error occurred. {e}"
+        tikz_graph = result.stdout
+    except subprocess.CalledProcessError:
+        tikz_graph = "Error: dot2tex command failed."
+    except FileNotFoundError:
+        tikz_graph = "Error: dot2tex is not installed or not found in PATH."
+    
+    return tikz_graph
 
 @app.route('/')
 def index():
@@ -62,12 +60,8 @@ def dfa():
                     transitions[f"{i}_{symbol}"] = request.form[key]
 
         dot_graph = generate_dot(alphabet, states, initial, dead, final, transitions)
-        tikz_graph, error = generate_tikz(dot_graph)
-
-        if error:
-            return jsonify({"error": error, "dot": dot_graph})
-        else:
-            return jsonify({"tikz": tikz_graph})
+        tikz_graph = generate_tikz(dot_graph)
+        return jsonify({"tikz": tikz_graph})
 
     return render_template('dfa.html')
 
