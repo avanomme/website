@@ -1,48 +1,50 @@
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
+
 from flask import Flask, render_template, request, jsonify
+from graphviz import Digraph
 from dot2tex import dot2tex
+import io
 
 app = Flask(__name__)
 
 def generate_dot(alph, nodes, initial, dead, final, transitions):
-    alph_array = alph.split()
-    nodes_array = [str(i) for i in range(int(nodes) + 1)]
-    initial_node = initial.strip()
-    final_nodes_array = final.split()
+    dot = Digraph(comment='DFA')
+    dot.attr(rankdir='LR')
 
-    if dead.strip():
-        dead_node = dead.strip()
-        nodes_array[int(dead_node)] = 'd'
+    # Add nodes
+    for node in range(int(nodes)):
+        if str(node) in final:
+            dot.attr('node', shape='doublecircle')
+        else:
+            dot.attr('node', shape='circle')
+        
+        if node == int(initial):
+            dot.attr('node', style='filled', fillcolor='lightgray')
+        
+        dot.node(str(node))
 
-    dot_graph = f"""
-digraph DFA {{
-    rankdir=LR; 
-    node [shape = circle]; 
+    # Add dead state if specified
+    if dead:
+        dot.attr('node', shape='circle')
+        dot.node('d', 'dead')
 
-    {initial_node} [label="{initial_node}"];
-"""
-
-    for node in nodes_array:
-        if node != initial_node:
-            if node in final_nodes_array:
-                dot_graph += f'    {node} [label="{node}", shape=doublecircle];\n'
-            else:
-                dot_graph += f'    {node} [label="{node}"];\n'
-
+    # Add transitions
     for node in transitions:
-        for alphs in transitions[node]:
-            target_node = transitions[node][alphs]
-            dot_graph += f'    {node} -> {target_node} [label="{alphs}"];\n'
+        for symbol in transitions[node]:
+            target = transitions[node][symbol]
+            dot.edge(node, target, label=symbol)
 
-    dot_graph += "}\n"
+    return dot
 
-    return dot_graph
-
-def generate_tikz(dot_graph):
+def generate_tikz(dot):
+    dot_string = dot.source
     try:
-        tikz_code = dot2tex(dot_graph, format='tikz', crop=True)
+        tikz_code = dot2tex(dot_string, format='tikz', crop=True)
         return tikz_code
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error generating TikZ. Fallback to DOT graph:\n\n{dot_string}"
 
 @app.route('/')
 def index():
@@ -55,7 +57,7 @@ def dfa():
         nodes = request.form['states']
         initial = request.form['initial']
         dead = request.form['dead']
-        final = request.form['final']
+        final = request.form['final'].split()
         transitions = {}
 
         for i in range(int(nodes)):
@@ -66,9 +68,13 @@ def dfa():
                 if key in request.form:
                     transitions[node][alph_char] = request.form[key]
 
-        dot_graph = generate_dot(alph, nodes, initial, dead, final, transitions)
-        tikz_graph = generate_tikz(dot_graph)
-        return jsonify({"tikz": tikz_graph})
+        dot = generate_dot(alph, nodes, initial, dead, final, transitions)
+        tikz_graph = generate_tikz(dot)
+        
+        # Generate SVG for preview
+        svg = dot.pipe(format='svg').decode('utf-8')
+        
+        return jsonify({"tikz": tikz_graph, "svg": svg})
 
     return render_template('dfa.html')
 
