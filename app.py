@@ -44,27 +44,33 @@ def generate_tikz(dot_graph):
     except Exception as e:
         return f"Error: {str(e)}"
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/dfa.html', methods=['GET', 'POST'])
+def dfa():
     if request.method == 'POST':
-        alph = request.form['alph']
-        nodes = request.form['nodes']
+        alph = request.form['alphabet']
+        nodes = request.form['states']
         initial = request.form['initial']
         dead = request.form['dead']
         final = request.form['final']
         transitions = {}
 
-        for i in range(int(nodes) + 1):
+        for i in range(int(nodes)):
             node = str(i)
             transitions[node] = {}
             for alph_char in alph.split():
-                transitions[node][alph_char] = request.form.get(f'transition_{node}_{alph_char}', '')
+                key = f"transition_{node}_{alph_char}"
+                if key in request.form:
+                    transitions[node][alph_char] = request.form[key]
 
         dot_graph = generate_dot(alph, nodes, initial, dead, final, transitions)
         tikz_graph = generate_tikz(dot_graph)
         return jsonify({"tikz": tikz_graph})
 
-    return render_template('index.html')
+    return render_template('dfa.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
