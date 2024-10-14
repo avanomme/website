@@ -1,15 +1,13 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "app.py",
-        "use": "@vercel/python"
+    "functions": {
+      "api/process_dot2tex.py": {
+        "runtime": "python3.9"
       }
-    ],
+    },
     "routes": [
       {
-        "src": "/(.*)",
-        "dest": "app.py"
+        "src": "/api/process_dot2tex",
+        "dest": "/api/process_dot2tex.py"
       }
     ]
   }
