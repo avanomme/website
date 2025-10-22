@@ -1,0 +1,26 @@
+# Ignore git metadata and node_modules
+.git
+node_modules
+
+# Exclude local virtualenvs and build artifacts
+venv
+build
+dist
+
+# Large assets and source trees not required for frontend deployment
+lib/graphviz
+sounds
+
+# Editor / OS files
+.DS_Store
+*.swp
+*.swo
+
+# temp and generated files
+*.aux
+*.fls
+*.fdb_latexmk
+temp.*
+
+# Optional: do not upload tests/docs heavy folders
+lib/**/tests

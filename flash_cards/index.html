@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flash Cards</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="app.css">
+</head>
+<body class="theme-dark">
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="title-group">
+        <h1>Flash Cards</h1>
+        <p class="subtitle">Autoplay study deck with high-quality Coqui TTS</p>
+      </div>
+      <div class="meta">
+        <span id="sectionMeta" class="meta__section"></span>
+        <span id="cardMeta" class="meta__card"></span>
+      </div>
+    </header>
+
+    <main class="card-area">
+      <div class="section-heading">
+        <h2 id="sectionTitle"></h2>
+      </div>
+
+      <article class="flashcard" id="flashcard">
+        <div class="flashcard__front" id="cardFront">
+          <header class="flashcard__header">
+            <span class="chip chip--question">Question</span>
+          </header>
+          <div id="cardQuestion" class="flashcard__content"></div>
+          <div class="flashcard__hint">Click to reveal answer</div>
+        </div>
+
+        <div class="flashcard__back hidden" id="cardBack">
+          <header class="flashcard__header">
+            <span class="chip chip--question">Question</span>
+          </header>
+          <div id="cardQuestionRepeat" class="flashcard__question-repeat"></div>
+
+          <header class="flashcard__header flashcard__header--answer">
+            <span class="chip chip--answer">Answer</span>
+          </header>
+          <div id="cardAnswer" class="flashcard__content"></div>
+          <div class="flashcard__hint">Click to continue</div>
+        </div>
+      </article>
+    </main>
+
+    <footer class="control-panel">
+      <div class="button-row">
+        <button id="playPauseBtn" type="button">Play</button>
+        <button id="prevBtn" type="button" class="ghost">Prev</button>
+        <button id="toggleAnswerBtn" type="button">Show Answer</button>
+        <button id="nextBtn" type="button" class="ghost">Next</button>
+      </div>
+
+      <section class="options-group">
+        <h3 class="options-title">Autoplay</h3>
+        <div class="options">
+          <div class="option toggle">
+            <input type="checkbox" id="autoRevealToggle" checked>
+            <label for="autoRevealToggle">Auto reveal answer</label>
+          </div>
+          <div class="option range">
+            <label for="autoRevealDelay">
+              Reveal delay
+              <span class="value" id="autoRevealValue">3.0s</span>
+            </label>
+            <input type="range" id="autoRevealDelay" min="0" max="8000" step="500" value="1000">
+          </div>
+          <div class="option range">
+            <label for="autoAdvanceDelay">
+              Advance delay
+              <span class="value" id="autoAdvanceValue">4.0s</span>
+            </label>
+            <input type="range" id="autoAdvanceDelay" min="1000" max="12000" step="500" value="1000">
+          </div>
+        </div>
+      </section>
+
+      <section class="options-group">
+        <h3 class="options-title">Speech</h3>
+        <div class="options">
+          <div class="option toggle">
+            <input type="checkbox" id="speechToggle" checked>
+            <label for="speechToggle">Enable speech</label>
+          </div>
+          <div class="option">
+            <label for="voicePicker">Voice</label>
+            <select id="voicePicker"></select>
+          </div>
+          <div class="option range">
+            <label for="speechRate">
+              Speech rate
+              <span class="value" id="speechRateValue">1.00x</span>
+            </label>
+            <input type="range" id="speechRate" min="0.75" max="1.75" step="0.05" value="1">
+          </div>
+        </div>
+      </section>
+
+      <section class="options-group">
+        <h3 class="options-title">Navigation</h3>
+        <div class="options">
+          <div class="option">
+            <label for="sectionPicker">Jump to Section</label>
+            <select id="sectionPicker"></select>
+          </div>
+          <div class="option">
+            <label for="cardPicker">Jump to Card</label>
+            <select id="cardPicker"></select>
+          </div>
+        </div>
+        <div class="options options--toggles">
+          <div class="option toggle">
+            <input type="checkbox" id="shuffleToggle">
+            <label for="shuffleToggle">Shuffle cards</label>
+          </div>
+          <div class="option toggle">
+            <input type="checkbox" id="loopToggle" checked>
+            <label for="loopToggle">Loop deck</label>
+          </div>
+        </div>
+      </section>
+
+      <section class="notice hidden" id="message"></section>
+    </footer>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

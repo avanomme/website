@@ -71,3 +71,7 @@ node_modules/
 
 venv/
 .vercel
+
+# Large assets - prefer Git LFS or external hosting
+sounds/
+lib/graphviz/

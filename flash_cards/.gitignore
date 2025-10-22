@@ -1,0 +1,32 @@
+# Virtual environments
+.venv/
+.venv-tts/
+venv/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# TTS generated files
+/tmp/tts_output.wav
+/tmp/tts_cache/
+/tmp/melo_cache/
+
+# Precompiled audio cache (comment out if you want to commit it)
+audio_cache/
+
+# OS files
+.DS_Store
+._*
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
