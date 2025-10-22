@@ -75,3 +75,4 @@ venv/
 # Large assets - prefer Git LFS or external hosting
 sounds/
 lib/graphviz/
+.DS_Store
