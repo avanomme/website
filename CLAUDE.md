@@ -159,21 +159,29 @@ The project mixes vanilla JavaScript (flash cards) with Next.js components:
 **Solution**: These directories must be excluded from Vercel deployment via `.vercelignore`.
 
 ### NPM Scripts
-The `package.json` currently has minimal scripts:
-```json
-"scripts": {
-  "test": "echo \"Error: no test specified\" && exit 1"
-}
+Available commands:
+```bash
+npm run build         # Compile TypeScript to JavaScript (./dist/)
+npm run build:watch   # Compile TypeScript in watch mode
+npm run check         # Type-check without emitting files
+npm run clean         # Remove all compiled files from dist/
 ```
 
-There are no `build`, `dev`, or `start` scripts defined. The project doesn't use Next.js build tooling despite having Next.js-style components. The Flask app (`app.py`) is the primary server.
+The project doesn't use Next.js build tooling despite having Next.js-style components in `/pages/`. The Flask app (`app.py`) is the primary server.
 
 ### TypeScript Build
-To compile TypeScript files:
+The project includes TypeScript files in `/src/`:
+- `dfa.ts` - Client-side DOT graph visualization
+- `server.ts` - Express server for graph generation
+
+To compile:
 ```bash
+npm run build
+# or
 npx tsc
 ```
-Output goes to `./dist/` directory.
+
+Output goes to `./dist/` directory with ES5 target and CommonJS modules.
 
 ### Vercel Configuration
 The `vercel.json` specifies:
@@ -182,3 +190,20 @@ The `vercel.json` specifies:
 - All routes forwarded to `app.py`
 
 **Important**: Vercel serverless functions have size limits (50MB compressed). The TTS functionality (`tts_server.py`, `melo_server.py`) cannot run on Vercel and must be deployed separately or run locally.
+
+### Import Error Fixes
+
+The `app.py` has been modified to handle optional imports gracefully:
+
+**Problem**: The `dot2tex` module uses relative imports (`.base`, `.pgfformat`) which fail in Vercel's serverless environment with error:
+```
+ImportError: attempted relative import with no known parent package
+```
+
+**Solution**: All GraphViz and dot2tex imports are wrapped in try/except blocks:
+- `GRAPHVIZ_AVAILABLE` - Set to `False` if graphviz can't be imported
+- `DOT2TEX_AVAILABLE` - Set to `False` if dot2tex can't be imported
+- The `/dfa.html` route returns a 503 error if GraphViz is unavailable
+- The `/study.html` route works independently and doesn't require these libraries
+
+This allows the flashcard functionality (`/study.html`) to work on Vercel even when GraphViz/dot2tex dependencies fail.
