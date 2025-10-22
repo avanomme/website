@@ -4,6 +4,8 @@ node_modules
 
 # Exclude local virtualenvs and build artifacts
 venv
+.venv
+flash_cards/.venv-tts
 build
 dist
 

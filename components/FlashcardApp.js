@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
-const FlashcardApp = () => {
-  const [flashcards, setFlashcards] = useState([]);
+const FlashcardApp = ({ initialFlashcards = [] }) => {
+  const [flashcards, setFlashcards] = useState(initialFlashcards || []);
   const [newFlashcard, setNewFlashcard] = useState({
     question: "",
     answer: "",
