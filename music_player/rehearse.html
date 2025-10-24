@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stratford Choir Christmas 2025 Rehearsal</title>
+    <title>Grinch 2025 Rehearsal</title>
     <!-- Verovio for MusicXML rendering -->
     <script src="https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" defer></script>
     <!-- Tone.js and MIDI parser -->
     <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
     <!-- Local soundfonts -->
-    <script src="soundfonts/acoustic_grand_piano-ogg.js" defer></script>
-    <script src="soundfonts/choir_aahs-ogg.js" defer></script>
-    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <script src="/music_player/soundfonts/acoustic_grand_piano-ogg.js" defer></script>
+    <script src="/music_player/soundfonts/choir_aahs-ogg.js" defer></script>
+    <link rel="icon" type="image/png" href="/music_player/assets/favicon.png">
     <style>
         * {
             margin: 0;
@@ -617,6 +617,7 @@
                     <input type="range" id="volumeSlider" min="0" max="100" value="100" step="1" style="width: 120px;">
                     <span id="volumeValue" style="font-size: 0.85em; color: white; min-width: 35px;">100%</span>
                 </div>
+                <button id="partsBtn" style="padding: 8px 32px;">🎭 Parts</button>
                 <button id="scoresBtn" style="padding: 8px 32px;">🎵 Scores</button>
             </div>
         </div>
@@ -641,6 +642,18 @@
                         </div>
                     </div>
                     <button id="nextPageBtn" style="width: 40px; height: 40px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold;" disabled>▶</button>
+                </div>
+            </div>
+
+            <div class="dropdown-section">
+                <label class="dropdown-label">Systems Per Page</label>
+                <div style="margin-top: 10px;">
+                    <input type="range" id="systemsSlider" min="1" max="10" value="1" step="1" style="width: 100%;" disabled>
+                    <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.85em; color: #cbd5e0;">
+                        <span>Min</span>
+                        <span id="systemsValue" style="font-weight: 600; color: #667eea;">1 system</span>
+                        <span>Max</span>
+                    </div>
                 </div>
             </div>
 
@@ -767,6 +780,7 @@
         let scoreLibraryData = [];
         let currentScoreIndex = -1;
         let totalPages = 1;
+        let currentSystemsPerPage = 1;
 
         // DOM elements
         const fileInputOverlay = document.getElementById('fileInputOverlay');
@@ -807,6 +821,8 @@
         const mobilePrevPageBtn = document.getElementById('mobilePrevPageBtn');
         const mobileNextPageBtn = document.getElementById('mobileNextPageBtn');
         const mobilePageLabel = document.getElementById('mobilePageLabel');
+        const systemsSlider = document.getElementById('systemsSlider');
+        const systemsValue = document.getElementById('systemsValue');
 
         // Verovio and playback state
         let tk = null;
@@ -977,13 +993,16 @@
                     }
                 });
 
+                // Systems per page
+                systemsSlider.addEventListener('input', handleSystemsPerPageChange);
+
 
                 // Load score library
                 console.log('[App] Loading score library...');
                 console.log('[App] scanForMIDIFiles function:', typeof scanForMIDIFiles);
                 try {
-                    console.log('[App] Calling scanForMIDIFiles("./scores")...');
-                    scoreLibraryData = await scanForMIDIFiles('./scores');
+                    console.log('[App] Calling scanForMIDIFiles("/music_player/scores")...');
+                    scoreLibraryData = await scanForMIDIFiles('/music_player/scores');
                     console.log('[App] ✓ scanForMIDIFiles returned');
                     console.log('[App] Found scores:', scoreLibraryData);
                     console.log('[App] Score count:', scoreLibraryData.length);
@@ -1158,6 +1177,14 @@
                 highlightTimeMs = originalSeconds * 1000;
             }
 
+            // Check for page changes FIRST and render new page before highlighting
+            const currentElements = tk.getElementsAtTime(highlightTimeMs);
+            if (currentElements && currentElements.page > 0 && currentElements.page !== currentPage) {
+                currentPage = currentElements.page;
+                // Render the new page immediately before trying to highlight notes
+                document.getElementById("scoreCanvas").innerHTML = tk.renderToSVG(currentPage);
+            }
+
             // Check if we have custom JSON timing events with "on"/"off" arrays
             if (currentEvent && (Array.isArray(currentEvent.on) || Array.isArray(currentEvent.off))) {
                 // Process "off" array to remove notes that have ended
@@ -1179,13 +1206,6 @@
                         }
                     }
                 }
-
-                // Also handle page changes
-                const currentElements = tk.getElementsAtTime(highlightTimeMs);
-                if (currentElements && currentElements.page > 0 && currentElements.page !== currentPage) {
-                    currentPage = currentElements.page;
-                    document.getElementById("scoreCanvas").innerHTML = tk.renderToSVG(currentPage);
-                }
             } else {
                 // Fall back to Verovio's getElementsAtTime
                 // In this mode, we still remove all notes first since we don't have duration info
@@ -1194,13 +1214,7 @@
                     playingNote.classList.remove("playing");
                 }
 
-                const currentElements = tk.getElementsAtTime(highlightTimeMs);
                 if (!currentElements || currentElements.page === 0) return;
-
-                if (currentElements.page !== currentPage) {
-                    currentPage = currentElements.page;
-                    document.getElementById("scoreCanvas").innerHTML = tk.renderToSVG(currentPage);
-                }
 
                 if (Array.isArray(currentElements.notes)) {
                     for (const note of currentElements.notes) {
@@ -1609,6 +1623,48 @@
             renderScore();
         }
 
+        async function handleSystemsPerPageChange(event) {
+            if (!isLoaded || !tk) return;
+
+            const systems = parseInt(event.target.value);
+            currentSystemsPerPage = systems;
+            systemsValue.textContent = systems === 1 ? '1 system' : `${systems} systems`;
+
+            console.log('[Systems] Changing to', systems, 'systems per page');
+
+            // Stop playback if playing
+            if (playerState === 'playing' || playerState === 'paused') {
+                console.log('[Systems] Stopping playback before rebuilding');
+                stopMIDIHandler();
+            }
+
+            // Update Verovio options
+            tk.setOptions({
+                pageWidth: 2100,
+                pageHeight: 2970,
+                scale: currentScale,
+                adjustPageHeight: true,
+                spacingStaff: 20,
+                systemMaxPerPage: systems,
+                breaks: "auto",
+                xmlIdSeed: 0
+            });
+
+            // Rebuild the score by reloading the current score
+            if (currentScoreIndex >= 0 && currentScoreIndex < scoreLibraryData.length) {
+                const score = scoreLibraryData[currentScoreIndex];
+                console.log('[Systems] Rebuilding score:', score.title);
+                try {
+                    // Reload without resetting the dropdown selection
+                    await loadMusicXMLFile(score.path, score.jsonPath);
+                    console.log('[Systems] Score rebuilt with', systems, 'systems per page');
+                } catch (error) {
+                    console.error('[Systems] Error rebuilding score:', error);
+                    alert('Error rebuilding score: ' + error.message);
+                }
+            }
+        }
+
         function handlePageChange(event) {
             const page = parseInt(event.target.value);
             goToPage(page);
@@ -1837,6 +1893,12 @@
                 currentPageLabel.textContent = `Page 1`;
                 totalPagesLabel.textContent = `of ${totalPages}`;
                 updatePageButtons();
+
+                // Enable systems slider
+                systemsSlider.disabled = false;
+                systemsSlider.value = currentSystemsPerPage;
+                systemsValue.textContent = currentSystemsPerPage === 1 ? '1 system' : `${currentSystemsPerPage} systems`;
+
                 console.log('[App] Total pages:', totalPages);
 
                 // Render score
@@ -1974,6 +2036,12 @@
                 currentPageLabel.textContent = `Page 1`;
                 totalPagesLabel.textContent = `of ${totalPages}`;
                 updatePageButtons();
+
+                // Enable systems slider
+                systemsSlider.disabled = false;
+                systemsSlider.value = currentSystemsPerPage;
+                systemsValue.textContent = currentSystemsPerPage === 1 ? '1 system' : `${currentSystemsPerPage} systems`;
+
                 console.log('[App] Total pages:', totalPages);
 
                 renderScore();

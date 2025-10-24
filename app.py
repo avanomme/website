@@ -27,6 +27,11 @@ app = Flask(__name__)
 def flash_cards_static(filename):
     return send_from_directory('flash_cards', filename)
 
+# Serve static files from music_player directory
+@app.route('/music_player/<path:filename>')
+def music_player_static(filename):
+    return send_from_directory('music_player', filename)
+
 def generate_dot(alph, nodes, initial, dead, final, transitions):
     if not GRAPHVIZ_AVAILABLE:
         return None
@@ -110,6 +115,11 @@ def dfa():
 @app.route('/study.html')
 def study():
     return render_template('study.html')
+
+@app.route('/grinch')
+@app.route('/grinch.html')
+def grinch():
+    return send_from_directory('music_player', 'rehearse.html')
 
 if __name__ == '__main__':
     app.run(debug=True)

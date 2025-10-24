@@ -3,14 +3,14 @@
     {
       "id": "014-santa-for-a-day",
       "title": "014 Santa for a Day",
-      "path": "scores/014-santa-for-a-day/014-santa-for-a-day.mei",
-      "jsonPath": "scores/014-santa-for-a-day/014-santa-for-a-day.json"
+      "path": "/music_player/scores/04_santa_for_a_day/014_Santa_For_a_Day.mei",
+      "jsonPath": "/music_player/scores/04_santa_for_a_day/014_Santa_For_a_Day.json"
     },
     {
       "id": "we-three",
       "title": "We Three Kings",
-      "path": "scores/we-three/we-three.mei",
-      "jsonPath": "scores/we-three/we-three.json"
+      "path": "/music_player/scores/we-three/we-three.mei",
+      "jsonPath": "/music_player/scores/we-three/we-three.json"
     }
   ]
 }
