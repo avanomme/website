@@ -1,0 +1,16 @@
+{
+  "title": "007_its_the_thought",
+  "composer": "Unknown",
+  "generated": "2025-10-24T22:55:47.846Z",
+  "assets": {
+    "mei": "007_its_the_thought.mei",
+    "timemap": "007_its_the_thought.json",
+    "midi": "007_its_the_thought.mid",
+    "svgPreview": "007_its_the_thought-preview.svg"
+  },
+  "stats": {
+    "timemapEvents": 1194,
+    "tempoChanges": 5,
+    "midiSizeKB": "36.16"
+  }
+}
