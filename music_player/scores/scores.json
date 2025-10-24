@@ -1,0 +1,16 @@
+{
+  "scores": [
+    {
+      "id": "014-santa-for-a-day",
+      "title": "014 Santa for a Day",
+      "path": "scores/014-santa-for-a-day/014-santa-for-a-day.mei",
+      "jsonPath": "scores/014-santa-for-a-day/014-santa-for-a-day.json"
+    },
+    {
+      "id": "we-three",
+      "title": "We Three Kings",
+      "path": "scores/we-three/we-three.mei",
+      "jsonPath": "scores/we-three/we-three.json"
+    }
+  ]
+}

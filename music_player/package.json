@@ -1,0 +1,27 @@
+{
+  "name": "stratford-rehearse",
+  "version": "1.0.0",
+  "description": "MuseScore Rehearse 4 - Music practice and rehearsal tool",
+  "scripts": {
+    "prerender": "node scripts/prerender-browser.js",
+    "serve": "npx http-server -p 8080 -c-1",
+    "generate-timemaps": "node generate-timemaps.js",
+    "generate-all": "node generate-all-assets.js"
+  },
+  "keywords": [
+    "music",
+    "verovio",
+    "musicxml",
+    "rehearsal"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "puppeteer": "^22.0.0",
+    "serve-handler": "^6.1.5"
+  },
+  "dependencies": {
+    "vercel": "^48.5.0",
+    "verovio": "^4.5.1"
+  }
+}

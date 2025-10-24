@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>MIDI playback</title>
+        <!-- A stylesheet for modifying the appearance of the notes being played -->
+        <link href="midi.css" rel="stylesheet" type="text/css" />
+        <style>
+            g.note.playing,
+            g.chord.playing {
+                fill: #764ba2 !important;
+                stroke: #764ba2 !important;
+                opacity: 0.9 !important;
+                animation: note-pulse 0.5s ease-in-out;
+            }
+
+            g.note.playing path,
+            g.note.playing rect,
+            g.note.playing ellipse,
+            g.note.playing circle,
+            g.note.playing polygon,
+            g.note.playing line,
+            g.note.playing polyline,
+            g.chord.playing path,
+            g.chord.playing rect,
+            g.chord.playing ellipse,
+            g.chord.playing circle,
+            g.chord.playing polygon,
+            g.chord.playing line,
+            g.chord.playing polyline {
+                fill: #764ba2 !important;
+                stroke: #764ba2 !important;
+            }
+
+            @keyframes note-pulse {
+                0% {
+                    fill: #667eea;
+                    opacity: 0.7;
+                }
+                50% {
+                    fill: #764ba2;
+                    opacity: 1.0;
+                }
+                100% {
+                    fill: #764ba2;
+                    opacity: 0.9;
+                }
+            }
+        </style>
+        <!-- Verovio -->
+        <script src="https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" defer></script>
+        <!-- Tone.js and MIDI parser -->
+        <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+        <!-- Local soundfonts -->
+        <script src="soundfonts/acoustic_grand_piano-ogg.js" defer></script>
+        <script src="soundfonts/choir_aahs-ogg.js" defer></script>
+    </head>
+    <body>
+        <div style="margin-bottom: 1em;">
+            <label for="measureSlider" style="font-weight: bold; margin-right: 0.5em;">Start at measure:</label>
+            <input type="range" id="measureSlider" min="1" max="1" value="1" style="vertical-align: middle;">
+            <span id="measureNumber" style="font-family: monospace; margin-left: 0.5em;">1</span>
+        </div>
+        <button id="playMIDI">Play</button>
+        <button id="stopMIDI">Stop</button>
+        <div id="notation"></div>
+        <script>
+            /** 
+                We need to wait for the whole page to load before we try to 
+                work with Verovio.
+            **/
+            document.addEventListener("DOMContentLoaded", (event) => {
+                // Slider and measure number UI
+                const measureSlider = document.getElementById("measureSlider");
+                const measureNumberDisplay = document.getElementById("measureNumber");
+
+                verovio.module.onRuntimeInitialized = function () {
+                    // This line initializes the Verovio toolkit
+                    const tk = new verovio.toolkit();
+
+                    tk.setOptions({
+                        pageWidth: 2100,
+                        pageHeight: 2970,
+                        scale: 45,
+                        adjustPageHeight: true,
+                        spacingStaff: 20,
+                        systemMaxPerPage: 1,     // 👈 this is key
+                        breaks: "auto"
+                    });
+
+                    // The current page, which will change when playing through the piece
+                    let currentPage = 1;
+
+                    let midi = null;
+                    let highlightLoopId = null;
+                    let totalDuration = 0;
+                    let isLoaded = false;
+                    let schedulePlaybackPromise = null;
+                    let totalMeasures = 1;
+                    let startMeasure = 1;
+
+                    const samplerCache = new Map();
+                    const activePlayers = new Set();
+                    const DEFAULT_SOUNDFONT = "acoustic_grand_piano";
+                    const FALLBACK_PLAYER_KEY = "__fallback_poly_synth__";
+                    const SOUND_FONT_PROGRAM_MAP = new Map([
+                        [0, "acoustic_grand_piano"],
+                        [52, "choir_aahs"]
+                    ]);
+                    const SOUND_FONT_KEYWORDS = [
+                        { keyword: "choir aahs", soundfont: "choir_aahs" },
+                        { keyword: "choir", soundfont: "choir_aahs" },
+                        { keyword: "voice", soundfont: "choir_aahs" },
+                        { keyword: "soprano", soundfont: "choir_aahs" },
+                        { keyword: "alto", soundfont: "choir_aahs" },
+                        { keyword: "tenor", soundfont: "choir_aahs" },
+                        { keyword: "bass", soundfont: "choir_aahs" },
+                        { keyword: "piano", soundfont: "acoustic_grand_piano" },
+                        { keyword: "acoustic grand piano", soundfont: "acoustic_grand_piano" }
+                    ];
+
+                    const resolveSoundfontKey = (track) => {
+                        const programNumber = track?.instrument?.number;
+                        if (typeof programNumber === "number" && SOUND_FONT_PROGRAM_MAP.has(programNumber)) {
+                            return SOUND_FONT_PROGRAM_MAP.get(programNumber);
+                        }
+
+                        const instrumentName = (track?.instrument?.name || "").toLowerCase();
+                        for (const { keyword, soundfont } of SOUND_FONT_KEYWORDS) {
+                            if (instrumentName.includes(keyword)) {
+                                return soundfont;
+                            }
+                        }
+
+                        const instrumentFamily = (track?.instrument?.family || "").toLowerCase();
+                        for (const { keyword, soundfont } of SOUND_FONT_KEYWORDS) {
+                            if (instrumentFamily.includes(keyword)) {
+                                return soundfont;
+                            }
+                        }
+
+                        return DEFAULT_SOUNDFONT;
+                    };
+
+                    const getFallbackPlayer = () => {
+                        if (!samplerCache.has(FALLBACK_PLAYER_KEY)) {
+                            samplerCache.set(FALLBACK_PLAYER_KEY, new Tone.PolySynth(Tone.Synth).toDestination());
+                        }
+                        return samplerCache.get(FALLBACK_PLAYER_KEY);
+                    };
+
+                    const getSamplerForSoundfont = async (soundfontKey) => {
+                        if (samplerCache.has(soundfontKey)) {
+                            return samplerCache.get(soundfontKey);
+                        }
+                        // Use the prebuilt MIDI.js soundfont objects directly
+                        if (
+                            typeof MIDI !== "undefined" &&
+                            MIDI.Soundfont &&
+                            MIDI.Soundfont[soundfontKey]
+                        ) {
+                            const soundfontData = MIDI.Soundfont[soundfontKey];
+                            const sampler = new Tone.Sampler({
+                                urls: soundfontData,
+                                attack: soundfontKey === "acoustic_grand_piano" ? 0.002 : 0.01,
+                                release: soundfontKey === "acoustic_grand_piano" ? 2.5 : 1.5
+                            }).toDestination();
+                            try {
+                                await sampler.loaded;
+                            } catch (error) {
+                                console.error(`Failed to load soundfont "${soundfontKey}":`, error);
+                                if (typeof sampler.dispose === "function") {
+                                    sampler.dispose();
+                                }
+                                return null;
+                            }
+                            samplerCache.set(soundfontKey, sampler);
+                            return sampler;
+                        }
+                        console.warn(`Soundfont "${soundfontKey}" not found in MIDI.Soundfont; using fallback synth.`);
+                        return null;
+                    };
+
+                    const getPlayerForTrack = async (track) => {
+                        const soundfontKey = resolveSoundfontKey(track);
+                        const sampler = await getSamplerForSoundfont(soundfontKey);
+                        return sampler || getFallbackPlayer();
+                    };
+
+                    // Used to offset highlighting and playback time
+                    let startMeasureTime = 0;
+                    // Time map for precise highlighting and slider
+                    let timeMap = null;
+
+                    // Utility: binary search in timeMap.events for closest event.tstamp <= absSeconds*1000
+                    function findClosestTimeMapEvent(absSeconds) {
+                        if (!timeMap || !timeMap.events || timeMap.events.length === 0) return null;
+                        let left = 0, right = timeMap.events.length - 1, result = null;
+                        let absMs = absSeconds * 1000;
+                        while (left <= right) {
+                            let mid = Math.floor((left + right) / 2);
+                            let t = timeMap.events[mid].tstamp;
+                            if (t <= absMs) {
+                                result = timeMap.events[mid];
+                                left = mid + 1;
+                            } else {
+                                right = mid - 1;
+                            }
+                        }
+                        return result;
+                    }
+
+                    const highlightCurrentTime = function (currentSeconds) {
+                        const playingNotes = document.querySelectorAll('g.note.playing');
+                        for (const playingNote of playingNotes) {
+                            playingNote.classList.remove("playing");
+                        }
+
+                        // Use timeMap.events for highlighting, matching against tstamp (ms)
+                        let highlightTimeMs = 0;
+                        if (timeMap && Array.isArray(timeMap.events) && timeMap.events.length > 0) {
+                            // Add startMeasureTime to currentSeconds for partial playback
+                            let absSeconds = currentSeconds + startMeasureTime;
+                            let event = findClosestTimeMapEvent(absSeconds);
+                            if (event) {
+                                highlightTimeMs = event.tstamp;
+                            } else {
+                                highlightTimeMs = absSeconds * 1000;
+                            }
+                        } else {
+                            // Fallback
+                            highlightTimeMs = (currentSeconds + startMeasureTime) * 1000;
+                        }
+
+                        const currentElements = tk.getElementsAtTime(highlightTimeMs);
+                        if (!currentElements || currentElements.page === 0) return;
+
+                        if (currentElements.page !== currentPage) {
+                            currentPage = currentElements.page;
+                            document.getElementById("notation").innerHTML = tk.renderToSVG(currentPage);
+                        }
+
+                        if (Array.isArray(currentElements.notes)) {
+                            for (const note of currentElements.notes) {
+                                const noteElement = document.getElementById(note);
+                                if (noteElement) {
+                                    noteElement.classList.add("playing");
+                                }
+                            }
+                        }
+                    };
+
+                    const stopHighlightLoop = function () {
+                        if (highlightLoopId !== null) {
+                            Tone.Transport.clear(highlightLoopId);
+                            highlightLoopId = null;
+                        }
+                    };
+
+                    const resetTransport = function () {
+                        Tone.Transport.stop();
+                        Tone.Transport.cancel();
+                        Tone.Transport.position = 0;
+                        stopHighlightLoop();
+                        activePlayers.forEach((player) => {
+                            if (typeof player.releaseAll === "function") {
+                                player.releaseAll();
+                            }
+                        });
+                        activePlayers.clear();
+                        highlightCurrentTime(0);
+                    };
+
+                    const schedulePlayback = async function () {
+                        if (!midi) return;
+
+                        resetTransport();
+
+                        // Determine start measure from slider
+                        startMeasure = parseInt(measureSlider.value, 10) || 1;
+
+                        // Find the earliest note.time for the selected startMeasure using the time map
+                        let measureTimes = [];
+                        let midiMeasures = [];
+                        if (typeof tk.getMeasures === "function") {
+                            midiMeasures = tk.getMeasures();
+                            measureTimes = midiMeasures.map(m => (m["@start"] || 0) / 1000);
+                        }
+                        if ((!measureTimes || measureTimes.length === 0) && timeMap && Array.isArray(timeMap.measures)) {
+                            measureTimes = timeMap.measures.map(m => (m.absoluteTime || 0) / 1000);
+                        }
+                        if (!measureTimes || measureTimes.length === 0) {
+                            // Fallback: estimate from notes
+                            let allNotes = [];
+                            midi.tracks.forEach(track => {
+                                if (track.notes) allNotes = allNotes.concat(track.notes);
+                            });
+                            allNotes.sort((a, b) => a.time - b.time);
+                            let seen = new Set();
+                            for (const n of allNotes) {
+                                if (n.measure && !seen.has(n.measure)) {
+                                    measureTimes.push(n.time);
+                                    seen.add(n.measure);
+                                }
+                            }
+                        }
+                        if (!measureTimes || measureTimes.length === 0) measureTimes = [0];
+                        // Clamp startMeasure
+                        if (startMeasure < 1) startMeasure = 1;
+                        if (startMeasure > measureTimes.length) startMeasure = measureTimes.length;
+                        startMeasureTime = measureTimes[startMeasure - 1] || 0;
+
+                        const trackPlayers = await Promise.all(
+                            midi.tracks.map(async (track) => {
+                                if (!track.notes || track.notes.length === 0) {
+                                    return null;
+                                }
+                                try {
+                                    const player = await getPlayerForTrack(track);
+                                    return { track, player };
+                                } catch (error) {
+                                    console.error("Failed to prepare player for track:", error);
+                                    return null;
+                                }
+                            })
+                        );
+
+                        // Set initial tempo from timeMap if available, else fallback to MIDI header
+                        let initialBpm = 120;
+                        if (timeMap && Array.isArray(timeMap.events)) {
+                            // Find the first event with a tempo property at or after startMeasureTime
+                            let foundTempo = null;
+                            for (let i = 0; i < timeMap.events.length; ++i) {
+                                const ev = timeMap.events[i];
+                                if (typeof ev.tempo === "number" && (ev.tstamp/1000) >= startMeasureTime) {
+                                    foundTempo = ev.tempo;
+                                    break;
+                                }
+                            }
+                            // If not found, look for the latest tempo before startMeasureTime
+                            if (!foundTempo) {
+                                for (let i = timeMap.events.length - 1; i >= 0; --i) {
+                                    const ev = timeMap.events[i];
+                                    if (typeof ev.tempo === "number" && (ev.tstamp/1000) <= startMeasureTime) {
+                                        foundTempo = ev.tempo;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (foundTempo) initialBpm = foundTempo;
+                        } else if (midi.header && midi.header.tempos && midi.header.tempos.length > 0) {
+                            initialBpm = midi.header.tempos[0].bpm;
+                        }
+                        Tone.Transport.bpm.value = initialBpm;
+
+                        // Schedule tempo changes using timeMap.events
+                        if (timeMap && Array.isArray(timeMap.events)) {
+                            timeMap.events.forEach(ev => {
+                                if (typeof ev.tempo === "number") {
+                                    // Only schedule tempo changes that occur after startMeasureTime
+                                    let eventSeconds = ev.tstamp / 1000;
+                                    if (eventSeconds >= startMeasureTime) {
+                                        Tone.Transport.schedule((time) => {
+                                            // Use immediate tempo change (no ramp) for better sync
+                                            Tone.Transport.bpm.value = ev.tempo;
+                                        }, eventSeconds - startMeasureTime);
+                                    }
+                                }
+                            });
+                        } else if (midi.header && midi.header.tempos && midi.header.tempos.length > 0) {
+                            midi.header.tempos.slice(1).forEach(tempoEvent => {
+                                if (tempoEvent.time >= startMeasureTime) {
+                                    Tone.Transport.schedule((time) => {
+                                        Tone.Transport.bpm.value = tempoEvent.bpm;
+                                    }, tempoEvent.time - startMeasureTime);
+                                }
+                            });
+                        }
+
+                        await Tone.loaded();
+
+                        // Schedule only notes at or after startMeasureTime
+                        trackPlayers.forEach((entry) => {
+                            if (!entry) return;
+                            const { track, player } = entry;
+                            activePlayers.add(player);
+                            track.notes.forEach((note) => {
+                                if (note.time >= startMeasureTime) {
+                                    Tone.Transport.schedule((time) => {
+                                        player.triggerAttackRelease(note.name, note.duration, time, note.velocity ?? 0.8);
+                                    }, note.time - startMeasureTime);
+                                }
+                            });
+                        });
+
+                        // Calculate total duration from start point
+                        let maxEnd = 0;
+                        midi.tracks.forEach(track => {
+                            if (track.notes && track.notes.length > 0) {
+                                for (const note of track.notes) {
+                                    if (note.time >= startMeasureTime) {
+                                        maxEnd = Math.max(maxEnd, note.time - startMeasureTime + note.duration);
+                                    }
+                                }
+                            }
+                        });
+                        totalDuration = maxEnd + 1;
+
+                        highlightLoopId = Tone.Transport.scheduleRepeat(() => {
+                            const currentSeconds = Tone.Transport.seconds;
+                            highlightCurrentTime(currentSeconds);
+                            if (currentSeconds >= totalDuration) {
+                                stopMIDIHandler();
+                            }
+                        }, 0.05);
+                    };
+
+                    const preparePlayback = async function () {
+                        if (!schedulePlaybackPromise) {
+                            schedulePlaybackPromise = schedulePlayback()
+                                .catch((error) => {
+                                    console.error("Failed to schedule playback:", error);
+                                    throw error;
+                                })
+                                .finally(() => {
+                                    schedulePlaybackPromise = null;
+                                });
+                        }
+                        return schedulePlaybackPromise;
+                    };
+
+                    const playMIDIHandler = async function () {
+                        if (!isLoaded || !midi) return;
+                        if (Tone.Transport.state === "started") return;
+
+                        try {
+                            await Tone.start();
+                            await preparePlayback();
+                            if (Tone.Transport.state === "started") return;
+                            // Reset highlight to start measure
+                            highlightCurrentTime(0);
+                            Tone.Transport.start("+0.05");
+                        } catch (error) {
+                            console.error("Failed to start playback:", error);
+                        }
+                    };
+
+                    const stopMIDIHandler = function () {
+                        resetTransport();
+                    };
+
+                    /**
+                        Wire up the buttons to actually work.
+                    */
+                    document.getElementById("playMIDI").addEventListener("click", playMIDIHandler);
+                    document.getElementById("stopMIDI").addEventListener("click", stopMIDIHandler);
+
+                    // Slider UI event: update label live
+                    measureSlider.addEventListener("input", function () {
+                        measureNumberDisplay.textContent = measureSlider.value;
+                    });
+                    // Make slider functional: jump to measure start time using time map
+                    measureSlider.addEventListener("change", function () {
+                        // Only if loaded and timeMap available
+                        if (!isLoaded || !timeMap || !Array.isArray(timeMap.measures) || timeMap.measures.length === 0) return;
+                        let selectedMeasure = parseInt(measureSlider.value, 10) || 1;
+                        if (selectedMeasure < 1) selectedMeasure = 1;
+                        if (selectedMeasure > timeMap.measures.length) selectedMeasure = timeMap.measures.length;
+                        // Get the absolute time in ms for the selected measure
+                        let absMs = timeMap.measures[selectedMeasure - 1].absoluteTime || 0;
+                        let absSeconds = absMs / 1000;
+                        // Stop playback if running
+                        if (Tone.Transport.state === "started") {
+                            stopMIDIHandler();
+                        }
+                        // Set startMeasure and startMeasureTime for next playback
+                        startMeasure = selectedMeasure;
+                        startMeasureTime = absSeconds;
+                        // Show correct measure/page in notation
+                        // Use getElementsAtTime to get page for this time
+                        const currentElements = tk.getElementsAtTime(absMs);
+                        if (currentElements && currentElements.page > 0 && currentElements.page !== currentPage) {
+                            currentPage = currentElements.page;
+                            document.getElementById("notation").innerHTML = tk.renderToSVG(currentPage);
+                        }
+                        // Highlight at new position
+                        highlightCurrentTime(0);
+                    });
+
+                    // This line fetches the MEI file we want to render...
+                    fetch("we-three.mei")
+                    // ... then receives the response and "unpacks" the MEI from it
+                    .then((response) => response.text())
+                    .then((meiData) => {
+                        // ... then we can load the data into Verovio ...
+                        const result = tk.loadData(meiData);
+                        if (!result) {
+                            throw new Error("Verovio failed to load the MEI file.");
+                        }
+                        // ... and generate the SVG for the first page ...
+                        let svg = tk.renderToSVG(1);
+                        document.getElementById("notation").innerHTML = svg;
+
+                        // Generate the time map for precise highlighting & slider
+                        timeMap = tk.renderToTimemap();
+                        // The timeMap.events is an array of time events with absoluteTime (ms), measure, etc.
+                        // The timeMap.measures is an array of measures with absoluteTime (ms), etc.
+
+                        const base64midi = tk.renderToMIDI();
+                        const midiByteArray = Uint8Array.from(atob(base64midi), c => c.charCodeAt(0));
+                        midi = new Midi(midiByteArray.buffer);
+                        totalDuration = midi.duration + 1;
+                        isLoaded = true;
+
+                        // Determine total number of measures
+                        let measures = [];
+                        if (typeof tk.getMeasures === "function") {
+                            measures = tk.getMeasures();
+                            totalMeasures = measures.length;
+                        } else if (timeMap && Array.isArray(timeMap.measures)) {
+                            totalMeasures = timeMap.measures.length;
+                        } else if (typeof tk.getPageCount === "function") {
+                            // Fallback: try to estimate
+                            let allNotes = [];
+                            midi.tracks.forEach(track => {
+                                if (track.notes) allNotes = allNotes.concat(track.notes);
+                            });
+                            let measureSet = new Set();
+                            for (const note of allNotes) {
+                                if (note.measure) measureSet.add(note.measure);
+                            }
+                            totalMeasures = measureSet.size || 1;
+                        } else {
+                            totalMeasures = 1;
+                        }
+                        // Update slider UI
+                        measureSlider.max = totalMeasures;
+                        measureSlider.value = 1;
+                        measureNumberDisplay.textContent = "1";
+                    })
+                    .catch((error) => {
+                        console.error("Failed to load score:", error);
+                        document.getElementById("notation").innerHTML = `
+                            <div style="padding: 2rem; color: #b00020;">
+                                <strong>Error loading score:</strong> ${error.message}
+                            </div>`;
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,2297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stratford Choir Christmas 2025 Rehearsal</title>
+    <!-- Verovio for MusicXML rendering -->
+    <script src="https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" defer></script>
+    <!-- Tone.js and MIDI parser -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+    <!-- Local soundfonts -->
+    <script src="soundfonts/acoustic_grand_piano-ogg.js" defer></script>
+    <script src="soundfonts/choir_aahs-ogg.js" defer></script>
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #1a202c;
+            color: #e2e8f0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .rehearse-container {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            grid-template-rows: auto 1fr auto;
+            height: 100vh;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            color: white;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .header-actions button {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .header-actions button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar {
+            background: #2d3748;
+            padding: 20px;
+            overflow-y: auto;
+            grid-row: 2 / 4;
+        }
+
+        .sidebar h2 {
+            font-size: 1.3em;
+            margin-bottom: 12px;
+            color: #e2e8f0;
+        }
+
+        .sidebar h3 {
+            font-size: 1.1em;
+            margin: 25px 0 12px 0;
+            color: #cbd5e0;
+        }
+
+        .dropdown-section {
+            margin-bottom: 20px;
+        }
+
+        .dropdown-label {
+            font-size: 0.9em;
+            color: #cbd5e0;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .custom-select {
+            width: 100%;
+            padding: 10px 12px;
+            background: #374151;
+            border: 1px solid #4a5568;
+            border-radius: 6px;
+            color: #e2e8f0;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .custom-select:hover {
+            background: #4b5563;
+            border-color: #667eea;
+        }
+
+        .custom-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .custom-select option {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 8px;
+        }
+
+        .practice-tools {
+            background: #374151;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tool-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .tool-option input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .tool-option label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 0.95em;
+        }
+
+        .tool-option input[type="number"] {
+            width: 60px;
+            padding: 4px 8px;
+            background: #2d3748;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+            color: #e2e8f0;
+        }
+
+        .main-area {
+            grid-column: 2;
+            grid-row: 2;
+            display: flex;
+            flex-direction: column;
+            background: #f7fafc;
+            overflow: hidden;
+        }
+
+        .score-display {
+            flex: 1;
+            padding: 20px;
+            overflow: auto;
+            background: white;
+            color: #4a5568;
+        }
+
+        .score-display.has-score {
+            background: white;
+            padding: 10px;
+        }
+
+        #scoreCanvas {
+            width: 100%;
+            min-height: 400px;
+            display: none;
+        }
+
+        #scoreCanvas.visible {
+            display: block;
+        }
+
+        #scoreCanvas svg {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Verovio highlighting styles - official API with animations */
+        :root {
+            --animation-duration: 0.5s;
+        }
+
+        g.note.playing,
+        g.chord.playing {
+            fill: #22c55e !important;
+            stroke: #22c55e !important;
+            opacity: 0.9 !important;
+            animation: note-pulse var(--animation-duration) ease-in-out;
+        }
+
+        g.note.playing path,
+        g.note.playing rect,
+        g.note.playing ellipse,
+        g.note.playing circle,
+        g.note.playing polygon,
+        g.note.playing line,
+        g.note.playing polyline,
+        g.chord.playing path,
+        g.chord.playing rect,
+        g.chord.playing ellipse,
+        g.chord.playing circle,
+        g.chord.playing polygon,
+        g.chord.playing line,
+        g.chord.playing polyline {
+            fill: #22c55e !important;
+            stroke: #22c55e !important;
+        }
+
+        /* Pulse animation for active notes */
+        @keyframes note-pulse {
+            0% {
+                fill: #16a34a;
+                opacity: 0.7;
+            }
+            50% {
+                fill: #22c55e;
+                opacity: 1.0;
+            }
+            100% {
+                fill: #22c55e;
+                opacity: 0.9;
+            }
+        }
+
+        .placeholder {
+            text-align: center;
+        }
+
+        .placeholder-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .placeholder-text {
+            font-size: 1.3em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .placeholder-subtext {
+            font-size: 0.95em;
+            opacity: 0.7;
+        }
+
+        .controls-bar {
+            grid-column: 2;
+            grid-row: 3;
+            background: #2d3748;
+            padding: 20px 30px;
+            border-top: 1px solid #4a5568;
+        }
+
+        .controls-layout {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .playback-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .playback-buttons button {
+            width: 45px;
+            height: 45px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .playback-buttons button:hover {
+            background: #5568d3;
+            transform: scale(1.05);
+        }
+
+        .playback-buttons button:disabled {
+            background: #4a5568;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            color: #cbd5e0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #4a5568;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 14px;
+            height: 14px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .controls-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .tempo-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tempo-control label {
+            font-size: 0.85em;
+            color: #cbd5e0;
+        }
+
+        .tempo-control input {
+            width: 80px;
+        }
+
+        .tempo-value {
+            font-size: 0.85em;
+            color: #667eea;
+            font-weight: 600;
+            min-width: 45px;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: #4a5568;
+            height: 6px;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            background: #667eea;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .file-input-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .file-input-overlay.visible {
+            display: flex;
+        }
+
+        .file-input-dialog {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .file-input-dialog h2 {
+            color: #2d3748;
+            margin-bottom: 20px;
+        }
+
+        .file-input-dialog input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px dashed #cbd5e0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .file-input-dialog input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .file-input-dialog button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .file-input-dialog button.secondary {
+            background: #cbd5e0;
+            color: #2d3748;
+        }
+
+        .part-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            margin-bottom: 8px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .part-item:hover {
+            background: #edf2f7;
+            border-color: #667eea;
+        }
+
+        .part-item.muted {
+            opacity: 0.5;
+            background: #fff5f5;
+            border-color: #fc8181;
+        }
+
+        .part-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            cursor: pointer;
+        }
+
+        .part-item label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 500;
+            color: #2d3748;
+        }
+
+        .part-volume-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: auto;
+        }
+
+        .part-volume-control input[type="range"] {
+            width: 100px;
+        }
+
+        .part-volume-control span {
+            min-width: 35px;
+            font-size: 0.85em;
+            color: #718096;
+        }
+
+        @media (max-width: 1024px) {
+            .rehearse-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr auto;
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .controls-bar {
+                grid-column: 1;
+            }
+
+            .main-area {
+                grid-column: 1;
+            }
+
+            .header h1 {
+                font-size: 1.2em;
+            }
+
+            .header-actions {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+
+            .mobile-page-nav {
+                display: flex !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .header h1 {
+                font-size: 1.1em;
+            }
+
+            .header-actions {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header-actions > div {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .controls-layout {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto;
+                gap: 15px;
+            }
+
+            .playback-buttons {
+                justify-content: center;
+            }
+
+            .controls-right {
+                justify-content: center;
+            }
+
+            .tempo-control {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="rehearse-container">
+        <div class="header">
+            <h1>Stratford Choir Christmas 2025 Rehearsal</h1>
+            <div class="header-actions">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <label style="font-size: 0.9em; color: white;">🔊 Volume</label>
+                    <input type="range" id="volumeSlider" min="0" max="100" value="100" step="1" style="width: 120px;">
+                    <span id="volumeValue" style="font-size: 0.85em; color: white; min-width: 35px;">100%</span>
+                </div>
+                <button id="scoresBtn" style="padding: 8px 32px;">🎵 Scores</button>
+                <button id="partsBtn" style="padding: 8px 32px;">🎼 Parts</button>
+                <a href="videos.html" style="padding: 8px 16px; background: rgba(255, 255, 255, 0.2); color: white; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; cursor: pointer; font-weight: 600; transition: all 0.2s; text-decoration: none; display: inline-block;">📺 Videos</a>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="dropdown-section">
+                <label class="dropdown-label">Score Library</label>
+                <select class="custom-select" id="scoreLibrary">
+                    <option value="">Loading scores...</option>
+                </select>
+            </div>
+
+            <div class="dropdown-section">
+                <label class="dropdown-label">Page Navigation</label>
+                <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
+                    <button id="prevPageBtn" style="width: 40px; height: 40px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold;" disabled>◀</button>
+                    <div style="flex: 1;">
+                        <input type="range" id="pageSlider" min="1" max="1" value="1" step="1" style="width: 100%;" disabled>
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px; font-size: 0.85em; color: #cbd5e0;">
+                            <span id="currentPageLabel">Page 1</span>
+                            <span id="totalPagesLabel">of 1</span>
+                        </div>
+                    </div>
+                    <button id="nextPageBtn" style="width: 40px; height: 40px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 18px; font-weight: bold;" disabled>▶</button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="main-area">
+            <div class="score-display" id="scoreDisplay">
+                <div class="placeholder" id="scorePlaceholder">
+                    <div class="placeholder-icon">🎵</div>
+                    <div class="placeholder-text">No Score Loaded</div>
+                    <div class="placeholder-subtext">Load a music score to start rehearsing</div>
+                </div>
+                <div class="score-svg-container" id="scoreCanvas"></div>
+            </div>
+        </div>
+
+        <div class="controls-bar">
+            <div class="controls-layout">
+                <div class="playback-buttons">
+                    <button id="playBtn" disabled title="Play">▶</button>
+                    <button id="pauseBtn" disabled title="Pause">⏸</button>
+                    <button id="stopBtn" disabled title="Stop">⏹</button>
+                </div>
+
+                <div class="progress-section">
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <span id="duration">0:00</span>
+                    </div>
+                    <div class="progress-bar" id="progressBar">
+                        <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <div class="controls-right">
+                    <div class="mobile-page-nav" style="display: none; align-items: center; gap: 10px; margin-right: 15px;">
+                        <button id="mobilePrevPageBtn" style="width: 35px; height: 35px; background: #4a5568; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;" disabled>◀</button>
+                        <span id="mobilePageLabel" style="font-size: 0.85em; color: #cbd5e0; min-width: 70px; text-align: center;">Page 1/1</span>
+                        <button id="mobileNextPageBtn" style="width: 35px; height: 35px; background: #4a5568; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;" disabled>▶</button>
+                    </div>
+                    <div class="tempo-control">
+                        <button id="zoomOutBtn" style="width: 35px; height: 35px; background: #4a5568; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-right: 5px;" title="Zoom Out">−</button>
+                        <button id="zoomInBtn" style="width: 35px; height: 35px; background: #4a5568; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-right: 15px;" title="Zoom In">+</button>
+                        <label>Tempo</label>
+                        <input type="range" id="tempoSlider" min="25" max="200" value="100" step="5">
+                        <span class="tempo-value" id="tempoValue">100%</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- File Input Overlay -->
+    <div class="file-input-overlay" id="fileInputOverlay">
+        <div class="file-input-dialog">
+            <h2>Load Music Score</h2>
+            <input type="file" id="fileInput" accept=".mscz,.mscx,.mxl,.musicxml,.xml,.mid,.midi">
+            <p style="text-align: center; color: #718096; margin: 10px 0;">or</p>
+            <input type="text" id="urlInput" placeholder="Enter URL to score file...">
+            <div>
+                <button id="loadBtn">Load</button>
+                <button class="secondary" id="cancelBtn">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Parts Selection Overlay -->
+    <div class="file-input-overlay" id="partsOverlay">
+        <div class="file-input-dialog" style="max-width: 600px;">
+            <h2>Select Parts to Play</h2>
+            <p style="color: #718096; margin-bottom: 15px; font-size: 0.9em;">Toggle which parts you want to hear during playback</p>
+            <div id="partsList" style="max-height: 400px; overflow-y: auto; margin-bottom: 20px;">
+                <p style="text-align: center; color: #a0aec0; padding: 40px;">Load a score to see available parts</p>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <div>
+                    <button id="selectAllParts" style="background: #48bb78;">Select All</button>
+                    <button id="deselectAllParts" style="background: #f56565;">Deselect All</button>
+                </div>
+                <button class="secondary" id="partsCloseBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scores Selection Overlay -->
+    <div class="file-input-overlay" id="scoresOverlay">
+        <div class="file-input-dialog" style="max-width: 500px;">
+            <h2>Select Score</h2>
+            <p style="color: #718096; margin-bottom: 15px; font-size: 0.9em;">Choose a score from the library</p>
+            <div style="margin-bottom: 20px;">
+                <select class="custom-select" id="mobileScoreLibrary" style="width: 100%; padding: 12px; background: #374151; border: 1px solid #4a5568; border-radius: 6px; color: #e2e8f0; font-size: 1em;">
+                    <option value="">Loading scores...</option>
+                </select>
+            </div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button class="secondary" id="scoresCloseBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('[App] Script starting...');
+
+        // Score library scanner (inline implementation)
+        async function scanForMIDIFiles(directory) {
+            try {
+                const response = await fetch(directory + '/scores.json');
+                if (!response.ok) {
+                    console.warn('scores.json not found, returning empty library');
+                    return [];
+                }
+                const data = await response.json();
+                return data.scores || [];
+            } catch (error) {
+                console.error('Error loading scores.json:', error);
+                return [];
+            }
+        }
+
+        console.log('[App] scanForMIDIFiles function defined');
+
+        // Global state
+        let player = null;
+        let scoreLibraryData = [];
+        let currentScoreIndex = -1;
+        let totalPages = 1;
+
+        // DOM elements
+        const fileInputOverlay = document.getElementById('fileInputOverlay');
+        const fileInput = document.getElementById('fileInput');
+        const urlInput = document.getElementById('urlInput');
+        const loadBtn = document.getElementById('loadBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        const tempoSlider = document.getElementById('tempoSlider');
+        const tempoValue = document.getElementById('tempoValue');
+        const zoomInBtn = document.getElementById('zoomInBtn');
+        const zoomOutBtn = document.getElementById('zoomOutBtn');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const scoreLibraryEl = document.getElementById('scoreLibrary');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const volumeValue = document.getElementById('volumeValue');
+        const partsBtn = document.getElementById('partsBtn');
+        const partsOverlay = document.getElementById('partsOverlay');
+        const partsList = document.getElementById('partsList');
+        const selectAllParts = document.getElementById('selectAllParts');
+        const deselectAllParts = document.getElementById('deselectAllParts');
+        const partsCloseBtn = document.getElementById('partsCloseBtn');
+        const pageSlider = document.getElementById('pageSlider');
+        const prevPageBtn = document.getElementById('prevPageBtn');
+        const nextPageBtn = document.getElementById('nextPageBtn');
+        const currentPageLabel = document.getElementById('currentPageLabel');
+        const totalPagesLabel = document.getElementById('totalPagesLabel');
+        const scoresBtn = document.getElementById('scoresBtn');
+        const scoresOverlay = document.getElementById('scoresOverlay');
+        const mobileScoreLibrary = document.getElementById('mobileScoreLibrary');
+        const scoresCloseBtn = document.getElementById('scoresCloseBtn');
+        const mobilePrevPageBtn = document.getElementById('mobilePrevPageBtn');
+        const mobileNextPageBtn = document.getElementById('mobileNextPageBtn');
+        const mobilePageLabel = document.getElementById('mobilePageLabel');
+
+        // Verovio and playback state
+        let tk = null;
+        let midi = null;
+        let currentPage = 1;
+        let timeMap = null;
+        let totalDuration = 0;
+        let totalMeasures = 1;
+        let isLoaded = false;
+        let highlightLoopId = null;
+        let schedulePlaybackPromise = null;
+        let startMeasureTime = 0;
+        let startMeasure = 1; // Selected start measure
+        let currentScale = 32; // 70% of original 45
+        let playerState = 'stopped';
+        let currentTime = 0;
+        let pausedTime = 0; // Time when paused (in Transport seconds)
+        let masterVolume = 1.0;
+        let tempoFactor = 1.0;
+
+        // Track management
+        const samplerCache = new Map();
+        const activePlayers = new Set();
+        const mutedTracks = new Set();
+        const trackVolumes = new Map();
+        const trackPlayers = new Map(); // Map track index to player instance for live volume control
+        const DEFAULT_SOUNDFONT = "acoustic_grand_piano";
+        const FALLBACK_PLAYER_KEY = "__fallback_poly_synth__";
+        const SOUND_FONT_PROGRAM_MAP = new Map([
+            [0, "acoustic_grand_piano"],
+            [52, "choir_aahs"]
+        ]);
+        const SOUND_FONT_KEYWORDS = [
+            { keyword: "choir aahs", soundfont: "choir_aahs" },
+            { keyword: "choir", soundfont: "choir_aahs" },
+            { keyword: "voice", soundfont: "choir_aahs" },
+            { keyword: "soprano", soundfont: "choir_aahs" },
+            { keyword: "alto", soundfont: "choir_aahs" },
+            { keyword: "tenor", soundfont: "choir_aahs" },
+            { keyword: "bass", soundfont: "choir_aahs" },
+            { keyword: "piano", soundfont: "acoustic_grand_piano" },
+            { keyword: "acoustic grand piano", soundfont: "acoustic_grand_piano" }
+        ];
+
+        // Initialize audio context on first user interaction (mobile fix)
+        let audioUnlocked = false;
+        async function unlockAudio() {
+            if (audioUnlocked) return;
+            try {
+                console.log('[Audio] Attempting to unlock audio context...');
+                await Tone.start();
+                if (Tone.context.state !== 'running') {
+                    await Tone.context.resume();
+                }
+                console.log('[Audio] Audio context unlocked, state:', Tone.context.state);
+                audioUnlocked = true;
+            } catch (error) {
+                console.error('[Audio] Failed to unlock audio:', error);
+            }
+        }
+
+        async function init() {
+            try {
+                console.log('[App] Initializing Verovio...');
+
+                // Verovio toolkit will be initialized after WASM loads
+                tk = new verovio.toolkit();
+
+                tk.setOptions({
+                    pageWidth: 2100,
+                    pageHeight: 2970,
+                    scale: currentScale,
+                    adjustPageHeight: true,
+                    spacingStaff: 20,
+                    systemMaxPerPage: 1,
+                    breaks: "auto",
+                    xmlIdSeed: 0  // Generate consistent IDs matching timemap JSON
+                });
+
+                console.log('[App] Verovio toolkit initialized');
+
+                // UI event listeners
+                cancelBtn.addEventListener('click', () => fileInputOverlay.classList.remove('visible'));
+                loadBtn.addEventListener('click', handleLoad);
+                fileInput.addEventListener('change', handleFileSelect);
+                playBtn.addEventListener('click', async () => {
+                    await unlockAudio(); // Ensure audio is unlocked before playing
+                    await playMIDIHandler();
+                });
+                pauseBtn.addEventListener('click', pauseMIDIHandler);
+                stopBtn.addEventListener('click', stopMIDIHandler);
+                progressBar.addEventListener('click', handleProgressClick);
+                tempoSlider.addEventListener('input', handleTempoChange);
+                zoomInBtn.addEventListener('click', handleZoomIn);
+                zoomOutBtn.addEventListener('click', handleZoomOut);
+
+                // Page navigation
+                pageSlider.addEventListener('input', handlePageChange);
+                prevPageBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        goToPage(currentPage - 1);
+                    }
+                });
+                nextPageBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        goToPage(currentPage + 1);
+                    }
+                });
+
+                // Volume controls
+                volumeSlider.addEventListener('input', (e) => {
+                    masterVolume = parseInt(e.target.value) / 100;
+                    // Set volume in decibels (0 dB = unity gain)
+                    Tone.Destination.volume.value = Tone.gainToDb(masterVolume);
+                    volumeValue.textContent = `${e.target.value}%`;
+                    console.log('[Volume] Master volume set to', masterVolume, '(' + Tone.gainToDb(masterVolume).toFixed(2) + ' dB)');
+
+                    // Apply master volume change to all active players immediately (live update)
+                    trackPlayers.forEach((player, trackIdx) => {
+                        if (player && player.volume) {
+                            const trackVolume = trackVolumes.get(trackIdx) || 1.0;
+                            const volumeDb = Tone.gainToDb(trackVolume * masterVolume);
+                            player.volume.value = volumeDb;
+                            console.log('[Volume] Live update - Track', trackIdx, 'master adjustment:', volumeDb.toFixed(2) + ' dB');
+                        }
+                    });
+                });
+
+                // Initialize volume to maximum
+                Tone.Destination.volume.value = 0; // 0 dB = full volume
+                console.log('[Volume] Initialized to', masterVolume, '(0 dB)');
+
+                // Parts selection
+                partsBtn.addEventListener('click', () => {
+                    partsOverlay.classList.add('visible');
+                });
+                partsCloseBtn.addEventListener('click', () => {
+                    partsOverlay.classList.remove('visible');
+                });
+                selectAllParts.addEventListener('click', () => {
+                    mutedTracks.clear();
+                    updatePartsList();
+                });
+                deselectAllParts.addEventListener('click', () => {
+                    if (midi && midi.tracks) {
+                        midi.tracks.forEach((track, idx) => mutedTracks.add(idx));
+                        updatePartsList();
+                    }
+                });
+
+                // Scores selection
+                scoresBtn.addEventListener('click', () => {
+                    scoresOverlay.classList.add('visible');
+                });
+                scoresCloseBtn.addEventListener('click', () => {
+                    scoresOverlay.classList.remove('visible');
+                });
+
+                // Mobile page navigation
+                mobilePrevPageBtn.addEventListener('click', () => {
+                    if (currentPage > 1) {
+                        goToPage(currentPage - 1);
+                    }
+                });
+                mobileNextPageBtn.addEventListener('click', () => {
+                    if (currentPage < totalPages) {
+                        goToPage(currentPage + 1);
+                    }
+                });
+
+
+                // Load score library
+                console.log('[App] Loading score library...');
+                console.log('[App] scanForMIDIFiles function:', typeof scanForMIDIFiles);
+                try {
+                    console.log('[App] Calling scanForMIDIFiles("./scores")...');
+                    scoreLibraryData = await scanForMIDIFiles('./scores');
+                    console.log('[App] ✓ scanForMIDIFiles returned');
+                    console.log('[App] Found scores:', scoreLibraryData);
+                    console.log('[App] Score count:', scoreLibraryData.length);
+
+                    if (scoreLibraryData.length > 0) {
+                        console.log('[App] Rendering score library to dropdown...');
+                        renderScoreLibrary();
+                        console.log('[App] ✓ Score library rendered');
+                    } else {
+                        console.warn('[App] No scores found!');
+                        scoreLibraryEl.innerHTML = '<option value="">No scores found</option>';
+                    }
+                } catch (scoreError) {
+                    console.error('[App] ❌ Error loading score library:', scoreError);
+                    console.error('[App] Score error stack:', scoreError.stack);
+                    scoreLibraryEl.innerHTML = '<option value="">Error loading scores</option>';
+                }
+
+                // Add mobile audio unlock listener - unlock on any touch/click
+                if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+                    console.log('[App] Mobile device detected, adding audio unlock listeners');
+                    const unlockOnInteraction = () => {
+                        unlockAudio();
+                        // Remove listeners after first interaction
+                        document.removeEventListener('touchstart', unlockOnInteraction);
+                        document.removeEventListener('touchend', unlockOnInteraction);
+                        document.removeEventListener('click', unlockOnInteraction);
+                    };
+                    document.addEventListener('touchstart', unlockOnInteraction, { passive: true });
+                    document.addEventListener('touchend', unlockOnInteraction, { passive: true });
+                    document.addEventListener('click', unlockOnInteraction, { once: true });
+                }
+
+                console.log('[App] Initialization complete');
+            } catch (error) {
+                console.error('[App] Failed to initialize:', error);
+                console.error('[App] Error stack:', error.stack);
+                scoreLibraryEl.innerHTML = '<option value="">Error loading scores</option>';
+                alert('Failed to initialize player: ' + error.message);
+            }
+        }
+
+        // Helper functions from verovio_midi.html
+        const resolveSoundfontKey = (track) => {
+            const programNumber = track?.instrument?.number;
+            if (typeof programNumber === "number" && SOUND_FONT_PROGRAM_MAP.has(programNumber)) {
+                return SOUND_FONT_PROGRAM_MAP.get(programNumber);
+            }
+
+            const instrumentName = (track?.instrument?.name || "").toLowerCase();
+            for (const { keyword, soundfont } of SOUND_FONT_KEYWORDS) {
+                if (instrumentName.includes(keyword)) {
+                    return soundfont;
+                }
+            }
+
+            const instrumentFamily = (track?.instrument?.family || "").toLowerCase();
+            for (const { keyword, soundfont } of SOUND_FONT_KEYWORDS) {
+                if (instrumentFamily.includes(keyword)) {
+                    return soundfont;
+                }
+            }
+
+            return DEFAULT_SOUNDFONT;
+        };
+
+        const getFallbackPlayer = () => {
+            if (!samplerCache.has(FALLBACK_PLAYER_KEY)) {
+                samplerCache.set(FALLBACK_PLAYER_KEY, new Tone.PolySynth(Tone.Synth).toDestination());
+            }
+            return samplerCache.get(FALLBACK_PLAYER_KEY);
+        };
+
+        const getSamplerForSoundfont = async (soundfontKey) => {
+            console.log('[Sampler] Requesting soundfont:', soundfontKey);
+
+            if (samplerCache.has(soundfontKey)) {
+                console.log('[Sampler] Using cached sampler for', soundfontKey);
+                return samplerCache.get(soundfontKey);
+            }
+
+            if (
+                typeof MIDI !== "undefined" &&
+                MIDI.Soundfont &&
+                MIDI.Soundfont[soundfontKey]
+            ) {
+                console.log('[Sampler] Loading soundfont:', soundfontKey);
+                const soundfontData = MIDI.Soundfont[soundfontKey];
+                console.log('[Sampler] Soundfont data keys:', Object.keys(soundfontData).length, 'samples');
+
+                const sampler = new Tone.Sampler({
+                    urls: soundfontData,
+                    attack: soundfontKey === "acoustic_grand_piano" ? 0.002 : 0.01,
+                    release: soundfontKey === "acoustic_grand_piano" ? 2.5 : 1.5
+                }).toDestination();
+
+                try {
+                    console.log('[Sampler] Waiting for sampler to load...');
+                    await sampler.loaded;
+                    console.log('[Sampler] ✓ Sampler loaded successfully for', soundfontKey);
+                } catch (error) {
+                    console.error(`[Sampler] ❌ Failed to load soundfont "${soundfontKey}":`, error);
+                    if (typeof sampler.dispose === "function") {
+                        sampler.dispose();
+                    }
+                    return null;
+                }
+                samplerCache.set(soundfontKey, sampler);
+                return sampler;
+            }
+            console.warn(`[Sampler] Soundfont "${soundfontKey}" not found in MIDI.Soundfont; using fallback synth.`);
+            return null;
+        };
+
+        const getPlayerForTrack = async (track) => {
+            const soundfontKey = resolveSoundfontKey(track);
+            const sampler = await getSamplerForSoundfont(soundfontKey);
+            return sampler || getFallbackPlayer();
+        };
+
+        function findClosestTimeMapEvent(absSeconds) {
+            if (!timeMap || !timeMap.events || timeMap.events.length === 0) return null;
+            let left = 0, right = timeMap.events.length - 1, result = null;
+            let absMs = absSeconds * 1000;
+            while (left <= right) {
+                let mid = Math.floor((left + right) / 2);
+                let t = timeMap.events[mid].tstamp;
+                if (t <= absMs) {
+                    result = timeMap.events[mid];
+                    left = mid + 1;
+                } else {
+                    right = mid - 1;
+                }
+            }
+            return result;
+        }
+
+        // Convert transport time to original score time
+        // The timemap timestamps already have MEI tempo changes baked in.
+        // Tempo changes are scheduled correctly in Tone.Transport via schedulePlayback().
+        // We just need to account for the user's tempo factor (speed adjustment).
+        function convertTransportTimeToScoreTime(transportSeconds) {
+            // Simple linear conversion: score time = transport time * tempo factor + start offset
+            //
+            // Why this works:
+            // - At 100% speed (tempoFactor=1.0): scoreTime = transportTime (direct mapping)
+            // - At 50% speed (tempoFactor=0.5): 10s transport = 5s score (playing slower)
+            // - At 200% speed (tempoFactor=2.0): 10s transport = 20s score (playing faster)
+            //
+            // The MEI tempo changes are already:
+            // 1. Baked into timemap timestamps (tstamp values from Verovio)
+            // 2. Scheduled as BPM changes in Tone.Transport (lines 1194-1226)
+            // So we don't need to account for them in this conversion.
+            return (transportSeconds * tempoFactor) + startMeasureTime;
+        }
+
+        const highlightCurrentTime = function (currentSeconds) {
+            let highlightTimeMs = 0;
+            let currentEvent = null;
+
+            if (timeMap && Array.isArray(timeMap.events) && timeMap.events.length > 0) {
+                // Convert Transport time to original score time, accounting for tempo changes
+                let originalSeconds = convertTransportTimeToScoreTime(currentSeconds);
+                currentEvent = findClosestTimeMapEvent(originalSeconds);
+                if (currentEvent) {
+                    highlightTimeMs = currentEvent.tstamp;
+                } else {
+                    highlightTimeMs = originalSeconds * 1000;
+                }
+            } else {
+                let originalSeconds = convertTransportTimeToScoreTime(currentSeconds);
+                highlightTimeMs = originalSeconds * 1000;
+            }
+
+            // Check if we have custom JSON timing events with "on"/"off" arrays
+            if (currentEvent && (Array.isArray(currentEvent.on) || Array.isArray(currentEvent.off))) {
+                // Process "off" array to remove notes that have ended
+                if (Array.isArray(currentEvent.off)) {
+                    for (const noteId of currentEvent.off) {
+                        const noteElement = document.getElementById(noteId);
+                        if (noteElement) {
+                            noteElement.classList.remove("playing");
+                        }
+                    }
+                }
+
+                // Process "on" array to add notes that are starting
+                if (Array.isArray(currentEvent.on)) {
+                    for (const noteId of currentEvent.on) {
+                        const noteElement = document.getElementById(noteId);
+                        if (noteElement) {
+                            noteElement.classList.add("playing");
+                        }
+                    }
+                }
+
+                // Also handle page changes
+                const currentElements = tk.getElementsAtTime(highlightTimeMs);
+                if (currentElements && currentElements.page > 0 && currentElements.page !== currentPage) {
+                    currentPage = currentElements.page;
+                    document.getElementById("scoreCanvas").innerHTML = tk.renderToSVG(currentPage);
+                }
+            } else {
+                // Fall back to Verovio's getElementsAtTime
+                // In this mode, we still remove all notes first since we don't have duration info
+                const playingNotes = document.querySelectorAll('g.note.playing');
+                for (const playingNote of playingNotes) {
+                    playingNote.classList.remove("playing");
+                }
+
+                const currentElements = tk.getElementsAtTime(highlightTimeMs);
+                if (!currentElements || currentElements.page === 0) return;
+
+                if (currentElements.page !== currentPage) {
+                    currentPage = currentElements.page;
+                    document.getElementById("scoreCanvas").innerHTML = tk.renderToSVG(currentPage);
+                }
+
+                if (Array.isArray(currentElements.notes)) {
+                    for (const note of currentElements.notes) {
+                        const noteElement = document.getElementById(note);
+                        if (noteElement) {
+                            noteElement.classList.add("playing");
+                        }
+                    }
+                }
+            }
+        };
+
+        const stopHighlightLoop = function () {
+            if (highlightLoopId !== null) {
+                Tone.Transport.clear(highlightLoopId);
+                highlightLoopId = null;
+            }
+        };
+
+        const resetTransport = function () {
+            Tone.Transport.stop();
+            Tone.Transport.cancel();
+            Tone.Transport.position = 0;
+            stopHighlightLoop();
+            activePlayers.forEach((player) => {
+                if (typeof player.releaseAll === "function") {
+                    player.releaseAll();
+                }
+            });
+            activePlayers.clear();
+            trackPlayers.clear(); // Clear track-to-player mapping
+            pausedTime = 0;
+            highlightCurrentTime(0);
+        };
+
+        const schedulePlayback = async function () {
+            if (!midi) return;
+
+            resetTransport();
+
+            // startMeasureTime should already be set by handleProgressClick or other controls
+            // Don't reset it here unless we have measure-based navigation
+            if (timeMap && timeMap.measures && startMeasure > 1 && startMeasure <= timeMap.measures.length) {
+                const measureData = timeMap.measures[startMeasure - 1];
+                startMeasureTime = (measureData.absoluteTime || 0) / 1000;
+                console.log('[Playback] Starting from measure', startMeasure, 'at time', startMeasureTime);
+            }
+            // If startMeasureTime hasn't been set by anything else, it will be 0 (from initial state)
+            console.log('[Playback] Starting playback from time:', startMeasureTime, 'seconds');
+
+            const trackPlayerEntries = await Promise.all(
+                midi.tracks.map(async (track, trackIdx) => {
+                    if (!track.notes || track.notes.length === 0 || mutedTracks.has(trackIdx)) {
+                        return null;
+                    }
+                    try {
+                        const player = await getPlayerForTrack(track);
+                        return { track, player, trackIdx };
+                    } catch (error) {
+                        console.error("Failed to prepare player for track:", error);
+                        return null;
+                    }
+                })
+            );
+
+            // Set initial tempo from timeMap if available
+            // Find the tempo that's active at startMeasureTime (not just the first tempo)
+            let initialBpm = 120;
+            if (timeMap && Array.isArray(timeMap.events)) {
+                // Search backwards from startMeasureTime to find the most recent tempo marking
+                const startMs = startMeasureTime * 1000;
+                for (let i = timeMap.events.length - 1; i >= 0; i--) {
+                    const ev = timeMap.events[i];
+                    if (typeof ev.tempo === "number" && ev.tstamp <= startMs) {
+                        initialBpm = ev.tempo;
+                        console.log('[Playback] Found active tempo at start position:', initialBpm, 'BPM at', (ev.tstamp / 1000).toFixed(2), 's');
+                        break;
+                    }
+                }
+                // If no tempo found before startMeasureTime, use the first tempo in the score
+                if (initialBpm === 120) {
+                    for (let i = 0; i < timeMap.events.length; ++i) {
+                        const ev = timeMap.events[i];
+                        if (typeof ev.tempo === "number") {
+                            initialBpm = ev.tempo;
+                            console.log('[Playback] Using first tempo in score:', initialBpm, 'BPM');
+                            break;
+                        }
+                    }
+                }
+            } else if (midi.header && midi.header.tempos && midi.header.tempos.length > 0) {
+                // For MIDI-based tempo, find tempo at startMeasureTime
+                for (let i = midi.header.tempos.length - 1; i >= 0; i--) {
+                    if (midi.header.tempos[i].time <= startMeasureTime) {
+                        initialBpm = midi.header.tempos[i].bpm;
+                        console.log('[Playback] Found active MIDI tempo at start position:', initialBpm, 'BPM');
+                        break;
+                    }
+                }
+            }
+            Tone.Transport.bpm.value = initialBpm * tempoFactor;
+
+            // Set initial CSS animation duration based on starting tempo
+            const baseBpm = 100;
+            const baseAnimationDuration = 0.5;
+            const actualBpm = initialBpm * tempoFactor;
+            const scaledDuration = (baseAnimationDuration * baseBpm) / actualBpm;
+            document.documentElement.style.setProperty('--animation-duration', `${scaledDuration}s`);
+            console.log('[Playback] Initial tempo:', initialBpm, 'BPM (scaled:', actualBpm, 'BPM) - animation duration:', scaledDuration.toFixed(2) + 's');
+
+            // Schedule tempo changes using timeMap.events (scaled by user tempo)
+            if (timeMap && Array.isArray(timeMap.events)) {
+                timeMap.events.forEach(ev => {
+                    if (typeof ev.tempo === "number") {
+                        let eventSeconds = ev.tstamp / 1000;
+                        if (eventSeconds >= startMeasureTime) {
+                            // Scale the event time by tempo factor
+                            const scheduledTime = (eventSeconds - startMeasureTime) / tempoFactor;
+                            Tone.Transport.schedule((time) => {
+                                // Keep the tempo at the user's adjusted rate
+                                Tone.Transport.bpm.value = ev.tempo * tempoFactor;
+
+                                // Update CSS animation duration to match MEI tempo
+                                // Base animation is 0.5s at 100 BPM, scale inversely with tempo
+                                const baseBpm = 100;
+                                const baseAnimationDuration = 0.5;
+                                const actualBpm = ev.tempo * tempoFactor;
+                                const scaledDuration = (baseAnimationDuration * baseBpm) / actualBpm;
+                                document.documentElement.style.setProperty('--animation-duration', `${scaledDuration}s`);
+
+                                // Force restart animation on currently playing notes
+                                const playingNotes = document.querySelectorAll('g.note.playing, g.chord.playing');
+                                playingNotes.forEach(note => {
+                                    note.classList.remove('playing');
+                                    // Force reflow to restart animation
+                                    void note.offsetWidth;
+                                    note.classList.add('playing');
+                                });
+
+                                console.log('[Tempo Event] MEI tempo change to', ev.tempo, 'BPM (scaled:', actualBpm, 'BPM) - animation duration:', scaledDuration.toFixed(2) + 's');
+                            }, scheduledTime);
+                        }
+                    }
+                });
+            } else if (midi.header && midi.header.tempos && midi.header.tempos.length > 0) {
+                midi.header.tempos.slice(1).forEach(tempoEvent => {
+                    if (tempoEvent.time >= startMeasureTime) {
+                        // Scale the event time by tempo factor
+                        const scheduledTime = (tempoEvent.time - startMeasureTime) / tempoFactor;
+                        Tone.Transport.schedule((time) => {
+                            Tone.Transport.bpm.value = tempoEvent.bpm * tempoFactor;
+
+                            // Update CSS animation duration to match MIDI tempo
+                            const baseBpm = 100;
+                            const baseAnimationDuration = 0.5;
+                            const actualBpm = tempoEvent.bpm * tempoFactor;
+                            const scaledDuration = (baseAnimationDuration * baseBpm) / actualBpm;
+                            document.documentElement.style.setProperty('--animation-duration', `${scaledDuration}s`);
+
+                            // Force restart animation on currently playing notes
+                            const playingNotes = document.querySelectorAll('g.note.playing, g.chord.playing');
+                            playingNotes.forEach(note => {
+                                note.classList.remove('playing');
+                                // Force reflow to restart animation
+                                void note.offsetWidth;
+                                note.classList.add('playing');
+                            });
+
+                            console.log('[Tempo Event] MIDI tempo change to', tempoEvent.bpm, 'BPM (scaled:', actualBpm, 'BPM) - animation duration:', scaledDuration.toFixed(2) + 's');
+                        }, scheduledTime);
+                    }
+                });
+            }
+
+            await Tone.loaded();
+
+            // Schedule notes (scaled by tempo)
+            trackPlayerEntries.forEach((entry) => {
+                if (!entry) return;
+                const { track, player, trackIdx } = entry;
+                activePlayers.add(player);
+
+                // Store player reference for live volume control
+                trackPlayers.set(trackIdx, player);
+
+                // Set initial player volume (in dB)
+                const trackVolume = trackVolumes.get(trackIdx) || 1.0;
+                player.volume.value = Tone.gainToDb(trackVolume * masterVolume);
+                console.log('[Playback] Track', trackIdx, 'volume set to', trackVolume, '(' + player.volume.value.toFixed(2) + ' dB)');
+
+                track.notes.forEach((note) => {
+                    if (note.time >= startMeasureTime) {
+                        // Scale note timing by tempo factor
+                        // At 50% tempo (0.5), notes should play at 2x their original time
+                        const scheduledTime = (note.time - startMeasureTime) / tempoFactor;
+                        const scaledDuration = note.duration / tempoFactor;
+                        Tone.Transport.schedule((time) => {
+                            const velocity = note.velocity ?? 0.8;
+                            // Note: player.volume already has track and master volume applied
+                            player.triggerAttackRelease(note.name, scaledDuration, time, velocity);
+                        }, scheduledTime);
+                    }
+                });
+            });
+
+            // Calculate total duration (scaled by tempo)
+            let maxEnd = 0;
+            midi.tracks.forEach(track => {
+                if (track.notes && track.notes.length > 0) {
+                    for (const note of track.notes) {
+                        if (note.time >= startMeasureTime) {
+                            maxEnd = Math.max(maxEnd, (note.time - startMeasureTime + note.duration) / tempoFactor);
+                        }
+                    }
+                }
+            });
+            totalDuration = maxEnd + 1;
+
+            highlightLoopId = Tone.Transport.scheduleRepeat(() => {
+                const currentSeconds = Tone.Transport.seconds;
+                currentTime = currentSeconds;
+                highlightCurrentTime(currentSeconds);
+                updateTimeDisplay(startMeasureTime + currentSeconds);
+                if (currentSeconds >= totalDuration) {
+                    stopMIDIHandler();
+                }
+            }, 0.05);
+        };
+
+        const preparePlayback = async function () {
+            if (!schedulePlaybackPromise) {
+                schedulePlaybackPromise = schedulePlayback()
+                    .catch((error) => {
+                        console.error("Failed to schedule playback:", error);
+                        throw error;
+                    })
+                    .finally(() => {
+                        schedulePlaybackPromise = null;
+                    });
+            }
+            return schedulePlaybackPromise;
+        };
+
+        const playMIDIHandler = async function () {
+            console.log('[Play] Clicked, current state:', playerState, 'Transport:', Tone.Transport.state);
+            if (!isLoaded || !midi) {
+                console.warn('[Play] Cannot play - not loaded or no MIDI');
+                return;
+            }
+            if (Tone.Transport.state === "started") {
+                console.warn('[Play] Already playing');
+                return;
+            }
+
+            try {
+                // Ensure audio context is started (critical for mobile)
+                console.log('[Play] Starting Tone.js context...');
+                await Tone.start();
+                console.log('[Play] Tone.js context state:', Tone.context.state);
+
+                // Explicitly check and resume context if needed (iOS Safari fix)
+                if (Tone.context.state !== 'running') {
+                    console.log('[Play] Resuming audio context...');
+                    await Tone.context.resume();
+                    console.log('[Play] Audio context state after resume:', Tone.context.state);
+                }
+
+                // Double-check the context is actually running
+                if (Tone.context.state !== 'running') {
+                    console.error('[Play] Audio context failed to start. State:', Tone.context.state);
+                    alert('Unable to start audio. Please check your device audio settings and try again.');
+                    return;
+                }
+
+                console.log('[Play] ✓ Audio context running successfully');
+
+                // If resuming from pause, just start the transport
+                if (playerState === 'paused' && Tone.Transport.state === 'paused') {
+                    console.log('[Play] Resuming from pause at transport time:', pausedTime);
+                    // Re-start the highlight loop
+                    highlightLoopId = Tone.Transport.scheduleRepeat(() => {
+                        const currentSeconds = Tone.Transport.seconds;
+                        currentTime = currentSeconds;
+                        highlightCurrentTime(currentSeconds);
+                        updateTimeDisplay(startMeasureTime + currentSeconds);
+                        if (currentSeconds >= totalDuration) {
+                            stopMIDIHandler();
+                        }
+                    }, 0.05);
+
+                    Tone.Transport.start();
+                    playerState = 'playing';
+                    updateButtonStates();
+                    console.log('[Play] Resumed playback');
+                    return;
+                }
+
+                // Otherwise, start from beginning (or startMeasureTime)
+                await preparePlayback();
+                if (Tone.Transport.state === "started") return;
+                highlightCurrentTime(0);
+                Tone.Transport.start("+0.05");
+                playerState = 'playing';
+                updateButtonStates();
+                console.log('[Play] Started playback');
+            } catch (error) {
+                console.error("Failed to start playback:", error);
+                alert('Audio playback error: ' + error.message);
+            }
+        };
+
+        const pauseMIDIHandler = function () {
+            console.log('[Pause] Clicked, current state:', playerState, 'Transport:', Tone.Transport.state);
+            if (Tone.Transport.state === "started") {
+                // Save current position
+                pausedTime = Tone.Transport.seconds;
+                console.log('[Pause] Saving position:', pausedTime);
+
+                // Stop the highlight loop but keep it scheduled
+                if (highlightLoopId !== null) {
+                    Tone.Transport.clear(highlightLoopId);
+                    highlightLoopId = null;
+                }
+
+                // Pause transport (keeps position)
+                Tone.Transport.pause();
+                playerState = 'paused';
+                updateButtonStates();
+                console.log('[Pause] Paused playback at', pausedTime, 'seconds');
+            }
+        };
+
+        const stopMIDIHandler = function () {
+            console.log('[Stop] Clicked, current state:', playerState, 'Transport:', Tone.Transport.state);
+            if (playerState !== 'stopped') {
+                resetTransport();
+                playerState = 'stopped';
+                currentTime = 0;
+                pausedTime = 0;
+                startMeasureTime = 0; // Reset to beginning
+
+                // Reset to page 1
+                currentPage = 1;
+                pageSlider.value = 1;
+                currentPageLabel.textContent = `Page 1`;
+                updatePageButtons();
+                renderScore();
+
+                updateTimeDisplay(0);
+                updateButtonStates();
+                console.log('[Stop] Stopped playback and reset to page 1');
+            }
+        };
+
+        function updateButtonStates() {
+            console.log('[ButtonStates] Updating for state:', playerState);
+            switch (playerState) {
+                case 'playing':
+                    playBtn.disabled = true;
+                    pauseBtn.disabled = false;
+                    stopBtn.disabled = false;
+                    console.log('[ButtonStates] Playing: play=disabled, pause=enabled, stop=enabled');
+                    break;
+                case 'paused':
+                    playBtn.disabled = false; // Can resume
+                    pauseBtn.disabled = true; // Already paused
+                    stopBtn.disabled = false; // Can stop to reset
+                    console.log('[ButtonStates] Paused: play=enabled (resume), pause=disabled, stop=enabled');
+                    break;
+                case 'stopped':
+                    playBtn.disabled = isLoaded ? false : true;
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    console.log('[ButtonStates] Stopped: play=' + (isLoaded ? 'enabled' : 'disabled') + ', pause=disabled, stop=disabled');
+                    break;
+                case 'loading':
+                    playBtn.disabled = true;
+                    pauseBtn.disabled = true;
+                    stopBtn.disabled = true;
+                    console.log('[ButtonStates] Loading: all disabled');
+                    break;
+            }
+        }
+
+        function updateTimeDisplay(timeSeconds) {
+            currentTimeEl.textContent = formatTime(timeSeconds);
+            if (totalDuration > 0) {
+                const percent = (timeSeconds / totalDuration) * 100;
+                progressFill.style.width = `${percent}%`;
+            }
+        }
+
+        function handleZoomIn() {
+            if (!isLoaded || !tk) return;
+            currentScale = Math.min(currentScale + 5, 100);
+            console.log('[Zoom] Zoom in to scale:', currentScale);
+            tk.setOptions({ scale: currentScale });
+            renderScore();
+        }
+
+        function handleZoomOut() {
+            if (!isLoaded || !tk) return;
+            currentScale = Math.max(currentScale - 5, 15);
+            console.log('[Zoom] Zoom out to scale:', currentScale);
+            tk.setOptions({ scale: currentScale });
+            renderScore();
+        }
+
+        function handlePageChange(event) {
+            const page = parseInt(event.target.value);
+            goToPage(page);
+        }
+
+        function goToPage(page) {
+            if (!isLoaded || !tk || page < 1 || page > totalPages) return;
+
+            console.log('[Page] Navigating to page', page);
+            currentPage = page;
+
+            // Update UI
+            pageSlider.value = page;
+            currentPageLabel.textContent = `Page ${page}`;
+            updatePageButtons();
+
+            // Render the page
+            renderScore();
+
+            // Calculate the start time for this page
+            if (timeMap && timeMap.events && timeMap.events.length > 0) {
+                // Find the first event on this page
+                const pageElements = tk.getElementsAtTime(0); // Get first page info
+
+                // Search through timemap to find first event on this page
+                for (let i = 0; i < timeMap.events.length; i++) {
+                    const event = timeMap.events[i];
+                    const eventMs = event.tstamp;
+                    const elementsAtTime = tk.getElementsAtTime(eventMs);
+
+                    if (elementsAtTime && elementsAtTime.page === page) {
+                        // Found first event on this page
+                        startMeasureTime = eventMs / 1000;
+                        console.log('[Page] Set start time to', startMeasureTime, 'seconds for page', page);
+
+                        // Update highlighting to show this position
+                        highlightCurrentTime(0);
+                        updateTimeDisplay(startMeasureTime);
+                        break;
+                    }
+                }
+            }
+
+            // If playing, stop and reset to new position
+            if (playerState === 'playing' || playerState === 'paused') {
+                stopMIDIHandler();
+            }
+        }
+
+        function updatePageButtons() {
+            prevPageBtn.disabled = currentPage <= 1 || !isLoaded;
+            nextPageBtn.disabled = currentPage >= totalPages || !isLoaded;
+            pageSlider.disabled = !isLoaded;
+
+            // Update mobile controls
+            mobilePrevPageBtn.disabled = currentPage <= 1 || !isLoaded;
+            mobileNextPageBtn.disabled = currentPage >= totalPages || !isLoaded;
+            mobilePageLabel.textContent = `Page ${currentPage}/${totalPages}`;
+        }
+
+
+        function renderScoreLibrary() {
+            scoreLibraryEl.innerHTML = '<option value="">Select a score...</option>';
+            mobileScoreLibrary.innerHTML = '<option value="">Select a score...</option>';
+
+            scoreLibraryData.forEach((score, index) => {
+                // Desktop sidebar option
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = score.title;
+                scoreLibraryEl.appendChild(option);
+
+                // Mobile overlay option
+                const mobileOption = document.createElement('option');
+                mobileOption.value = index;
+                mobileOption.textContent = score.title;
+                mobileScoreLibrary.appendChild(mobileOption);
+            });
+
+            // Add change listener for sidebar
+            scoreLibraryEl.addEventListener('change', (e) => {
+                const index = parseInt(e.target.value);
+                if (!isNaN(index)) {
+                    loadScoreByIndex(index);
+                    // Sync mobile dropdown
+                    mobileScoreLibrary.value = index;
+                }
+            });
+
+            // Add change listener for mobile
+            mobileScoreLibrary.addEventListener('change', (e) => {
+                const index = parseInt(e.target.value);
+                if (!isNaN(index)) {
+                    loadScoreByIndex(index);
+                    // Sync sidebar dropdown
+                    scoreLibraryEl.value = index;
+                    // Close the overlay
+                    scoresOverlay.classList.remove('visible');
+                }
+            });
+        }
+
+        async function loadScoreByIndex(index) {
+            if (index < 0 || index >= scoreLibraryData.length) return;
+
+            currentScoreIndex = index;
+            const score = scoreLibraryData[index];
+
+            console.log('[App] Loading score:', score.title, '(', score.path, ')');
+
+            try {
+                await loadMusicXMLFile(score.path, score.jsonPath);
+                // Sync both dropdowns
+                scoreLibraryEl.value = index;
+                mobileScoreLibrary.value = index;
+                console.log('[App] Score loaded successfully');
+            } catch (error) {
+                console.error('[App] Error loading score:', error);
+                alert('Error loading score: ' + error.message);
+            }
+        }
+
+        async function loadMusicXMLFile(filePath, jsonPath = null) {
+            // Stop any current playback before loading new score
+            if (playerState === 'playing' || playerState === 'paused') {
+                console.log('[App] Stopping current playback before loading new score');
+                resetTransport();
+                playerState = 'stopped';
+                currentTime = 0;
+                startMeasureTime = 0;
+                updateTimeDisplay(0);
+            }
+
+            playerState = 'loading';
+            updateButtonStates();
+
+            try {
+                const response = await fetch(filePath);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${filePath}: ${response.statusText}`);
+                }
+                const meiData = await response.text();
+
+                const result = tk.loadData(meiData);
+                if (!result) {
+                    throw new Error("Verovio failed to load the MEI file.");
+                }
+
+                // Generate SVG and time map
+                currentPage = 1;
+
+                // Load custom JSON timing data if available
+                let customTimingEvents = null;
+                if (jsonPath) {
+                    try {
+                        const jsonResponse = await fetch(jsonPath);
+                        if (jsonResponse.ok) {
+                            customTimingEvents = await jsonResponse.json();
+                            console.log('[App] Loaded custom timing data:', customTimingEvents.length, 'events');
+                        }
+                    } catch (jsonError) {
+                        console.warn('[App] Could not load custom timing JSON:', jsonError);
+                    }
+                }
+
+                // Get Verovio's timemap
+                let rawTimeMap = tk.renderToTimemap();
+                let verovioTimeMap;
+                // renderToTimemap might return a string that needs parsing
+                if (typeof rawTimeMap === 'string') {
+                    verovioTimeMap = JSON.parse(rawTimeMap);
+                } else {
+                    verovioTimeMap = rawTimeMap;
+                }
+
+                console.log('[App] Raw Verovio timeMap type:', typeof rawTimeMap);
+                console.log('[App] Verovio timeMap keys:', Object.keys(verovioTimeMap || {}));
+                console.log('[App] Full Verovio timeMap:', verovioTimeMap);
+
+                // Use custom timing events if available, otherwise use Verovio's timemap
+                if (customTimingEvents && customTimingEvents.length > 0) {
+                    timeMap = {
+                        events: customTimingEvents,
+                        measures: verovioTimeMap?.measures || []
+                    };
+                    console.log('[App] Using custom timing events with', customTimingEvents.length, 'events');
+                    console.log('[App] Verovio timeMap measures:', verovioTimeMap?.measures?.length || 0);
+                } else {
+                    timeMap = verovioTimeMap;
+                    console.log('[App] Using Verovio timeMap directly');
+                }
+                console.log('[App] Final timeMap structure:', timeMap);
+                console.log('[App] TimeMap measures count:', timeMap?.measures?.length || 0);
+
+                // Generate MIDI
+                const base64midi = tk.renderToMIDI();
+                const midiByteArray = Uint8Array.from(atob(base64midi), c => c.charCodeAt(0));
+                midi = new Midi(midiByteArray.buffer);
+                totalDuration = midi.duration + 1;
+                isLoaded = true;
+                startMeasureTime = 0; // Reset to beginning for new score
+
+                // Initialize track volumes (piano defaults to 70%)
+                midi.tracks.forEach((track, idx) => {
+                    if (!trackVolumes.has(idx)) {
+                        let trackName = track.name || track.instrument?.name || '';
+                        let defaultVolume = trackName.toLowerCase().includes('piano') ? 0.7 : 1.0;
+                        trackVolumes.set(idx, defaultVolume);
+                    }
+                });
+
+                // Update measure count
+                totalMeasures = timeMap?.measures?.length || 0;
+                startMeasure = 1;
+
+                // Update metadata
+                durationEl.textContent = formatTime(totalDuration);
+
+                scoreDisplay.classList.add('has-score');
+                document.getElementById('scorePlaceholder').style.display = 'none';
+
+                // Get total page count and set up page navigation
+                totalPages = tk.getPageCount();
+                pageSlider.max = totalPages;
+                pageSlider.value = 1;
+                currentPageLabel.textContent = `Page 1`;
+                totalPagesLabel.textContent = `of ${totalPages}`;
+                updatePageButtons();
+                console.log('[App] Total pages:', totalPages);
+
+                // Render score
+                renderScore();
+
+                updatePartsList();
+                fileInputOverlay.classList.remove('visible');
+
+                playerState = 'stopped';
+                updateButtonStates();
+                console.log('[App] Buttons updated after load');
+
+                console.log('[App] Score loaded and rendered');
+            } catch (error) {
+                console.error('[App] Error loading MusicXML:', error);
+                playerState = 'stopped';
+                updateButtonStates();
+                throw error;
+            }
+        }
+
+        function renderScore() {
+            const scoreCanvas = document.getElementById('scoreCanvas');
+            console.log('[App] Rendering score SVG at scale:', currentScale);
+
+            if (!tk || !isLoaded) {
+                console.error('[App] Toolkit not ready or no score loaded');
+                return;
+            }
+
+            const svg = tk.renderToSVG(currentPage);
+
+            if (svg && svg.length > 0) {
+                scoreCanvas.innerHTML = svg;
+                scoreCanvas.classList.add('visible');
+                console.log('[App] ✅ SVG rendered successfully at scale', currentScale);
+            } else {
+                console.error('[App] ❌ No SVG available');
+                scoreCanvas.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: #e53e3e;">
+                        <div style="font-size: 2em; margin-bottom: 20px;">⚠️</div>
+                        <div style="font-size: 1.2em; font-weight: 600; margin-bottom: 10px;">
+                            Error Rendering Score
+                        </div>
+                        <div style="font-size: 0.9em;">
+                            Could not render score visualization.
+                        </div>
+                    </div>
+                `;
+                scoreCanvas.classList.add('visible');
+            }
+        }
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                try {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const meiData = e.target.result;
+                        // Create a temporary file path
+                        const metadata = {
+                            title: file.name.replace(/\.(mei|xml|musicxml|mxl)$/i, ''),
+                            composer: 'Unknown'
+                        };
+                        await loadMusicXMLString(meiData, metadata);
+                    };
+                    reader.readAsText(file);
+                } catch (error) {
+                    console.error('Error loading file:', error);
+                    alert('Error loading file: ' + error.message);
+                }
+            }
+        }
+
+        async function loadMusicXMLString(meiData, metadata = {}) {
+            // Stop any current playback before loading new score
+            if (playerState === 'playing' || playerState === 'paused') {
+                console.log('[App] Stopping current playback before loading new score');
+                resetTransport();
+                playerState = 'stopped';
+                currentTime = 0;
+                startMeasureTime = 0;
+                updateTimeDisplay(0);
+            }
+
+            playerState = 'loading';
+            updateButtonStates();
+
+            try {
+                const result = tk.loadData(meiData);
+                if (!result) {
+                    throw new Error("Verovio failed to load the MEI data.");
+                }
+
+                currentPage = 1;
+                let rawTimeMap = tk.renderToTimemap();
+                // renderToTimemap might return a string that needs parsing
+                if (typeof rawTimeMap === 'string') {
+                    timeMap = JSON.parse(rawTimeMap);
+                } else {
+                    timeMap = rawTimeMap;
+                }
+                console.log('[App] TimeMap loaded:', timeMap);
+                console.log('[App] TimeMap measures:', timeMap?.measures?.length || 0);
+
+                const base64midi = tk.renderToMIDI();
+                const midiByteArray = Uint8Array.from(atob(base64midi), c => c.charCodeAt(0));
+                midi = new Midi(midiByteArray.buffer);
+                totalDuration = midi.duration + 1;
+                isLoaded = true;
+                startMeasureTime = 0; // Reset to beginning for new score
+
+                midi.tracks.forEach((track, idx) => {
+                    if (!trackVolumes.has(idx)) {
+                        let trackName = track.name || track.instrument?.name || '';
+                        let defaultVolume = trackName.toLowerCase().includes('piano') ? 0.7 : 1.0;
+                        trackVolumes.set(idx, defaultVolume);
+                    }
+                });
+
+                // Update measure count
+                totalMeasures = timeMap?.measures?.length || 0;
+                startMeasure = 1;
+
+                durationEl.textContent = formatTime(totalDuration);
+
+                scoreDisplay.classList.add('has-score');
+                document.getElementById('scorePlaceholder').style.display = 'none';
+
+                // Get total page count and set up page navigation
+                totalPages = tk.getPageCount();
+                pageSlider.max = totalPages;
+                pageSlider.value = 1;
+                currentPageLabel.textContent = `Page 1`;
+                totalPagesLabel.textContent = `of ${totalPages}`;
+                updatePageButtons();
+                console.log('[App] Total pages:', totalPages);
+
+                renderScore();
+
+                updatePartsList();
+                fileInputOverlay.classList.remove('visible');
+
+                playerState = 'stopped';
+                updateButtonStates();
+                console.log('[App] Buttons updated after loading from string');
+            } catch (error) {
+                console.error('[App] Error loading MusicXML string:', error);
+                playerState = 'stopped';
+                updateButtonStates();
+                throw error;
+            }
+        }
+
+        async function handleLoad() {
+            const url = urlInput.value.trim();
+            if (url) {
+                try {
+                    await loadMusicXMLFile(url);
+                } catch (error) {
+                    console.error('Error loading URL:', error);
+                    alert('Error loading URL: ' + error.message);
+                }
+            }
+        }
+
+        function handleProgressClick(event) {
+            if (!isLoaded) return;
+            const rect = progressBar.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const percent = x / rect.width;
+            const time = percent * totalDuration;
+
+            console.log('[Progress] Clicked at', percent.toFixed(2) * 100 + '%', '=', time.toFixed(2), 'seconds');
+
+            // Stop playback if playing or paused
+            if (playerState === 'playing' || playerState === 'paused') {
+                stopMIDIHandler();
+            }
+
+            // Set the new start position
+            startMeasureTime = time;
+
+            // Find which page this time corresponds to and navigate to it
+            if (timeMap && timeMap.events && timeMap.events.length > 0) {
+                const timeMs = time * 1000;
+                const elementsAtTime = tk.getElementsAtTime(timeMs);
+                if (elementsAtTime && elementsAtTime.page > 0) {
+                    currentPage = elementsAtTime.page;
+                    pageSlider.value = currentPage;
+                    currentPageLabel.textContent = `Page ${currentPage}`;
+                    updatePageButtons();
+                    renderScore();
+                }
+            }
+
+            // Update display to show the new position
+            highlightCurrentTime(0); // Pass 0 because we're starting from startMeasureTime
+            updateTimeDisplay(time);
+
+            console.log('[Progress] Ready to play from', time.toFixed(2), 'seconds on page', currentPage);
+        }
+
+        function handleTempoChange(event) {
+            const value = parseInt(event.target.value);
+            setTempo(value);
+        }
+
+        async function setTempo(value) {
+            const oldTempoFactor = tempoFactor;
+            tempoFactor = value / 100;
+            tempoSlider.value = value;
+            tempoValue.textContent = `${value}%`;
+
+            // Update CSS animation duration to match tempo
+            // Base animation is 0.5s at 100 BPM, scale inversely with actual BPM
+            const baseBpm = 100;
+            const baseAnimationDuration = 0.5;
+            // Current BPM will be recalculated when playback restarts, but we can estimate
+            // For now, use tempoFactor scaling (this will be precise when playback restarts)
+            const scaledDuration = baseAnimationDuration / tempoFactor;
+            document.documentElement.style.setProperty('--animation-duration', `${scaledDuration}s`);
+
+            console.log('[Tempo] Changed from', oldTempoFactor, 'to', tempoFactor, '- animation duration:', scaledDuration.toFixed(2) + 's');
+
+            // If currently playing, restart playback with new tempo
+            if (playerState === 'playing') {
+                const currentPlaybackTime = Tone.Transport.seconds;
+
+                // Convert current transport time to original score time
+                const originalScoreTime = (currentPlaybackTime * oldTempoFactor) + startMeasureTime;
+                console.log('[Tempo] At transport time', currentPlaybackTime, 'original score time', originalScoreTime);
+
+                // Stop current playback
+                resetTransport();
+
+                // Set the start time to where we were in the original score
+                startMeasureTime = originalScoreTime;
+
+                // Restart playback
+                try {
+                    await Tone.start();
+                    await preparePlayback();
+                    highlightCurrentTime(0);
+                    Tone.Transport.start("+0.05");
+                    playerState = 'playing';
+                    updateButtonStates();
+                    console.log('[Tempo] Resumed playback from score time', startMeasureTime, 'with new tempo', tempoFactor);
+                } catch (error) {
+                    console.error("Failed to restart playback with new tempo:", error);
+                    playerState = 'stopped';
+                    updateButtonStates();
+                }
+            }
+        }
+
+        function updatePartsList() {
+            if (!midi || !midi.tracks || midi.tracks.length === 0) {
+                partsList.innerHTML = '<p style="text-align: center; color: #a0aec0; padding: 40px;">Load a score to see available parts</p>';
+                return;
+            }
+
+            partsList.innerHTML = '';
+
+            // Group tracks by part name (combine piano tracks)
+            const partGroups = new Map();
+            midi.tracks.forEach((track, trackIdx) => {
+                if (!track.notes || track.notes.length === 0) return;
+
+                let trackName = track.name || track.instrument?.name || `Track ${trackIdx + 1}`;
+
+                // Normalize piano names
+                if (trackName.toLowerCase().includes('piano')) {
+                    trackName = 'Piano';
+                }
+
+                if (!partGroups.has(trackName)) {
+                    partGroups.set(trackName, []);
+                }
+                partGroups.get(trackName).push(trackIdx);
+            });
+
+            // Create UI for each part group
+            partGroups.forEach((trackIndices, partName) => {
+                const partItem = document.createElement('div');
+                partItem.className = 'part-item';
+
+                // Check if all tracks in group are muted
+                const allMuted = trackIndices.every(idx => mutedTracks.has(idx));
+                if (allMuted) {
+                    partItem.classList.add('muted');
+                }
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `part-${partName}`;
+                checkbox.checked = !allMuted;
+                checkbox.addEventListener('change', (e) => {
+                    if (e.target.checked) {
+                        trackIndices.forEach(idx => mutedTracks.delete(idx));
+                        partItem.classList.remove('muted');
+                    } else {
+                        trackIndices.forEach(idx => mutedTracks.add(idx));
+                        partItem.classList.add('muted');
+                    }
+                });
+
+                const label = document.createElement('label');
+                label.htmlFor = `part-${partName}`;
+                label.textContent = trackIndices.length > 1 ? `${partName} (${trackIndices.length} tracks)` : partName;
+
+                const volumeControl = document.createElement('div');
+                volumeControl.className = 'part-volume-control';
+
+                const volumeSlider = document.createElement('input');
+                volumeSlider.type = 'range';
+                volumeSlider.min = '0';
+                volumeSlider.max = '100';
+
+                // Use average volume of all tracks in group
+                const avgVolume = trackIndices.reduce((sum, idx) => sum + (trackVolumes.get(idx) || 1.0), 0) / trackIndices.length;
+                volumeSlider.value = Math.round(avgVolume * 100);
+
+                const volumeLabel = document.createElement('span');
+                volumeLabel.textContent = `${volumeSlider.value}%`;
+
+                volumeSlider.addEventListener('input', (e) => {
+                    const volume = parseInt(e.target.value) / 100;
+                    // Apply volume to all tracks in group
+                    trackIndices.forEach(idx => {
+                        trackVolumes.set(idx, volume);
+
+                        // Apply volume change to active player immediately (live update)
+                        const player = trackPlayers.get(idx);
+                        if (player && player.volume) {
+                            const volumeDb = Tone.gainToDb(volume * masterVolume);
+                            player.volume.value = volumeDb;
+                            console.log('[Volume] Live update - Track', idx, 'volume:', volume, '(' + volumeDb.toFixed(2) + ' dB)');
+                        }
+                    });
+                    volumeLabel.textContent = `${e.target.value}%`;
+                });
+
+                volumeControl.appendChild(volumeSlider);
+                volumeControl.appendChild(volumeLabel);
+
+                partItem.appendChild(checkbox);
+                partItem.appendChild(label);
+                partItem.appendChild(volumeControl);
+
+                partsList.appendChild(partItem);
+            });
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Wait for Verovio WASM to be fully initialized
+        console.log('[App] Checking Verovio availability...');
+
+        async function waitForVerovio() {
+            console.log('[App] Waiting for Verovio to initialize...');
+
+            // First, wait for verovio object to exist
+            let attempts = 0;
+            while (typeof verovio === 'undefined' && attempts < 50) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+                attempts++;
+            }
+
+            if (typeof verovio === 'undefined') {
+                console.error('[App] ❌ Verovio script never loaded');
+                return false;
+            }
+
+            console.log('[App] Verovio script loaded, waiting for WASM runtime...');
+
+            // Wait for WASM runtime to be fully initialized
+            return new Promise((resolve) => {
+                // Check if already initialized by trying to create a test toolkit
+                const testInitialized = () => {
+                    try {
+                        // Try to instantiate a toolkit - this will fail if WASM isn't ready
+                        const testKit = new verovio.toolkit();
+                        console.log('[App] ✓ Verovio WASM runtime is ready!');
+                        return true;
+                    } catch (e) {
+                        return false;
+                    }
+                };
+
+                // Check if already ready
+                if (testInitialized()) {
+                    resolve(true);
+                    return;
+                }
+
+                console.log('[App] WASM not ready yet, setting up callback...');
+
+                let resolved = false;
+                const doResolve = (success) => {
+                    if (!resolved) {
+                        resolved = true;
+                        resolve(success);
+                    }
+                };
+
+                // Set up the onRuntimeInitialized callback
+                if (verovio.module) {
+                    const originalCallback = verovio.module.onRuntimeInitialized;
+                    verovio.module.onRuntimeInitialized = function() {
+                        console.log('[App] ✓ Verovio WASM runtime initialized via callback!');
+                        if (originalCallback) originalCallback();
+                        clearInterval(checkInterval);
+                        doResolve(true);
+                    };
+                }
+
+                // Also poll as a fallback
+                const checkInterval = setInterval(() => {
+                    if (testInitialized()) {
+                        console.log('[App] ✓ Verovio WASM runtime detected via polling!');
+                        clearInterval(checkInterval);
+                        doResolve(true);
+                    }
+                }, 200);
+
+                // Timeout after 15 seconds
+                setTimeout(() => {
+                    clearInterval(checkInterval);
+                    if (!resolved) {
+                        console.error('[App] ❌ Verovio WASM failed to initialize after 15 seconds');
+                        console.error('[App] This might be a network issue or WASM compatibility problem');
+                        doResolve(false);
+                    }
+                }, 15000);
+            });
+        }
+
+        // Start initialization
+        waitForVerovio().then((success) => {
+            if (success) {
+                console.log('[App] Starting app initialization...');
+                init();
+            } else {
+                console.error('[App] Cannot start - Verovio not available');
+                alert('Failed to load Verovio. Please refresh the page or check your internet connection.');
+            }
+        });
+    </script>
+</body>
+</html>

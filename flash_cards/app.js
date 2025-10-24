@@ -54,8 +54,10 @@ const state = {
   currentAudio: null,
   ttsServerUrl: 'http://localhost:5050',
   meloServerUrl: 'http://localhost:5051',
-  useCoquiTTS: true,
+  edgeTtsServerUrl: 'http://localhost:5052',
+  useCoquiTTS: false,
   useMeloTTS: false,
+  useEdgeTTS: true,  // NEW: Free Edge TTS - No API keys needed!
   usePrecompiled: true,
   audioCacheDir: 'audio_cache',
 };
@@ -169,7 +171,7 @@ function attachEventHandlers() {
   els.autoAdvanceDelay.addEventListener('change', handleAdvanceDelayChange);
 
   els.speechToggle.addEventListener('change', (event) => {
-    const speechAvailable = state.useCoquiTTS || supportsSpeech();
+    const speechAvailable = state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS || supportsSpeech();
     const enabled = event.target.checked && speechAvailable;
     state.speechEnabled = enabled;
     if (!enabled) {
@@ -182,7 +184,7 @@ function attachEventHandlers() {
   els.voicePicker.addEventListener('change', (event) => {
     const value = event.target.value;
     state.voiceURI = value;
-    if (state.useCoquiTTS) {
+    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
       state.voiceName = value;
     }
     restartAutoplayIfPlaying();
@@ -613,7 +615,7 @@ function scheduleAutoplay() {
   const token = Symbol('autoplay');
   state.autoplayToken = token;
 
-  const speechAvailable = state.speechEnabled && (state.useCoquiTTS || supportsSpeech()) && (card.questionSpeech || card.answerSpeech);
+  const speechAvailable = state.speechEnabled && (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS || supportsSpeech()) && (card.questionSpeech || card.answerSpeech);
 
   if (speechAvailable) {
     runSpeechSequence(card, token);
@@ -747,7 +749,7 @@ function clearTimers() {
 }
 
 function cancelSpeech() {
-  if (state.useCoquiTTS) {
+  if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
     if (state.currentAudio) {
       state.currentAudio.pause();
       state.currentAudio = null;
@@ -763,7 +765,7 @@ async function speak(text, token) {
     return;
   }
 
-  if (state.useCoquiTTS) {
+  if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
     return speakWithCoqui(text, token);
   } else if (supportsSpeech()) {
     return speakWithBrowser(text, token);
@@ -824,8 +826,16 @@ async function speakWithCoqui(text, token) {
     let audioBlob = await checkPrecompiledAudio(text, voiceName);
 
     if (!audioBlob) {
+      // Determine which TTS server to use
+      let ttsUrl = state.ttsServerUrl; // Default to Coqui
+      if (state.useEdgeTTS) {
+        ttsUrl = state.edgeTtsServerUrl;
+      } else if (state.useMeloTTS) {
+        ttsUrl = state.meloServerUrl;
+      }
+
       // Generate on-demand if not precompiled
-      const response = await fetch(`${state.ttsServerUrl}/api/speak`, {
+      const response = await fetch(`${ttsUrl}/api/speak`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -833,6 +843,7 @@ async function speakWithCoqui(text, token) {
         body: JSON.stringify({
           text: text,
           speaker: voiceName,
+          voice: voiceName, // Edge TTS uses 'voice' parameter
         }),
       });
 
@@ -965,7 +976,7 @@ function updateSpeechRateLabel() {
 }
 
 function updateSpeechControlsState() {
-  const speechSupported = state.useCoquiTTS || supportsSpeech();
+  const speechSupported = state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS || supportsSpeech();
   if (!speechSupported && els.speechToggle) {
     els.speechToggle.checked = false;
     els.speechToggle.disabled = true;
@@ -979,13 +990,13 @@ function updateSpeechControlsState() {
 
   if (els.speechRate) {
     // Speech rate doesn't apply to Coqui TTS (it has its own fixed rate)
-    els.speechRate.disabled = disableSpeechControls || state.useCoquiTTS;
+    els.speechRate.disabled = disableSpeechControls || state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS;
   }
 }
 
 async function initSpeech() {
-  if (state.useCoquiTTS) {
-    await initCoquiTTS();
+  if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
+    await initServerTTS();
   } else if (supportsSpeech()) {
     initBrowserSpeech();
   } else {
@@ -993,10 +1004,11 @@ async function initSpeech() {
   }
 }
 
-async function initCoquiTTS() {
+async function initServerTTS() {
   try {
     let coquiVoices = [];
     let meloVoices = [];
+    let edgeVoices = [];
 
     // Try Coqui TTS
     try {
@@ -1030,13 +1042,30 @@ async function initCoquiTTS() {
       console.log('MeloTTS server not available');
     }
 
-    // Combine all voices
-    const allVoices = [...coquiVoices, ...meloVoices];
+    // Try Edge TTS (FREE!)
+    try {
+      const healthResponse = await fetch(`${state.edgeTtsServerUrl}/api/health`, {timeout: 2000});
+      if (healthResponse.ok) {
+        const voicesResponse = await fetch(`${state.edgeTtsServerUrl}/api/voices`);
+        const data = await voicesResponse.json();
+        if (data.voices && data.voices.length > 0) {
+          edgeVoices = data.voices.map(v => ({...v, provider: 'edge', name: v.name || v.id}));
+          state.useEdgeTTS = true;
+          console.log(`✓ Loaded ${edgeVoices.length} Edge TTS voices (FREE!)`);
+        }
+      }
+    } catch (error) {
+      console.log('Edge TTS server not available');
+    }
+
+    // Combine all voices (prioritize Edge TTS since it's free!)
+    const allVoices = [...edgeVoices, ...coquiVoices, ...meloVoices];
 
     if (allVoices.length === 0) {
       console.warn('No TTS servers available, falling back to browser speech');
       state.useCoquiTTS = false;
       state.useMeloTTS = false;
+      state.useEdgeTTS = false;
       initBrowserSpeech();
       return;
     }
@@ -1136,7 +1165,7 @@ function populateVoicePicker() {
     const gender = voice.gender ? ` (${voice.gender})` : '';
     const star = preferredAccents.includes(voice.accent) ? '⭐ ' : '';
 
-    if (state.useCoquiTTS || state.useMeloTTS) {
+    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
       option.textContent = `${star}${voice.name}${accent}${gender}`;
     } else {
       option.textContent = `${voice.name}${accent}${gender}`;
@@ -1161,7 +1190,7 @@ function populateVoicePicker() {
     const accent = voice.accent ? ` [${voice.accent}]` : '';
     const gender = voice.gender ? ` (${voice.gender})` : '';
 
-    if (state.useCoquiTTS || state.useMeloTTS) {
+    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
       option.textContent = `${voice.name}${accent}${gender}`;
     } else {
       const lang = voice.lang ? ` (${voice.lang})` : '';

@@ -1,0 +1,16 @@
+{
+  "title": "we-three",
+  "composer": "Unknown",
+  "generated": "2025-10-24T11:36:54.150Z",
+  "assets": {
+    "mei": "we-three.mei",
+    "timemap": "we-three.json",
+    "midi": "we-three.mid",
+    "svgPreview": "we-three-preview.svg"
+  },
+  "stats": {
+    "timemapEvents": 521,
+    "tempoChanges": 1,
+    "midiSizeKB": "19.61"
+  }
+}

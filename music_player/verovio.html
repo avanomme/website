@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width">
+        <title>MIDI playback</title>
+        <!-- A stylesheet for modifying the appearance of the notes being played -->
+        <link href="midi.css" rel="stylesheet" type="text/css" />
+        <style>
+            g.note.playing,
+            g.chord.playing {
+                fill: #764ba2 !important;
+                stroke: #764ba2 !important;
+                opacity: 0.9 !important;
+                animation: note-pulse 0.5s ease-in-out;
+            }
+
+            g.note.playing path,
+            g.note.playing rect,
+            g.note.playing ellipse,
+            g.note.playing circle,
+            g.note.playing polygon,
+            g.note.playing line,
+            g.note.playing polyline,
+            g.chord.playing path,
+            g.chord.playing rect,
+            g.chord.playing ellipse,
+            g.chord.playing circle,
+            g.chord.playing polygon,
+            g.chord.playing line,
+            g.chord.playing polyline {
+                fill: #764ba2 !important;
+                stroke: #764ba2 !important;
+            }
+
+            @keyframes note-pulse {
+                0% {
+                    fill: #667eea;
+                    opacity: 0.7;
+                }
+                50% {
+                    fill: #764ba2;
+                    opacity: 1.0;
+                }
+                100% {
+                    fill: #764ba2;
+                    opacity: 0.9;
+                }
+            }
+        </style>
+        <!-- Verovio -->
+        <script src="https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" defer></script>
+        <!-- Tone.js and MIDI parser -->
+        <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
+        <!-- Local soundfonts -->
+        <script src="soundfonts/MusyngKite/choir_aahs-mp3.js" defer></script>
+    </head>
+    <body>
+        <button id="playMIDI">Play</button>
+        <button id="stopMIDI">Stop</button>
+        <div id="notation"></div>
+        <script>
+            /** 
+                We need to wait for the whole page to load before we try to 
+                work with Verovio.
+            **/
+            document.addEventListener("DOMContentLoaded", (event) => {
+                verovio.module.onRuntimeInitialized = function () {
+                    // This line initializes the Verovio toolkit
+                    const tk = new verovio.toolkit();
+
+                    tk.setOptions({
+                        pageWidth: 2100,
+                        pageHeight: 2970,
+                        scale: 45,
+                        adjustPageHeight: true,
+                        spacingStaff: 20
+                    });
+
+                    // The current page, which will change when playing through the piece
+                    let currentPage = 1;
+
+                    let midi = null;
+                    let highlightLoopId = null;
+                    let totalDuration = 0;
+                    let isLoaded = false;
+                    let schedulePlaybackPromise = null;
+
+                    const samplerCache = new Map();
+                    const activePlayers = new Set();
+                    const DEFAULT_SOUNDFONT = "steinway";
+                    const FALLBACK_PLAYER_KEY = "__fallback_poly_synth__";
+                    const SOUND_FONT_PROGRAM_MAP = new Map([
+                        [0, "steinway"],
+                        [52, "choir_aahs"]
+                    ]);
+                    const SOUND_FONT_KEYWORDS = [
+                        { keyword: "choir aahs", soundfont: "choir_aahs" },
+                        { keyword: "choir", soundfont: "choir_aahs" },
+                        { keyword: "voice", soundfont: "choir_aahs" },
+                        { keyword: "soprano", soundfont: "choir_aahs" },
+                        { keyword: "alto", soundfont: "choir_aahs" },
+                        { keyword: "tenor", soundfont: "choir_aahs" },
+                        { keyword: "bass", soundfont: "choir_aahs" },
+                        { keyword: "piano", soundfont: "steinway" },
+                        { keyword: "acoustic grand piano", soundfont: "steinway" }
+                    ];
+                    const STEINWAY_SAMPLE_BASE_URL = "soundfonts/steinway/";
+                    const STEINWAY_SAMPLE_MAP = {
+                        A0: "A0.wav",
+                        C1: "C1.wav",
+                        "F#1": "F#1.wav",
+                        C2: "C2.wav",
+                        "F#2": "F#2.wav",
+                        C3: "C3.wav",
+                        "F#3": "F#3.wav",
+                        C4: "C4.wav",
+                        "F#4": "F#4.wav",
+                        C5: "C5.wav",
+                        "F#5": "F#5.wav",
+                        C6: "C6.wav",
+                        "F#6": "F#6.wav",
+                        C7: "C7.wav",
+                        "F#7": "F#7.wav",
+                        C8: "C8.wav"
+                    };
+
+                    const resolveSoundfontKey = (track) => {
+                        const programNumber = track?.instrument?.number;
+                        if (typeof programNumber === "number" && SOUND_FONT_PROGRAM_MAP.has(programNumber)) {
+                            return SOUND_FONT_PROGRAM_MAP.get(programNumber);
+                        }
+
+                        const instrumentName = (track?.instrument?.name || "").toLowerCase();
+                        for (const { keyword, soundfont } of SOUND_FONT_KEYWORDS) {
+                            if (instrumentName.includes(keyword)) {
+                                return soundfont;
+                            }
+                        }
+
+                        const instrumentFamily = (track?.instrument?.family || "").toLowerCase();
+                        for (const { keyword, soundfont } of SOUND_FONT_KEYWORDS) {
+                            if (instrumentFamily.includes(keyword)) {
+                                return soundfont;
+                            }
+                        }
+
+                        return DEFAULT_SOUNDFONT;
+                    };
+
+                    const getFallbackPlayer = () => {
+                        if (!samplerCache.has(FALLBACK_PLAYER_KEY)) {
+                            samplerCache.set(FALLBACK_PLAYER_KEY, new Tone.PolySynth(Tone.Synth).toDestination());
+                        }
+                        return samplerCache.get(FALLBACK_PLAYER_KEY);
+                    };
+
+                    const getSamplerForSoundfont = async (soundfontKey) => {
+                        if (samplerCache.has(soundfontKey)) {
+                            return samplerCache.get(soundfontKey);
+                        }
+
+                        if (soundfontKey === "steinway") {
+                            const sampler = new Tone.Sampler({
+                                urls: STEINWAY_SAMPLE_MAP,
+                                baseUrl: STEINWAY_SAMPLE_BASE_URL,
+                                attack: 0.002,
+                                release: 2.5
+                            }).toDestination();
+
+                            await sampler.loaded;
+                            samplerCache.set(soundfontKey, sampler);
+                            return sampler;
+                        }
+
+                        if (typeof MIDI === "undefined" || !MIDI.Soundfont || !MIDI.Soundfont[soundfontKey]) {
+                            console.warn(`Soundfont "${soundfontKey}" not found; using fallback synth.`);
+                            return null;
+                        }
+
+                        const soundfontData = Object.fromEntries(Object.entries(MIDI.Soundfont[soundfontKey]));
+
+                        const sampler = new Tone.Sampler({
+                            urls: soundfontData,
+                            attack: 0.01,
+                            release: 1.5
+                        }).toDestination();
+
+                        try {
+                            await sampler.loaded;
+                        } catch (error) {
+                            console.error(`Failed to load soundfont "${soundfontKey}":`, error);
+                            if (typeof sampler.dispose === "function") {
+                                sampler.dispose();
+                            }
+                            return null;
+                        }
+
+                        samplerCache.set(soundfontKey, sampler);
+                        return sampler;
+                    };
+
+                    const getPlayerForTrack = async (track) => {
+                        const soundfontKey = resolveSoundfontKey(track);
+                        const sampler = await getSamplerForSoundfont(soundfontKey);
+                        return sampler || getFallbackPlayer();
+                    };
+
+                    const highlightCurrentTime = function (currentSeconds) {
+                        const playingNotes = document.querySelectorAll('g.note.playing');
+                        for (const playingNote of playingNotes) {
+                            playingNote.classList.remove("playing");
+                        }
+
+                        const currentElements = tk.getElementsAtTime(currentSeconds * 1000);
+                        if (!currentElements || currentElements.page === 0) return;
+
+                        if (currentElements.page !== currentPage) {
+                            currentPage = currentElements.page;
+                            document.getElementById("notation").innerHTML = tk.renderToSVG(currentPage);
+                        }
+
+                        if (Array.isArray(currentElements.notes)) {
+                            for (const note of currentElements.notes) {
+                                const noteElement = document.getElementById(note);
+                                if (noteElement) {
+                                    noteElement.classList.add("playing");
+                                }
+                            }
+                        }
+                    };
+
+                    const stopHighlightLoop = function () {
+                        if (highlightLoopId !== null) {
+                            Tone.Transport.clear(highlightLoopId);
+                            highlightLoopId = null;
+                        }
+                    };
+
+                    const resetTransport = function () {
+                        Tone.Transport.stop();
+                        Tone.Transport.cancel();
+                        Tone.Transport.position = 0;
+                        stopHighlightLoop();
+                        activePlayers.forEach((player) => {
+                            if (typeof player.releaseAll === "function") {
+                                player.releaseAll();
+                            }
+                        });
+                        activePlayers.clear();
+                        highlightCurrentTime(0);
+                    };
+
+                    const schedulePlayback = async function () {
+                        if (!midi) return;
+
+                        resetTransport();
+
+                        const trackPlayers = await Promise.all(
+                            midi.tracks.map(async (track) => {
+                                if (!track.notes || track.notes.length === 0) {
+                                    return null;
+                                }
+                                try {
+                                    const player = await getPlayerForTrack(track);
+                                    return { track, player };
+                                } catch (error) {
+                                    console.error("Failed to prepare player for track:", error);
+                                    return null;
+                                }
+                            })
+                        );
+
+                        if (midi.header && midi.header.tempos && midi.header.tempos.length > 0) {
+                            Tone.Transport.bpm.value = midi.header.tempos[0].bpm;
+                            midi.header.tempos.slice(1).forEach(tempoEvent => {
+                                Tone.Transport.schedule((time) => {
+                                    Tone.Transport.bpm.rampTo(tempoEvent.bpm, 0.01, time);
+                                }, tempoEvent.time);
+                            });
+                        } else {
+                            Tone.Transport.bpm.value = 120;
+                        }
+
+                        await Tone.loaded();
+
+                        trackPlayers.forEach((entry) => {
+                            if (!entry) return;
+                            const { track, player } = entry;
+                            activePlayers.add(player);
+                            track.notes.forEach((note) => {
+                                Tone.Transport.schedule((time) => {
+                                    player.triggerAttackRelease(note.name, note.duration, time, note.velocity ?? 0.8);
+                                }, note.time);
+                            });
+                        });
+
+                        totalDuration = midi.duration + 1;
+
+                        highlightLoopId = Tone.Transport.scheduleRepeat(() => {
+                            const currentSeconds = Tone.Transport.seconds;
+                            highlightCurrentTime(currentSeconds);
+                            if (currentSeconds >= totalDuration) {
+                                stopMIDIHandler();
+                            }
+                        }, 0.05);
+                    };
+
+                    const preparePlayback = async function () {
+                        if (!schedulePlaybackPromise) {
+                            schedulePlaybackPromise = schedulePlayback()
+                                .catch((error) => {
+                                    console.error("Failed to schedule playback:", error);
+                                    throw error;
+                                })
+                                .finally(() => {
+                                    schedulePlaybackPromise = null;
+                                });
+                        }
+                        return schedulePlaybackPromise;
+                    };
+
+                    const playMIDIHandler = async function () {
+                        if (!isLoaded || !midi) return;
+                        if (Tone.Transport.state === "started") return;
+
+                        try {
+                            await Tone.start();
+                            await preparePlayback();
+                            if (Tone.Transport.state === "started") return;
+                            Tone.Transport.start("+0.05");
+                        } catch (error) {
+                            console.error("Failed to start playback:", error);
+                        }
+                    };
+
+                    const stopMIDIHandler = function () {
+                        resetTransport();
+                    };
+
+                    /**
+                        Wire up the buttons to actually work.
+                    */
+                    document.getElementById("playMIDI").addEventListener("click", playMIDIHandler);
+                    document.getElementById("stopMIDI").addEventListener("click", stopMIDIHandler);
+
+                    // This line fetches the MEI file we want to render...
+                    fetch("we-three.musicxml")
+                    // ... then receives the response and "unpacks" the MEI from it
+                    .then((response) => response.text())
+                    .then((musicXML) => {
+                        // ... then we can load the data into Verovio ...
+                        const result = tk.loadData(musicXML);
+                        if (!result) {
+                            throw new Error("Verovio failed to load the MusicXML file.");
+                        }
+                        // ... and generate the SVG for the first page ...
+                        let svg = tk.renderToSVG(1);
+                        // ... and finally gets the <div> element with the ID we specified, 
+                        // and sets the content (innerHTML) to the SVG that we just generated.
+                        document.getElementById("notation").innerHTML = svg;
+
+                        const base64midi = tk.renderToMIDI();
+                        const midiByteArray = Uint8Array.from(atob(base64midi), c => c.charCodeAt(0));
+                        midi = new Midi(midiByteArray.buffer);
+                        totalDuration = midi.duration + 1;
+                        isLoaded = true;
+                    })
+                    .catch((error) => {
+                        console.error("Failed to load score:", error);
+                        document.getElementById("notation").innerHTML = `
+                            <div style="padding: 2rem; color: #b00020;">
+                                <strong>Error loading score:</strong> ${error.message}
+                            </div>`;
+                    });
+                }
+            });
+        </script>
+    </body>
+</html>

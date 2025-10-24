@@ -1,0 +1,41 @@
+{
+  "name": "@musescore/web-player",
+  "version": "1.0.0",
+  "description": "MuseScore player library for web browsers",
+  "main": "web/js/musescore-player-complete.js",
+  "type": "module",
+  "scripts": {
+    "serve": "python3 -m http.server 8000",
+    "test": "open http://localhost:8000/tests/test-player.html",
+    "player": "open http://localhost:8000/player4.html",
+    "rehearse": "open http://localhost:8000/rehearse4.html"
+  },
+  "keywords": [
+    "musescore",
+    "music",
+    "player",
+    "midi",
+    "musicxml",
+    "notation",
+    "audio",
+    "web-audio",
+    "playback"
+  ],
+  "author": "MuseScore Community",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/musescore/web-player.git"
+  },
+  "bugs": {
+    "url": "https://github.com/musescore/web-player/issues"
+  },
+  "homepage": "https://github.com/musescore/web-player#readme",
+  "files": [
+    "web/",
+    "examples/",
+    "docs/",
+    "README.md",
+    "LICENSE.txt"
+  ]
+}

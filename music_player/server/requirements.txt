@@ -1,0 +1,46 @@
+# Stratford Choir AI Synthesis Backend - Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+
+# Music Processing
+music21==9.1.0
+
+# Audio Processing
+pydub==0.25.1
+
+# TTS (Coqui TTS) - Choose one of the following:
+
+# Option 1: Coqui TTS (recommended for full AI voice synthesis)
+# Uncomment the line below to use Coqui TTS
+# TTS==0.22.0
+
+# Option 2: For OpenAI TTS (requires OpenAI API key)
+# openai==1.3.5
+
+# Additional dependencies for audio processing
+numpy==1.24.3
+scipy==1.11.4
+
+# CORS support (included in FastAPI but listed for clarity)
+python-multipart==0.0.6
+
+# Logging and utilities
+python-dotenv==1.0.0
+
+# Optional: For better performance
+# torch==2.1.0  # Required by TTS, install CPU or GPU version as needed
+# torchaudio==2.1.0
+
+# Notes:
+# 1. TTS library requires ffmpeg to be installed on your system
+#    - macOS: brew install ffmpeg
+#    - Linux: apt-get install ffmpeg
+#
+# 2. For TTS with GPU support, install PyTorch with CUDA:
+#    pip install torch torchaudio --index-url https://download.pytorch.org/whl/cu118
+#
+# 3. music21 requires MuseScore or another notation software for full functionality
+#    Download from: https://musescore.org/

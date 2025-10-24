@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rehearse - Stratford Community Choir</title>
+  <meta name="description" content="Interactive choral rehearsal tool for Stratford Choir with AI voice playback">
+  <link rel="stylesheet" href="assets/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.7.6/build/opensheetmusicdisplay.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@magenta/music@1.23.1/es6/core.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/midi-parser-js@4.0.4/src/main.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/soundfont-player@0.12.0/dist/soundfont-player.min.js"></script>
+  <script>
+    window.addEventListener('DOMContentLoaded', function() {
+      if (typeof window.opensheetmusicdisplay === 'undefined' ||
+          typeof window.opensheetmusicdisplay.OpenSheetMusicDisplay === 'undefined') {
+        var container = document.getElementById('score-container');
+        if (container) {
+          container.innerHTML = "<p style='color: red;' role='alert'>Could not load OpenSheetMusicDisplay library from CDN. Check your internet connection or try again later. If you are offline, download the library and serve it locally.</p>";
+        }
+        console.error('OpenSheetMusicDisplay library failed to load from CDN.');
+      }
+    });
+  </script>
+  <script src="js/player.js" defer></script>
+</head>
+<body class="rehearse-page">
+  <header>
+    <div class="header-title-row">
+      <div class="header-title">
+        <h1>Rehearsal Room</h1>
+        <span class="header-subtitle">Select a song and start practicing!</span>
+      </div>
+      <a href="index.html" class="back-link" aria-label="Back to home page">Back to Home</a>
+    </div>
+
+    <!-- Playback Controls Bar -->
+    <div class="header-controls-bar" role="region" aria-label="Playback controls">
+      <div class="button-group">
+        <button onclick="playScore()" id="playBtn" aria-label="Play music">
+          <span aria-hidden="true">▶️</span> Play
+        </button>
+        <button onclick="pauseScore()" id="pauseBtn" aria-label="Pause music">
+          <span aria-hidden="true">⏸</span> Pause
+        </button>
+        <button onclick="restartScore()" id="restartBtn" aria-label="Restart from beginning">
+          <span aria-hidden="true">⏮️</span> Restart
+        </button>
+      </div>
+
+      <div class="slider-container">
+        <label for="tempoSlider">
+          Tempo: <span id="tempoValue" aria-live="polite">120</span> BPM
+        </label>
+        <input type="range" id="tempoSlider" min="60" max="180" value="120" step="1"
+               oninput="setAbsoluteTempo(this.value)"
+               aria-label="Adjust tempo from 60 to 180 BPM">
+      </div>
+
+      <div class="slider-container">
+        <label for="masterVolumeSlider">
+          Master Volume: <span id="masterVolumeValue" aria-live="polite">50</span>%
+        </label>
+        <input type="range" id="masterVolumeSlider" min="0" max="100" value="50" step="1"
+               oninput="changeMasterVolume(this.value)"
+               aria-label="Adjust master volume from 0% to 100%">
+      </div>
+
+      <div class="zoom-controls">
+        <label>
+          Zoom: <span id="zoomValue" aria-live="polite">100</span>%
+        </label>
+        <div class="button-group">
+          <button onclick="zoomOut()" aria-label="Zoom out">-</button>
+          <button onclick="resetZoom()" aria-label="Reset zoom">100%</button>
+          <button onclick="zoomIn()" aria-label="Zoom in">+</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- LEFT SIDE: SONG LIST -->
+    <nav class="song-list" role="navigation" aria-label="Song selection">
+      <h2 class="visually-hidden">Available Songs</h2>
+      <button onclick="loadScore('candlelight-carol', 'candlelight-carol')" aria-label="Load Candlelight Carol">Candlelight Carol</button>
+      <button onclick="loadScore('holiday-favourites', 'holiday-favourites')" aria-label="Load Holiday Favourites">Holiday Favourites</button>
+      <button onclick="loadScore('most-wonderful', 'most-wonderful')" aria-label="Load It's the Most Wonderful Time of the Year">It's the Most Wonderful Time of the Year</button>
+      <button onclick="loadScore('little-drummer', 'little-drummer')" aria-label="Load The Little Drummer Boy/Peace On Earth">The Little Drummer Boy/Peace On Earth</button>
+      <button onclick="loadScore('mary-did', 'mary-did')" aria-label="Load Mary Did You Know?">Mary Did You Know?</button>
+      <button onclick="loadScore('Marys-holy', 'marys-holy')" aria-label="Load Mary's Holy Child">Mary's Holy Child</button>
+      <button onclick="loadScore('our-gift-for-you', 'our-gift-for-you')" aria-label="Load Our Gift For You">Our Gift For You</button>
+      <button onclick="loadScore('we-three', 'we-three')" aria-label="Load We Three Kings">We Three Kings</button>
+      <button onclick="loadScore('winter-song', 'winter-song')" aria-label="Load Winter Song">Winter Song</button>
+    </nav>
+
+    <!-- RIGHT SIDE: SCORE DISPLAY -->
+    <main class="score-area" role="main">
+      <div class="score-container">
+        <div class="controls" role="region" aria-label="Part controls">
+          <h2>Voice Parts</h2>
+
+          <div class="part-selector" role="group" aria-label="Voice part selection">
+            <label>
+              <input type="checkbox" checked onchange="togglePart('Soprano', this.checked)" id="partSoprano">
+              Soprano
+            </label>
+            <label>
+              <input type="checkbox" checked onchange="togglePart('Alto', this.checked)" id="partAlto">
+              Alto
+            </label>
+            <label>
+              <input type="checkbox" checked onchange="togglePart('Tenor', this.checked)" id="partTenor">
+              Tenor
+            </label>
+            <label>
+              <input type="checkbox" checked onchange="togglePart('Bass', this.checked)" id="partBass">
+              Bass
+            </label>
+          </div>
+
+          <div class="seek-container">
+            <label for="seekSlider">
+              Position: <span id="seekValue" aria-live="polite">0</span>
+            </label>
+            <input type="range" id="seekSlider" min="0" max="100" value="0" step="1"
+                   onchange="seekToMeasure(this.value)"
+                   aria-label="Seek to position in the score">
+          </div>
+
+        </div>
+        <div id="scoreDisplay" role="img" aria-label="Musical score display">
+          <p class="placeholder" id="placeholder" aria-live="polite">Choose a song to view the score and start rehearsal.</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

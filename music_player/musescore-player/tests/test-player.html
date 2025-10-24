@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MuseScore Player Test Suite</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .test-section h2 {
+            margin-top: 0;
+            color: #667eea;
+        }
+
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .test-result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .test-result.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .test-result.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .test-result.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+
+        .log-entry {
+            margin: 2px 0;
+            padding: 2px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .log-entry.error {
+            color: #dc3545;
+        }
+
+        .log-entry.success {
+            color: #28a745;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+
+        input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .stat {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>MuseScore Player Test Suite</h1>
+
+    <div class="test-section">
+        <h2>1. Initialization Test</h2>
+        <button id="testInit">Test Initialization</button>
+        <div id="initResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. File Loading Test</h2>
+        <div class="controls">
+            <input type="file" id="testFileInput" accept=".mid,.midi">
+            <button id="testLoad">Load File</button>
+            <button id="testLoadURL">Load from URL</button>
+        </div>
+        <input type="text" id="testURL" placeholder="Enter MIDI file URL" style="width: 100%; padding: 8px; margin-top: 10px;">
+        <div id="loadResult"></div>
+        <div class="stats" id="fileStats" style="display: none;">
+            <div class="stat">
+                <div class="stat-label">Duration</div>
+                <div class="stat-value" id="statDuration">0:00</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Tracks</div>
+                <div class="stat-value" id="statTracks">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Measures</div>
+                <div class="stat-value" id="statMeasures">0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Playback Test</h2>
+        <div class="controls">
+            <button id="testPlay" disabled>Play</button>
+            <button id="testPause" disabled>Pause</button>
+            <button id="testStop" disabled>Stop</button>
+            <button id="testSeek" disabled>Seek to 5s</button>
+        </div>
+        <div id="playbackResult"></div>
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">State</div>
+                <div class="stat-value" id="statState">Stopped</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Current Time</div>
+                <div class="stat-value" id="statTime">0:00</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Controls Test</h2>
+        <div class="controls">
+            <button id="testTempo" disabled>Set Tempo 50%</button>
+            <button id="testVolume" disabled>Set Volume 50%</button>
+            <button id="testLoop" disabled>Toggle Loop</button>
+        </div>
+        <div id="controlsResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Event System Test</h2>
+        <button id="testEvents">Test Events</button>
+        <div id="eventsResult"></div>
+        <div class="log" id="eventLog" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Stress Test</h2>
+        <div class="controls">
+            <button id="testStress">Run Stress Test</button>
+            <button id="testMemory">Memory Leak Test</button>
+        </div>
+        <div id="stressResult"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Log</h2>
+        <button id="clearLog">Clear Log</button>
+        <div class="log" id="testLog"></div>
+    </div>
+
+    <script type="module">
+        import { createPlayer, PlaybackState } from '../web/js/musescore-player-complete.js';
+
+        let player = null;
+        let testsPassed = 0;
+        let testsFailed = 0;
+
+        // Helper functions
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('testLog');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+            console.log(message);
+        }
+
+        function showResult(elementId, message, success) {
+            const el = document.getElementById(elementId);
+            el.className = `test-result ${success ? 'success' : 'error'}`;
+            el.textContent = message;
+
+            if (success) {
+                testsPassed++;
+                log(`✓ ${message}`, 'success');
+            } else {
+                testsFailed++;
+                log(`✗ ${message}`, 'error');
+            }
+        }
+
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        // Test 1: Initialization
+        document.getElementById('testInit').addEventListener('click', async () => {
+            try {
+                log('Testing player initialization...');
+                player = await createPlayer();
+
+                if (player && typeof player.play === 'function') {
+                    showResult('initResult', 'Player initialized successfully', true);
+                } else {
+                    throw new Error('Player object invalid');
+                }
+            } catch (error) {
+                showResult('initResult', `Initialization failed: ${error.message}`, false);
+            }
+        });
+
+        // Test 2: File Loading
+        document.getElementById('testLoad').addEventListener('click', async () => {
+            const fileInput = document.getElementById('testFileInput');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showResult('loadResult', 'Please select a file first', false);
+                return;
+            }
+
+            if (!player) {
+                showResult('loadResult', 'Initialize player first', false);
+                return;
+            }
+
+            try {
+                log(`Loading file: ${file.name}...`);
+                await player.loadFromFile(file);
+
+                const metadata = player.getMetadata();
+                document.getElementById('statDuration').textContent = formatTime(metadata.durationSeconds);
+                document.getElementById('statTracks').textContent = metadata.numParts;
+                document.getElementById('statMeasures').textContent = metadata.measureCount;
+                document.getElementById('fileStats').style.display = 'grid';
+
+                enablePlaybackControls();
+
+                showResult('loadResult', `File loaded: ${file.name}`, true);
+            } catch (error) {
+                showResult('loadResult', `Load failed: ${error.message}`, false);
+            }
+        });
+
+        document.getElementById('testLoadURL').addEventListener('click', async () => {
+            const url = document.getElementById('testURL').value.trim();
+
+            if (!url) {
+                showResult('loadResult', 'Please enter a URL', false);
+                return;
+            }
+
+            if (!player) {
+                showResult('loadResult', 'Initialize player first', false);
+                return;
+            }
+
+            try {
+                log(`Loading URL: ${url}...`);
+                await player.loadFromURL(url);
+
+                const metadata = player.getMetadata();
+                document.getElementById('statDuration').textContent = formatTime(metadata.durationSeconds);
+                document.getElementById('statTracks').textContent = metadata.numParts;
+                document.getElementById('statMeasures').textContent = metadata.measureCount;
+                document.getElementById('fileStats').style.display = 'grid';
+
+                enablePlaybackControls();
+
+                showResult('loadResult', `URL loaded successfully`, true);
+            } catch (error) {
+                showResult('loadResult', `Load failed: ${error.message}`, false);
+            }
+        });
+
+        function enablePlaybackControls() {
+            document.getElementById('testPlay').disabled = false;
+            document.getElementById('testPause').disabled = false;
+            document.getElementById('testStop').disabled = false;
+            document.getElementById('testSeek').disabled = false;
+            document.getElementById('testTempo').disabled = false;
+            document.getElementById('testVolume').disabled = false;
+            document.getElementById('testLoop').disabled = false;
+        }
+
+        // Test 3: Playback
+        document.getElementById('testPlay').addEventListener('click', () => {
+            player.play();
+            showResult('playbackResult', 'Playback started', true);
+        });
+
+        document.getElementById('testPause').addEventListener('click', () => {
+            player.pause();
+            showResult('playbackResult', 'Playback paused', true);
+        });
+
+        document.getElementById('testStop').addEventListener('click', () => {
+            player.stop();
+            showResult('playbackResult', 'Playback stopped', true);
+        });
+
+        document.getElementById('testSeek').addEventListener('click', () => {
+            player.seek(5);
+            showResult('playbackResult', 'Seeked to 5 seconds', true);
+        });
+
+        // Test 4: Controls
+        document.getElementById('testTempo').addEventListener('click', () => {
+            player.setTempo(0.5);
+            showResult('controlsResult', 'Tempo set to 50%', true);
+        });
+
+        document.getElementById('testVolume').addEventListener('click', () => {
+            player.setVolume(0.5);
+            showResult('controlsResult', 'Volume set to 50%', true);
+        });
+
+        document.getElementById('testLoop').addEventListener('click', () => {
+            const looping = !player._loop;
+            player.setLoop(looping);
+            showResult('controlsResult', `Loop ${looping ? 'enabled' : 'disabled'}`, true);
+        });
+
+        // Test 5: Events
+        document.getElementById('testEvents').addEventListener('click', async () => {
+            const eventLog = document.getElementById('eventLog');
+            eventLog.style.display = 'block';
+            eventLog.innerHTML = '';
+
+            if (!player) {
+                player = await createPlayer();
+            }
+
+            let eventsReceived = 0;
+
+            player.on('stateChanged', (state) => {
+                eventsReceived++;
+                const entry = document.createElement('div');
+                entry.textContent = `Event: stateChanged -> ${state}`;
+                eventLog.appendChild(entry);
+            });
+
+            player.on('timeUpdate', (time) => {
+                const entry = document.createElement('div');
+                entry.textContent = `Event: timeUpdate -> ${formatTime(time)}`;
+                eventLog.appendChild(entry);
+                eventLog.scrollTop = eventLog.scrollHeight;
+            });
+
+            player.on('loaded', () => {
+                eventsReceived++;
+                const entry = document.createElement('div');
+                entry.className = 'success';
+                entry.textContent = `Event: loaded`;
+                eventLog.appendChild(entry);
+            });
+
+            player.on('error', (error) => {
+                eventsReceived++;
+                const entry = document.createElement('div');
+                entry.className = 'error';
+                entry.textContent = `Event: error -> ${error.message}`;
+                eventLog.appendChild(entry);
+            });
+
+            showResult('eventsResult', 'Event listeners registered. Events will appear below.', true);
+        });
+
+        // Test 6: Stress Test
+        document.getElementById('testStress').addEventListener('click', async () => {
+            log('Starting stress test...');
+
+            for (let i = 0; i < 100; i++) {
+                player.play();
+                await new Promise(resolve => setTimeout(resolve, 10));
+                player.pause();
+                await new Promise(resolve => setTimeout(resolve, 10));
+                player.stop();
+                await new Promise(resolve => setTimeout(resolve, 10));
+            }
+
+            showResult('stressResult', 'Stress test completed: 100 play/pause/stop cycles', true);
+        });
+
+        document.getElementById('testMemory').addEventListener('click', async () => {
+            log('Starting memory leak test...');
+
+            const initialMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
+
+            for (let i = 0; i < 10; i++) {
+                const testPlayer = await createPlayer();
+                // Simulate usage
+                testPlayer.destroy();
+            }
+
+            const finalMemory = performance.memory ? performance.memory.usedJSHeapSize : 0;
+            const leaked = finalMemory - initialMemory;
+
+            showResult('stressResult', `Memory test: ${(leaked / 1024 / 1024).toFixed(2)} MB difference`, leaked < 10 * 1024 * 1024);
+        });
+
+        // Clear log
+        document.getElementById('clearLog').addEventListener('click', () => {
+            document.getElementById('testLog').innerHTML = '';
+            testsPassed = 0;
+            testsFailed = 0;
+        });
+
+        // State monitoring
+        setInterval(() => {
+            if (!player) return;
+
+            const state = player.getState();
+            const stateNames = ['Stopped', 'Playing', 'Paused', 'Loading', 'Error'];
+            document.getElementById('statState').textContent = stateNames[state];
+
+            const time = player.getCurrentTime();
+            document.getElementById('statTime').textContent = formatTime(time);
+        }, 100);
+
+        // Auto-initialize
+        log('Test suite loaded. Click "Test Initialization" to begin.');
+    </script>
+</body>
+</html>
