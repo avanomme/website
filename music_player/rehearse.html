@@ -2170,17 +2170,18 @@
 
             partsList.innerHTML = '';
 
-            // Group tracks by part name (combine piano tracks)
+            // Group tracks by part name (combine piano tracks, but keep choir parts separate)
             const partGroups = new Map();
             midi.tracks.forEach((track, trackIdx) => {
                 if (!track.notes || track.notes.length === 0) return;
 
                 let trackName = track.name || track.instrument?.name || `Track ${trackIdx + 1}`;
 
-                // Normalize piano names
+                // Only normalize piano names - keep choir parts (Soprano, Alto, Tenor, Bass) separate
                 if (trackName.toLowerCase().includes('piano')) {
                     trackName = 'Piano';
                 }
+                // Don't normalize choir parts - each should be its own group
 
                 if (!partGroups.has(trackName)) {
                     partGroups.set(trackName, []);
