@@ -1,10 +1,16 @@
 {
   "scores": [
     {
+      "id": "007-its-the-thought-that-counts",
+      "title": "007 It's the Thought that Counts",
+      "path": "/music_player/scores/007_its_the_thought/007_its_the_thought.mei",
+      "jsonPath": "/music_player/scores/007_its_the_thought/007_its_the_thought.json"
+    },
+    {
       "id": "014-santa-for-a-day",
       "title": "014 Santa for a Day",
-      "path": "/music_player/scores/04_santa_for_a_day/014_Santa_For_a_Day.mei",
-      "jsonPath": "/music_player/scores/04_santa_for_a_day/014_Santa_For_a_Day.json"
+      "path": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.mei",
+      "jsonPath": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.json"
     },
     {
       "id": "we-three",
