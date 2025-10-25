@@ -781,6 +781,8 @@
         let currentScoreIndex = -1;
         let totalPages = 1;
         let currentSystemsPerPage = 1;
+        let currentMEIData = null; // Store current MEI data for rebuilding
+        let currentJSONPath = null; // Store current JSON timing path
 
         // DOM elements
         const fileInputOverlay = document.getElementById('fileInputOverlay');
@@ -1624,7 +1626,7 @@
         }
 
         async function handleSystemsPerPageChange(event) {
-            if (!isLoaded || !tk) return;
+            if (!isLoaded || !tk || !currentMEIData) return;
 
             const systems = parseInt(event.target.value);
             currentSystemsPerPage = systems;
@@ -1650,18 +1652,115 @@
                 xmlIdSeed: 0
             });
 
-            // Rebuild the score by reloading the current score
-            if (currentScoreIndex >= 0 && currentScoreIndex < scoreLibraryData.length) {
-                const score = scoreLibraryData[currentScoreIndex];
-                console.log('[Systems] Rebuilding score:', score.title);
-                try {
-                    // Reload without resetting the dropdown selection
-                    await loadMusicXMLFile(score.path, score.jsonPath);
-                    console.log('[Systems] Score rebuilt with', systems, 'systems per page');
-                } catch (error) {
-                    console.error('[Systems] Error rebuilding score:', error);
-                    alert('Error rebuilding score: ' + error.message);
+            // Rebuild the score from stored MEI data
+            console.log('[Systems] Rebuilding score with', systems, 'systems per page');
+            try {
+                // Reload the score using the stored MEI data
+                await rebuildScoreFromMEI();
+                console.log('[Systems] Score rebuilt successfully');
+            } catch (error) {
+                console.error('[Systems] Error rebuilding score:', error);
+                alert('Error rebuilding score: ' + error.message);
+            }
+        }
+
+        async function rebuildScoreFromMEI() {
+            if (!currentMEIData || !tk) {
+                console.error('[Rebuild] No MEI data available');
+                return;
+            }
+
+            // Stop any current playback before rebuilding
+            if (playerState === 'playing' || playerState === 'paused') {
+                resetTransport();
+                playerState = 'stopped';
+                currentTime = 0;
+                startMeasureTime = 0;
+                updateTimeDisplay(0);
+            }
+
+            playerState = 'loading';
+            updateButtonStates();
+
+            try {
+                const result = tk.loadData(currentMEIData);
+                if (!result) {
+                    throw new Error("Verovio failed to load the MEI file.");
                 }
+
+                // Reset to page 1
+                currentPage = 1;
+
+                // Load custom JSON timing data if available
+                let customTimingEvents = null;
+                if (currentJSONPath) {
+                    try {
+                        const jsonResponse = await fetch(currentJSONPath);
+                        if (jsonResponse.ok) {
+                            customTimingEvents = await jsonResponse.json();
+                            console.log('[Rebuild] Loaded custom timing data:', customTimingEvents.length, 'events');
+                        }
+                    } catch (jsonError) {
+                        console.warn('[Rebuild] Could not load custom timing JSON:', jsonError);
+                    }
+                }
+
+                // Get Verovio's timemap
+                let rawTimeMap = tk.renderToTimemap();
+                let verovioTimeMap;
+                if (typeof rawTimeMap === 'string') {
+                    verovioTimeMap = JSON.parse(rawTimeMap);
+                } else {
+                    verovioTimeMap = rawTimeMap;
+                }
+
+                // Use custom timing events if available, otherwise use Verovio's timemap
+                if (customTimingEvents && customTimingEvents.length > 0) {
+                    timeMap = {
+                        events: customTimingEvents,
+                        measures: verovioTimeMap?.measures || []
+                    };
+                } else {
+                    timeMap = verovioTimeMap;
+                }
+
+                // Generate MIDI
+                const base64midi = tk.renderToMIDI();
+                const midiByteArray = Uint8Array.from(atob(base64midi), c => c.charCodeAt(0));
+                midi = new Midi(midiByteArray.buffer);
+                totalDuration = midi.duration + 1;
+                isLoaded = true;
+                startMeasureTime = 0;
+
+                // Update measure count
+                totalMeasures = timeMap?.measures?.length || 0;
+                startMeasure = 1;
+
+                // Update metadata
+                durationEl.textContent = formatTime(totalDuration);
+
+                // Update page count
+                totalPages = tk.getPageCount();
+                pageSlider.max = totalPages;
+                pageSlider.value = 1;
+                currentPageLabel.textContent = `Page 1`;
+                totalPagesLabel.textContent = `of ${totalPages}`;
+                updatePageButtons();
+
+                // Render score
+                renderScore();
+
+                // Update parts list
+                updatePartsList();
+
+                playerState = 'stopped';
+                updateButtonStates();
+                console.log('[Rebuild] Score rebuilt successfully with', totalPages, 'pages');
+            } catch (error) {
+                console.error('[Rebuild] Error rebuilding score:', error);
+                playerState = 'stopped';
+                updateButtonStates();
+                throw error;
             }
         }
 
@@ -1807,6 +1906,10 @@
                     throw new Error(`Failed to fetch ${filePath}: ${response.statusText}`);
                 }
                 const meiData = await response.text();
+
+                // Store MEI data and JSON path for rebuilding
+                currentMEIData = meiData;
+                currentJSONPath = jsonPath;
 
                 const result = tk.loadData(meiData);
                 if (!result) {
@@ -1989,6 +2092,10 @@
             updateButtonStates();
 
             try {
+                // Store MEI data for rebuilding
+                currentMEIData = meiData;
+                currentJSONPath = null; // No JSON timing for uploaded files
+
                 const result = tk.loadData(meiData);
                 if (!result) {
                     throw new Error("Verovio failed to load the MEI data.");
@@ -2170,29 +2277,42 @@
 
             partsList.innerHTML = '';
 
-            // Group tracks by part name (combine piano tracks, but keep choir parts separate)
+            // Group tracks by part name (ONLY combine piano tracks, keep all others separate)
             const partGroups = new Map();
             midi.tracks.forEach((track, trackIdx) => {
                 if (!track.notes || track.notes.length === 0) return;
 
                 let trackName = track.name || track.instrument?.name || `Track ${trackIdx + 1}`;
+                let groupKey = trackName;
 
-                // Only normalize piano names - keep choir parts (Soprano, Alto, Tenor, Bass) separate
+                // Only group piano tracks together
                 if (trackName.toLowerCase().includes('piano')) {
-                    trackName = 'Piano';
+                    groupKey = 'Piano';
+                } else {
+                    // For all non-piano tracks, make each track unique by appending the index
+                    // This ensures vocal parts and other instruments are never grouped
+                    groupKey = `${trackName}_${trackIdx}`;
                 }
-                // Don't normalize choir parts - each should be its own group
 
-                if (!partGroups.has(trackName)) {
-                    partGroups.set(trackName, []);
+                if (!partGroups.has(groupKey)) {
+                    partGroups.set(groupKey, []);
                 }
-                partGroups.get(trackName).push(trackIdx);
+                partGroups.get(groupKey).push(trackIdx);
             });
 
             // Create UI for each part group
-            partGroups.forEach((trackIndices, partName) => {
+            partGroups.forEach((trackIndices, groupKey) => {
                 const partItem = document.createElement('div');
                 partItem.className = 'part-item';
+
+                // Extract display name from group key (remove the _index suffix for non-piano parts)
+                let displayName;
+                if (groupKey === 'Piano') {
+                    displayName = 'Piano';
+                } else {
+                    // Remove the "_trackIdx" suffix we added for uniqueness
+                    displayName = groupKey.replace(/_\d+$/, '');
+                }
 
                 // Check if all tracks in group are muted
                 const allMuted = trackIndices.every(idx => mutedTracks.has(idx));
@@ -2202,7 +2322,7 @@
 
                 const checkbox = document.createElement('input');
                 checkbox.type = 'checkbox';
-                checkbox.id = `part-${partName}`;
+                checkbox.id = `part-${groupKey}`;
                 checkbox.checked = !allMuted;
                 checkbox.addEventListener('change', (e) => {
                     if (e.target.checked) {
@@ -2215,8 +2335,8 @@
                 });
 
                 const label = document.createElement('label');
-                label.htmlFor = `part-${partName}`;
-                label.textContent = trackIndices.length > 1 ? `${partName} (${trackIndices.length} tracks)` : partName;
+                label.htmlFor = `part-${groupKey}`;
+                label.textContent = trackIndices.length > 1 ? `${displayName} (${trackIndices.length} tracks)` : displayName;
 
                 const volumeControl = document.createElement('div');
                 volumeControl.className = 'part-volume-control';
