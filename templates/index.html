@@ -17,6 +17,38 @@
             font-family: Arial, sans-serif;
         }
 
+        .container {
+            display: flex;
+            align-items: center;
+            gap: 80px;
+        }
+
+        .grinch-link {
+            text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .grinch-link:hover {
+            transform: scale(1.1);
+        }
+
+        .grinch-image {
+            width: 300px;
+            height: 300px;
+            object-fit: contain;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .grinch-caption {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.5em;
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+            font-weight: bold;
+        }
+
         .spiral {
             position: relative;
             width: 200px;
@@ -49,16 +81,44 @@
                 transform: rotate(360deg) translate(100px, 100px);
             }
         }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .grinch-image {
+                width: 200px;
+                height: 200px;
+            }
+
+            .grinch-caption {
+                font-size: 1.2em;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="spiral">
-        <span style="transform: rotate(0deg) translate(0, 0);">T</span>
-        <span style="transform: rotate(36deg) translate(10px, 10px);">h</span>
-        <span style="transform: rotate(72deg) translate(20px, 20px);">e</span>
-        <span style="transform: rotate(108deg) translate(30px, 30px);">o</span>
-        <span style="transform: rotate(144deg) translate(40px, 40px);">r</span>
-        <span style="transform: rotate(180deg) translate(50px, 50px);">y</span>
+    <div class="container">
+        <a href="/grinch" class="grinch-link">
+            <div>
+                <img src="https://upload.wikimedia.org/wikipedia/en/e/e8/The_Grinch_%282018_film%29_poster.jpg"
+                     alt="The Grinch"
+                     class="grinch-image"
+                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23165016%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22%3EGrinch Rehearsal%3C/text%3E%3C/svg%3E'">
+                <div class="grinch-caption">Grinch 2025 Rehearsal</div>
+            </div>
+        </a>
+
+        <div class="spiral">
+            <span style="transform: rotate(0deg) translate(0, 0);">T</span>
+            <span style="transform: rotate(36deg) translate(10px, 10px);">h</span>
+            <span style="transform: rotate(72deg) translate(20px, 20px);">e</span>
+            <span style="transform: rotate(108deg) translate(30px, 30px);">o</span>
+            <span style="transform: rotate(144deg) translate(40px, 40px);">r</span>
+            <span style="transform: rotate(180deg) translate(50px, 50px);">y</span>
+        </div>
     </div>
 </body>
 </html>
