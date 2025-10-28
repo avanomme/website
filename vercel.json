@@ -1,6 +1,20 @@
 {
   "version": 2,
+  "builds": [
+    {
+      "src": "app.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "music_player/**",
+      "use": "@vercel/static"
+    }
+  ],
   "routes": [
+    {
+      "src": "/music_player/(.*)",
+      "dest": "/music_player/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "app.py"
