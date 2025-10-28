@@ -189,6 +189,7 @@ function processFile(file) {
 
     const results = {
         name: file.name,
+        dir: file.dir,
         success: false,
         assets: {}
     };
@@ -261,6 +262,77 @@ function processFile(file) {
 }
 
 /**
+ * Generate id from title (kebab-case)
+ */
+function generateId(title) {
+    return title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+}
+
+/**
+ * Update scores.json with processed files
+ */
+function updateScoresJSON(results) {
+    const scoresJSONPath = path.join(SCORES_DIR, 'scores.json');
+
+    // Read existing scores.json or create new structure
+    let scoresData = { scores: [] };
+    if (fs.existsSync(scoresJSONPath)) {
+        try {
+            scoresData = JSON.parse(fs.readFileSync(scoresJSONPath, 'utf-8'));
+        } catch (error) {
+            console.warn('Warning: Could not parse existing scores.json, creating new one');
+        }
+    }
+
+    // Track changes
+    let added = 0;
+    let updated = 0;
+
+    // Process each successful result
+    for (const result of results) {
+        if (!result.success || !result.assets.metadata) continue;
+
+        const metadata = result.assets.metadata;
+
+        // Generate paths relative to /music_player/scores/
+        const relativeDir = path.relative(SCORES_DIR, result.dir);
+        const meiPath = `/music_player/scores/${relativeDir}/${metadata.assets.mei}`;
+        const jsonPath = `/music_player/scores/${relativeDir}/${metadata.assets.timemap}`;
+
+        // Check if score already exists (by path)
+        const existingIndex = scoresData.scores.findIndex(s => s.path === meiPath);
+
+        const scoreEntry = {
+            id: generateId(metadata.title),
+            title: metadata.title,
+            path: meiPath,
+            jsonPath: jsonPath
+        };
+
+        if (existingIndex >= 0) {
+            // Update existing entry
+            scoresData.scores[existingIndex] = scoreEntry;
+            updated++;
+        } else {
+            // Add new entry
+            scoresData.scores.push(scoreEntry);
+            added++;
+        }
+    }
+
+    // Sort alphabetically by title
+    scoresData.scores.sort((a, b) => a.title.localeCompare(b.title));
+
+    // Write back to scores.json
+    fs.writeFileSync(scoresJSONPath, JSON.stringify(scoresData, null, 2) + '\n', 'utf-8');
+
+    return { added, updated, total: scoresData.scores.length };
+}
+
+/**
  * Generate summary report
  */
 function generateSummaryReport(results, outputPath) {
@@ -296,6 +368,7 @@ function main() {
     console.log('  2. MIDI file (for playback)');
     console.log('  3. SVG preview (first page)');
     console.log('  4. Metadata JSON (title, composer, stats)');
+    console.log('  5. Update scores.json (add/update entries, alphabetically sorted)');
     console.log('');
 
     // Check if scores directory exists
@@ -326,6 +399,12 @@ function main() {
 
     const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
 
+    // Update scores.json with new entries
+    console.log('\n=======================================================');
+    console.log('📝 Updating scores.json...');
+    const scoresUpdate = updateScoresJSON(results);
+    console.log(`✓ Added: ${scoresUpdate.added}, Updated: ${scoresUpdate.updated}, Total: ${scoresUpdate.total}`);
+
     // Generate summary report
     console.log('\n=======================================================');
     console.log('📊 Generating summary report...');
@@ -351,10 +430,14 @@ function main() {
     }
 
     console.log('\n📁 Generated assets:');
-    console.log('   • .json      - Timemap for highlighting');
-    console.log('   • .mid       - MIDI for audio playback');
-    console.log('   • -preview.svg - First page preview');
-    console.log('   • -metadata.json - File information\n');
+    console.log('   • .json          - Timemap for highlighting');
+    console.log('   • .mid           - MIDI for audio playback');
+    console.log('   • -preview.svg   - First page preview');
+    console.log('   • -metadata.json - File information');
+    console.log('\n📋 Updated scores.json:');
+    console.log(`   • ${scoresUpdate.added} new entries added`);
+    console.log(`   • ${scoresUpdate.updated} entries updated`);
+    console.log(`   • ${scoresUpdate.total} total scores (alphabetically sorted)\n`);
 
     // Exit with error code if any failed
     process.exit(summary.failed > 0 ? 1 : 0);
