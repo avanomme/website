@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Grinch 2025 Rehearsal</title>
     <!-- Verovio for MusicXML rendering -->
     <script src="https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" defer></script>
@@ -24,15 +24,23 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: #1a202c;
             color: #e2e8f0;
-            height: 100vh;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             overflow: hidden;
+            /* Support for iOS Safari's dynamic viewport */
+            height: 100vh;
+            height: 100dvh; /* Dynamic viewport height */
         }
 
         .rehearse-container {
             display: grid;
             grid-template-columns: 280px 1fr;
             grid-template-rows: auto 1fr auto;
-            height: 100vh;
+            height: 100%;
+            width: 100%;
         }
 
         .header {
@@ -170,6 +178,7 @@
             flex-direction: column;
             background: #f7fafc;
             overflow: hidden;
+            min-height: 0; /* Critical for grid layout to prevent overflow */
         }
 
         .score-display {
@@ -178,6 +187,8 @@
             overflow: auto;
             background: white;
             color: #4a5568;
+            min-height: 0; /* Critical for flexbox to prevent overflow */
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
 
         .score-display.has-score {
@@ -275,7 +286,9 @@
             grid-row: 3;
             background: #2d3748;
             padding: 20px 30px;
+            padding-bottom: calc(20px + env(safe-area-inset-bottom)); /* Safe area for iOS devices */
             border-top: 1px solid #4a5568;
+            flex-shrink: 0; /* Prevent controls from shrinking */
         }
 
         .controls-layout {
@@ -532,6 +545,18 @@
             color: #718096;
         }
 
+        /* iPad and tablet landscape mode */
+        @media (max-width: 1366px) and (min-width: 1025px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .controls-bar {
+                padding: 15px 20px;
+            }
+        }
+
+        /* iPad and tablet portrait/landscape transition */
         @media (max-width: 1024px) {
             .rehearse-container {
                 grid-template-columns: 1fr;
@@ -544,6 +569,8 @@
 
             .controls-bar {
                 grid-column: 1;
+                padding: 15px 20px;
+                padding-bottom: calc(15px + env(safe-area-inset-bottom));
             }
 
             .main-area {
@@ -561,6 +588,71 @@
 
             .mobile-page-nav {
                 display: flex !important;
+            }
+        }
+
+        /* iPad landscape mode specific */
+        @media (max-width: 1024px) and (min-width: 835px) and (orientation: landscape) {
+            .header {
+                padding: 12px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            .controls-bar {
+                padding: 12px 20px;
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            }
+
+            .controls-layout {
+                gap: 18px;
+            }
+
+            .playback-buttons button {
+                width: 42px;
+                height: 42px;
+                font-size: 17px;
+            }
+        }
+
+        /* iPad portrait mode specific */
+        @media (max-width: 834px) and (min-width: 769px) and (orientation: portrait) {
+            .header {
+                padding: 10px 15px;
+            }
+
+            .header h1 {
+                font-size: 1.2em;
+            }
+
+            .header-actions button {
+                padding: 6px 24px;
+                font-size: 0.9em;
+            }
+
+            .controls-bar {
+                padding: 12px 15px;
+                padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            }
+
+            .controls-layout {
+                gap: 12px;
+            }
+
+            .playback-buttons button {
+                width: 38px;
+                height: 38px;
+                font-size: 15px;
+            }
+
+            .progress-section {
+                gap: 6px;
+            }
+
+            .time-display {
+                font-size: 0.85em;
             }
         }
 
