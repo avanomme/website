@@ -851,6 +851,7 @@
         const mutedTracks = new Set();
         const trackVolumes = new Map();
         const trackPlayers = new Map(); // Map track index to player instance for live volume control
+        let staffLabels = new Map(); // Map staff number to label from MEI
         const DEFAULT_SOUNDFONT = "acoustic_grand_piano";
         const FALLBACK_PLAYER_KEY = "__fallback_poly_synth__";
         const SOUND_FONT_PROGRAM_MAP = new Map([
@@ -1044,6 +1045,46 @@
                 console.error('[App] Error stack:', error.stack);
                 scoreLibraryEl.innerHTML = '<option value="">Error loading scores</option>';
                 alert('Failed to initialize player: ' + error.message);
+            }
+        }
+
+        // Parse MEI data to extract staff labels
+        function parseStaffLabelsFromMEI(meiData) {
+            staffLabels.clear();
+
+            try {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(meiData, "text/xml");
+
+                // Find all staffDef elements
+                const staffDefs = xmlDoc.querySelectorAll('staffDef[n]');
+
+                staffDefs.forEach(staffDef => {
+                    const staffNum = parseInt(staffDef.getAttribute('n'));
+
+                    // First try to get label from direct child
+                    let labelEl = staffDef.querySelector('label');
+                    if (labelEl && labelEl.textContent.trim()) {
+                        staffLabels.set(staffNum, labelEl.textContent.trim());
+                        console.log(`[MEI] Staff ${staffNum} label: "${labelEl.textContent.trim()}"`);
+                        return;
+                    }
+
+                    // Check if this staffDef is inside a staffGrp with a label (e.g., Piano)
+                    const parentStaffGrp = staffDef.closest('staffGrp[bar\\.thru="true"]') || staffDef.closest('staffGrp');
+                    if (parentStaffGrp) {
+                        labelEl = parentStaffGrp.querySelector(':scope > label');
+                        if (labelEl && labelEl.textContent.trim()) {
+                            staffLabels.set(staffNum, labelEl.textContent.trim());
+                            console.log(`[MEI] Staff ${staffNum} label from group: "${labelEl.textContent.trim()}"`);
+                            return;
+                        }
+                    }
+                });
+
+                console.log('[MEI] Extracted staff labels:', Array.from(staffLabels.entries()));
+            } catch (error) {
+                console.error('[MEI] Failed to parse staff labels:', error);
             }
         }
 
@@ -1688,6 +1729,9 @@
                     throw new Error("Verovio failed to load the MEI file.");
                 }
 
+                // Parse staff labels from MEI
+                parseStaffLabelsFromMEI(currentMEIData);
+
                 // Reset to page 1
                 currentPage = 1;
 
@@ -1916,6 +1960,9 @@
                     throw new Error("Verovio failed to load the MEI file.");
                 }
 
+                // Parse staff labels from MEI
+                parseStaffLabelsFromMEI(meiData);
+
                 // Generate SVG and time map
                 currentPage = 1;
 
@@ -2101,6 +2148,9 @@
                     throw new Error("Verovio failed to load the MEI data.");
                 }
 
+                // Parse staff labels from MEI
+                parseStaffLabelsFromMEI(meiData);
+
                 currentPage = 1;
                 let rawTimeMap = tk.renderToTimemap();
                 // renderToTimemap might return a string that needs parsing
@@ -2282,7 +2332,16 @@
             midi.tracks.forEach((track, trackIdx) => {
                 if (!track.notes || track.notes.length === 0) return;
 
-                let trackName = track.name || track.instrument?.name || `Track ${trackIdx + 1}`;
+                // Get track name: prioritize MEI staff labels, then MIDI track name, then instrument name
+                let trackName;
+                const staffNum = trackIdx + 1; // MIDI track indices start at 0, staff numbers start at 1
+                if (staffLabels.has(staffNum)) {
+                    trackName = staffLabels.get(staffNum);
+                    console.log(`[Parts] Track ${trackIdx} using MEI label: "${trackName}"`);
+                } else {
+                    trackName = track.name || track.instrument?.name || `Track ${trackIdx + 1}`;
+                    console.log(`[Parts] Track ${trackIdx} using MIDI name: "${trackName}"`);
+                }
                 let groupKey = trackName;
 
                 // Only group piano tracks together
