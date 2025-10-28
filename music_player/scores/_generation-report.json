@@ -1,9 +1,18 @@
 {
-  "generated": "2025-10-24T23:05:20.839Z",
-  "total": 3,
-  "successful": 3,
+  "generated": "2025-10-28T19:13:01.250Z",
+  "total": 4,
+  "successful": 4,
   "failed": 0,
   "files": [
+    {
+      "name": "001_opening",
+      "success": true,
+      "title": "001_opening",
+      "composer": "Unknown",
+      "timemapEvents": 354,
+      "tempoChanges": 1,
+      "midiSizeKB": "9.34"
+    },
     {
       "name": "007_its_the_thought",
       "success": true,
@@ -20,7 +29,7 @@
       "composer": "Unknown",
       "timemapEvents": 422,
       "tempoChanges": 1,
-      "midiSizeKB": "9.73"
+      "midiSizeKB": "9.77"
     },
     {
       "name": "we-three",
