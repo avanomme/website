@@ -1,0 +1,16 @@
+{
+  "title": "000_opening",
+  "composer": "Unknown",
+  "generated": "2025-10-29T10:48:31.955Z",
+  "assets": {
+    "mei": "000_opening.mei",
+    "timemap": "000_opening.json",
+    "midi": "000_opening.mid",
+    "svgPreview": "000_opening-preview.svg"
+  },
+  "stats": {
+    "timemapEvents": 354,
+    "tempoChanges": 1,
+    "midiSizeKB": "9.34"
+  }
+}

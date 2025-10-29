@@ -1,10 +1,16 @@
 {
   "scores": [
     {
-      "id": "001-opening",
-      "title": "001_opening",
-      "path": "/music_player/scores/001_opening/001_opening.mei",
-      "jsonPath": "/music_player/scores/001_opening/001_opening.json"
+      "id": "000-opening",
+      "title": "000_opening",
+      "path": "/music_player/scores/000_opening/000_opening.mei",
+      "jsonPath": "/music_player/scores/000_opening/000_opening.json"
+    },
+    {
+      "id": "001-who-likes-christmas",
+      "title": "001_Who_Likes_Christmas",
+      "path": "/music_player/scores/001_who_likes_christmas/001_Who_Likes_Christmas.mei",
+      "jsonPath": "/music_player/scores/001_who_likes_christmas/001_Who_Likes_Christmas.json"
     },
     {
       "id": "007-its-the-thought",
