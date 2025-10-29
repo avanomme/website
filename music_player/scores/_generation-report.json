@@ -1,8 +1,8 @@
 {
-  "generated": "2025-10-29T10:48:33.200Z",
-  "total": 4,
+  "generated": "2025-10-29T11:32:47.045Z",
+  "total": 5,
   "successful": 4,
-  "failed": 0,
+  "failed": 1,
   "files": [
     {
       "name": "000_opening",
@@ -21,6 +21,13 @@
       "timemapEvents": 786,
       "tempoChanges": 1,
       "midiSizeKB": "34.62"
+    },
+    {
+      "name": "002_This_Time_of_Year",
+      "success": false,
+      "timemapEvents": 657,
+      "tempoChanges": 1,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/002_this_time_of_year/002_This_Time_of_Year.mei\" -t midi -o \"/Users/adam/projects/website/music_player/scores/002_this_time_of_year/002_This_Time_of_Year.mid\""
     },
     {
       "name": "007_its_the_thought",
