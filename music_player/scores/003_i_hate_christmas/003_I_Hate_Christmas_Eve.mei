@@ -5,10 +5,10 @@
    <meiHead>
       <fileDesc>
          <titleStmt>
-            <title type="main">003_I_Hate_Christmas_Eve</title>
-            <title type="subordinate">Subtitle</title>
+            <title type="main">I Hate Christmas Eve</title>
             <respStmt>
-               <persName role="composer">Composer / arranger</persName>
+               <persName role="composer">Mel Marvin</persName>
+               <persName role="lyricist">Timothy Mason</persName>
             </respStmt>
          </titleStmt>
          <pubStmt>
@@ -23,12 +23,10 @@
                <scoreDef>
                   <pgHead func="first">
                      <rend halign="center" valign="top">
-                        <rend type="title" fontsize="x-large">Untitled score</rend>
-                        <lb />
-                        <rend type="subtitle" fontsize="large">Subtitle</rend>
+                        <rend type="title" fontsize="x-large">I Hate Christmas Eve</rend>
                      </rend>
                      <rend halign="right" valign="bottom">
-                        <rend type="composer">Composer / arranger</rend>
+                        <rend type="composer">Music by MEL MARVIN<lb />Lyrics by TIMOTHY MASON</rend>
                      </rend>
                   </pgHead>
                   <staffGrp>
