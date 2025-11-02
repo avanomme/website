@@ -19,6 +19,12 @@
       "jsonPath": "/music_player/scores/002_this_time_of_year/002_This_Time_of_Year.json"
     },
     {
+      "id": "003-i-hate-christmas-eve",
+      "title": "003_I_Hate_Christmas_Eve",
+      "path": "/music_player/scores/003_i_hate_christmas/003_I_Hate_Christmas_Eve.mei",
+      "jsonPath": "/music_player/scores/003_i_hate_christmas/003_I_Hate_Christmas_Eve.json"
+    },
+    {
       "id": "004-whatchamawho",
       "title": "004_Whatchamawho",
       "path": "/music_player/scores/004_whatchamawho/004_Whatchamawho.mei",
@@ -35,12 +41,6 @@
       "title": "014_Santa_For_a_Day",
       "path": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.mei",
       "jsonPath": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.json"
-    },
-    {
-      "id": "untitled-score",
-      "title": "Untitled score",
-      "path": "/music_player/scores/003_i_hate_christmas/003_I_Hate_Christmas_Eve.mei",
-      "jsonPath": "/music_player/scores/003_i_hate_christmas/003_I_Hate_Christmas_Eve.json"
     }
   ]
 }
