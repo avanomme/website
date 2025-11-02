@@ -1,0 +1,16 @@
+{
+  "title": "005_Welcome_Christmas",
+  "composer": "Unknown",
+  "generated": "2025-11-02T10:53:19.553Z",
+  "assets": {
+    "mei": "005_Welcome_Christmas.mei",
+    "timemap": "005_Welcome_Christmas.json",
+    "midi": "005_Welcome_Christmas.mid",
+    "svgPreview": "005_Welcome_Christmas-preview.svg"
+  },
+  "stats": {
+    "timemapEvents": 108,
+    "tempoChanges": 1,
+    "midiSizeKB": "6.64"
+  }
+}

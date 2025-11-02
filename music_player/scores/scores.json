@@ -31,6 +31,12 @@
       "jsonPath": "/music_player/scores/004_whatchamawho/004_Whatchamawho.json"
     },
     {
+      "id": "005-welcome-christmas",
+      "title": "005_Welcome_Christmas",
+      "path": "/music_player/scores/005_welcome_christmas/005_Welcome_Christmas.mei",
+      "jsonPath": "/music_player/scores/005_welcome_christmas/005_Welcome_Christmas.json"
+    },
+    {
       "id": "007-its-the-thought",
       "title": "007_its_the_thought",
       "path": "/music_player/scores/007_its_the_thought/007_its_the_thought.mei",
