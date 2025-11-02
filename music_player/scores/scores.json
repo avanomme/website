@@ -43,16 +43,28 @@
       "jsonPath": "/music_player/scores/007_its_the_thought/007_its_the_thought.json"
     },
     {
+      "id": "008-this-time-of-year-reprise1",
+      "title": "008_This_Time_of_Year_Reprise1",
+      "path": "/music_player/scores/008_this_time_of_year_reprise1/008_This_Time_of_Year_Reprise1.mei",
+      "jsonPath": "/music_player/scores/008_this_time_of_year_reprise1/008_This_Time_of_Year_Reprise1.json"
+    },
+    {
       "id": "014-santa-for-a-day",
       "title": "014_Santa_For_a_Day",
       "path": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.mei",
       "jsonPath": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.json"
     },
     {
-      "id": "this-time-of-year",
-      "title": "This Time of Year",
+      "id": "002-this-time-of-year",
+      "title": "002_This_Time_of_Year",
       "path": "/music_player/scores/002_this_time_of_year/002_This_Time_of_Year.mei",
       "jsonPath": "/music_player/scores/002_this_time_of_year/002_This_Time_of_Year.json"
+    },
+    {
+      "id": "007a-after-thought",
+      "title": "007a_After_Thought",
+      "path": "/music_player/scores/007a_after_thought/007a_After_Thought.mei",
+      "jsonPath": "/music_player/scores/007a_after_thought/007a_After_Thought.json"
     }
   ]
 }

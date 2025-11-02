@@ -1,7 +1,7 @@
 {
-  "generated": "2025-11-02T11:27:53.016Z",
-  "total": 9,
-  "successful": 9,
+  "generated": "2025-11-02T12:38:19.766Z",
+  "total": 11,
+  "successful": 11,
   "failed": 0,
   "files": [
     {
@@ -59,6 +59,20 @@
       "title": "007_its_the_thought",
       "timemapEvents": 1194,
       "tempoChanges": 5
+    },
+    {
+      "name": "007a_After_Thought",
+      "success": true,
+      "title": "Untitled score",
+      "timemapEvents": 47,
+      "tempoChanges": 1
+    },
+    {
+      "name": "008_This_Time_of_Year_Reprise1",
+      "success": true,
+      "title": "008_This_Time_of_Year_Reprise1",
+      "timemapEvents": 237,
+      "tempoChanges": 1
     },
     {
       "name": "014_Santa_For_a_Day",
