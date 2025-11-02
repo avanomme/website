@@ -1,7 +1,7 @@
 {
-  "generated": "2025-11-02T08:55:30.777Z",
-  "total": 6,
-  "successful": 5,
+  "generated": "2025-11-02T10:25:59.059Z",
+  "total": 7,
+  "successful": 6,
   "failed": 1,
   "files": [
     {
@@ -32,11 +32,20 @@
     {
       "name": "003_I_Hate_Christmas_Eve",
       "success": true,
-      "title": "I Hate Christmas Eve",
+      "title": "Untitled score",
       "composer": "Unknown",
       "timemapEvents": 865,
       "tempoChanges": 1,
-      "midiSizeKB": "22.18"
+      "midiSizeKB": "22.30"
+    },
+    {
+      "name": "004_Whatchamawho",
+      "success": true,
+      "title": "004_Whatchamawho",
+      "composer": "Unknown",
+      "timemapEvents": 969,
+      "tempoChanges": 1,
+      "midiSizeKB": "23.61"
     },
     {
       "name": "007_its_the_thought",

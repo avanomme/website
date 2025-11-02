@@ -1,0 +1,16 @@
+{
+  "title": "004_Whatchamawho",
+  "composer": "Unknown",
+  "generated": "2025-11-02T10:25:58.338Z",
+  "assets": {
+    "mei": "004_Whatchamawho.mei",
+    "timemap": "004_Whatchamawho.json",
+    "midi": "004_Whatchamawho.mid",
+    "svgPreview": "004_Whatchamawho-preview.svg"
+  },
+  "stats": {
+    "timemapEvents": 969,
+    "tempoChanges": 1,
+    "midiSizeKB": "23.61"
+  }
+}
