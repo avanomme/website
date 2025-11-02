@@ -67,6 +67,12 @@
       "jsonPath": "/music_player/scores/009_one_of_a_kind/009_One_Of_A_Kind.json"
     },
     {
+      "id": "011-nows-the-time",
+      "title": "011_Nows_The_Time",
+      "path": "/music_player/scores/011_nows_the_time/011_Nows_The_Time.mei",
+      "jsonPath": "/music_player/scores/011_nows_the_time/011_Nows_The_Time.json"
+    },
+    {
       "id": "014-santa-for-a-day",
       "title": "014_Santa_For_a_Day",
       "path": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.mei",

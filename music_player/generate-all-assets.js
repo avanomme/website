@@ -224,19 +224,25 @@ function updateScoresJSON(results) {
         // Check if score already exists (by path)
         const existingIndex = scoresData.scores.findIndex(s => s.path === meiPath);
 
-        const scoreEntry = {
-            id: generateId(result.title),
-            title: result.title,
-            path: meiPath,
-            jsonPath: jsonPath
-        };
-
         if (existingIndex >= 0) {
-            // Update existing entry
-            scoresData.scores[existingIndex] = scoreEntry;
-            updated++;
+            // Preserve existing entry - only update paths if needed
+            const existingEntry = scoresData.scores[existingIndex];
+
+            // Only update jsonPath if it changed
+            if (existingEntry.jsonPath !== jsonPath) {
+                existingEntry.jsonPath = jsonPath;
+                updated++;
+            }
+
+            // Keep existing id and title - DO NOT overwrite them
         } else {
-            // Add new entry
+            // Add new entry with extracted title
+            const scoreEntry = {
+                id: generateId(result.title),
+                title: result.title,
+                path: meiPath,
+                jsonPath: jsonPath
+            };
             scoresData.scores.push(scoreEntry);
             added++;
         }
@@ -317,7 +323,7 @@ function main() {
     console.log('\n=======================================================');
     console.log('📝 Updating scores.json...');
     const scoresUpdate = updateScoresJSON(results);
-    console.log(`✓ Added: ${scoresUpdate.added}, Updated: ${scoresUpdate.updated}, Total: ${scoresUpdate.total}`);
+    console.log(`✓ Added: ${scoresUpdate.added}, Existing (preserved): ${scoresUpdate.total - scoresUpdate.added}, Total: ${scoresUpdate.total}`);
 
     // Generate summary report
     console.log('\n=======================================================');
@@ -347,7 +353,7 @@ function main() {
     console.log('   • .json - Timemap for highlighting');
     console.log('\n📋 Updated scores.json:');
     console.log(`   • ${scoresUpdate.added} new entries added`);
-    console.log(`   • ${scoresUpdate.updated} entries updated`);
+    console.log(`   • ${scoresUpdate.total - scoresUpdate.added} existing entries preserved (names unchanged)`);
     console.log(`   • ${scoresUpdate.total} total scores (alphabetically sorted)\n`);
 
     // Exit with error code if any failed
