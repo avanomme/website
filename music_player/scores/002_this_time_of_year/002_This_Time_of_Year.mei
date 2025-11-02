@@ -5,7 +5,11 @@
    <meiHead>
       <fileDesc>
          <titleStmt>
-            <title />
+            <title>This Time of Year</title>
+            <respStmt>
+               <persName role="composer">Mel Marvin</persName>
+               <persName role="lyricist">Timothy Mason</persName>
+            </respStmt>
          </titleStmt>
          <pubStmt>
             <date isodate="2025-10-29T08:52:50" />

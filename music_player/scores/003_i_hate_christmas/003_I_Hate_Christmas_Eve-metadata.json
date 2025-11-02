@@ -1,0 +1,16 @@
+{
+  "title": "I Hate Christmas Eve",
+  "composer": "Unknown",
+  "generated": "2025-11-02T08:55:30.062Z",
+  "assets": {
+    "mei": "003_I_Hate_Christmas_Eve.mei",
+    "timemap": "003_I_Hate_Christmas_Eve.json",
+    "midi": "003_I_Hate_Christmas_Eve.mid",
+    "svgPreview": "003_I_Hate_Christmas_Eve-preview.svg"
+  },
+  "stats": {
+    "timemapEvents": 865,
+    "tempoChanges": 1,
+    "midiSizeKB": "22.18"
+  }
+}
