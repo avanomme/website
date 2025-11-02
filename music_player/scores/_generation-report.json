@@ -1,78 +1,71 @@
 {
-  "generated": "2025-11-02T10:53:20.292Z",
-  "total": 8,
-  "successful": 7,
-  "failed": 1,
+  "generated": "2025-11-02T11:26:47.577Z",
+  "total": 9,
+  "successful": 9,
+  "failed": 0,
   "files": [
     {
       "name": "000_opening",
       "success": true,
       "title": "000_opening",
-      "composer": "Unknown",
       "timemapEvents": 354,
-      "tempoChanges": 1,
-      "midiSizeKB": "9.34"
+      "tempoChanges": 1
     },
     {
       "name": "001_Who_Likes_Christmas",
       "success": true,
       "title": "001_Who_Likes_Christmas",
-      "composer": "Unknown",
       "timemapEvents": 786,
-      "tempoChanges": 1,
-      "midiSizeKB": "34.62"
+      "tempoChanges": 1
     },
     {
       "name": "002_This_Time_of_Year",
-      "success": false,
+      "success": true,
+      "title": "This Time of Year",
       "timemapEvents": 657,
-      "tempoChanges": 1,
-      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/002_this_time_of_year/002_This_Time_of_Year.mei\" -t midi -o \"/Users/adam/projects/website/music_player/scores/002_this_time_of_year/002_This_Time_of_Year.mid\""
+      "tempoChanges": 1
     },
     {
       "name": "003_I_Hate_Christmas_Eve",
       "success": true,
-      "title": "Untitled score",
-      "composer": "Unknown",
+      "title": "003_I_Hate_Christmas_Eve",
       "timemapEvents": 865,
-      "tempoChanges": 1,
-      "midiSizeKB": "22.30"
+      "tempoChanges": 1
     },
     {
       "name": "004_Whatchamawho",
       "success": true,
       "title": "004_Whatchamawho",
-      "composer": "Unknown",
       "timemapEvents": 969,
-      "tempoChanges": 1,
-      "midiSizeKB": "23.61"
+      "tempoChanges": 1
     },
     {
       "name": "005_Welcome_Christmas",
       "success": true,
       "title": "005_Welcome_Christmas",
-      "composer": "Unknown",
       "timemapEvents": 108,
-      "tempoChanges": 1,
-      "midiSizeKB": "6.64"
+      "tempoChanges": 1
+    },
+    {
+      "name": "006_I_Hate_Christmas_Reprise",
+      "success": true,
+      "title": "006_I_Hate_Christmas_Reprise",
+      "timemapEvents": 275,
+      "tempoChanges": 3
     },
     {
       "name": "007_its_the_thought",
       "success": true,
       "title": "007_its_the_thought",
-      "composer": "Unknown",
       "timemapEvents": 1194,
-      "tempoChanges": 5,
-      "midiSizeKB": "36.16"
+      "tempoChanges": 5
     },
     {
       "name": "014_Santa_For_a_Day",
       "success": true,
       "title": "014_Santa_For_a_Day",
-      "composer": "Unknown",
       "timemapEvents": 422,
-      "tempoChanges": 1,
-      "midiSizeKB": "9.77"
+      "tempoChanges": 1
     }
   ]
 }

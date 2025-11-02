@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 
 /**
- * Generate all assets needed for the player from MEI files
+ * Generate timemaps and update scores.json from MEI files
  *
  * This script generates:
  * 1. Timemap JSON files (for highlighting synchronization)
- * 2. MIDI files (for audio playback with Tone.js)
- * 3. First page SVG preview (for thumbnails/verification)
- * 4. Metadata JSON (page count, duration, composer, etc.)
+ * 2. Updates scores.json with score names and paths
  *
  * Usage: node generate-all-assets.js
  */
@@ -115,73 +113,30 @@ function generateTimemap(verovioBin, meiPath, outputPath) {
     };
 }
 
-/**
- * Generate MIDI file for a MEI file
- */
-function generateMIDI(verovioBin, meiPath, outputPath) {
-    const command = `"${verovioBin}" "${meiPath}" -t midi -o "${outputPath}"`;
-    execSync(command, { stdio: 'pipe' });
-
-    if (!fs.existsSync(outputPath)) {
-        throw new Error('MIDI file was not created');
-    }
-
-    const stats = fs.statSync(outputPath);
-    return {
-        size: stats.size,
-        sizeKB: (stats.size / 1024).toFixed(2)
-    };
-}
 
 /**
- * Generate SVG preview (first page) for a MEI file
+ * Extract title from MEI file
  */
-function generateSVGPreview(verovioBin, meiPath, outputPath) {
-    // Generate first page only with specific options
-    const command = `"${verovioBin}" "${meiPath}" --page 1 --scale 40 --adjust-page-height --breaks auto -o "${outputPath}"`;
-    execSync(command, { stdio: 'pipe' });
-
-    if (!fs.existsSync(outputPath)) {
-        throw new Error('SVG file was not created');
-    }
-
-    const stats = fs.statSync(outputPath);
-    return {
-        size: stats.size,
-        sizeKB: (stats.size / 1024).toFixed(2)
-    };
-}
-
-/**
- * Extract metadata from MEI file
- */
-function extractMetadata(verovioBin, meiPath) {
+function extractTitle(meiPath) {
     try {
-        // Use verovio to get page count
-        // We can parse the MEI or use verovio's info
         const meiData = fs.readFileSync(meiPath, 'utf-8');
 
-        // Extract basic metadata from MEI XML
+        // Try to extract title from MEI header
         const titleMatch = meiData.match(/<title[^>]*>([^<]+)<\/title>/i);
-        const composerMatch = meiData.match(/<composer[^>]*>([^<]+)<\/composer>/i);
+        if (titleMatch && titleMatch[1].trim()) {
+            return titleMatch[1].trim();
+        }
 
-        return {
-            title: titleMatch ? titleMatch[1].trim() : path.basename(meiPath, '.mei'),
-            composer: composerMatch ? composerMatch[1].trim() : 'Unknown',
-            generated: new Date().toISOString()
-        };
+        // Fallback to filename
+        return path.basename(meiPath, '.mei');
     } catch (error) {
-        console.error(`Error extracting metadata: ${error.message}`);
-        return {
-            title: path.basename(meiPath, '.mei'),
-            composer: 'Unknown',
-            generated: new Date().toISOString()
-        };
+        console.error(`Error extracting title: ${error.message}`);
+        return path.basename(meiPath, '.mei');
     }
 }
 
 /**
- * Process a single MEI file and generate all assets
+ * Process a single MEI file and generate timemap
  */
 function processFile(file) {
     console.log(`\n📄 Processing: ${file.name}`);
@@ -190,65 +145,28 @@ function processFile(file) {
     const results = {
         name: file.name,
         dir: file.dir,
+        meiPath: file.meiPath,
         success: false,
-        assets: {}
+        title: null,
+        timemapInfo: null
     };
 
     try {
         const verovioBin = findVerovio();
 
         // 1. Generate Timemap JSON
-        console.log(`   [1/4] Generating timemap...`);
+        console.log(`   [1/2] Generating timemap...`);
         const timemapPath = `${file.basePath}.json`;
         const timemapInfo = generateTimemap(verovioBin, file.meiPath, timemapPath);
-        results.assets.timemap = {
-            path: timemapPath,
-            ...timemapInfo
-        };
+        results.timemapInfo = timemapInfo;
+        results.timemapPath = timemapPath;
         console.log(`   ✓ Timemap: ${timemapInfo.events} events, ${timemapInfo.tempoChanges} tempo changes`);
 
-        // 2. Generate MIDI file
-        console.log(`   [2/4] Generating MIDI...`);
-        const midiPath = `${file.basePath}.mid`;
-        const midiInfo = generateMIDI(verovioBin, file.meiPath, midiPath);
-        results.assets.midi = {
-            path: midiPath,
-            ...midiInfo
-        };
-        console.log(`   ✓ MIDI: ${midiInfo.sizeKB} KB`);
-
-        // 3. Generate SVG preview (first page)
-        console.log(`   [3/4] Generating SVG preview...`);
-        const svgPath = `${file.basePath}-preview.svg`;
-        const svgInfo = generateSVGPreview(verovioBin, file.meiPath, svgPath);
-        results.assets.svg = {
-            path: svgPath,
-            ...svgInfo
-        };
-        console.log(`   ✓ SVG Preview: ${svgInfo.sizeKB} KB`);
-
-        // 4. Extract and save metadata
-        console.log(`   [4/4] Extracting metadata...`);
-        const metadata = extractMetadata(verovioBin, file.meiPath);
-        metadata.assets = {
-            mei: path.basename(file.meiPath),
-            timemap: path.basename(timemapPath),
-            midi: path.basename(midiPath),
-            svgPreview: path.basename(svgPath)
-        };
-        metadata.stats = {
-            timemapEvents: timemapInfo.events,
-            tempoChanges: timemapInfo.tempoChanges,
-            midiSizeKB: midiInfo.sizeKB
-        };
-
-        const metadataPath = `${file.basePath}-metadata.json`;
-        fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2), 'utf-8');
-        results.assets.metadata = {
-            path: metadataPath,
-            ...metadata
-        };
-        console.log(`   ✓ Metadata: ${metadata.title} by ${metadata.composer}`);
+        // 2. Extract title from MEI
+        console.log(`   [2/2] Extracting title...`);
+        const title = extractTitle(file.meiPath);
+        results.title = title;
+        console.log(`   ✓ Title: ${title}`);
 
         results.success = true;
         console.log(`   ✅ Complete!`);
@@ -293,21 +211,22 @@ function updateScoresJSON(results) {
 
     // Process each successful result
     for (const result of results) {
-        if (!result.success || !result.assets.metadata) continue;
-
-        const metadata = result.assets.metadata;
+        if (!result.success || !result.title) continue;
 
         // Generate paths relative to /music_player/scores/
         const relativeDir = path.relative(SCORES_DIR, result.dir);
-        const meiPath = `/music_player/scores/${relativeDir}/${metadata.assets.mei}`;
-        const jsonPath = `/music_player/scores/${relativeDir}/${metadata.assets.timemap}`;
+        const meiFileName = path.basename(result.meiPath);
+        const timemapFileName = path.basename(result.timemapPath);
+
+        const meiPath = `/music_player/scores/${relativeDir}/${meiFileName}`;
+        const jsonPath = `/music_player/scores/${relativeDir}/${timemapFileName}`;
 
         // Check if score already exists (by path)
         const existingIndex = scoresData.scores.findIndex(s => s.path === meiPath);
 
         const scoreEntry = {
-            id: generateId(metadata.title),
-            title: metadata.title,
+            id: generateId(result.title),
+            title: result.title,
             path: meiPath,
             jsonPath: jsonPath
         };
@@ -344,11 +263,9 @@ function generateSummaryReport(results, outputPath) {
         files: results.map(r => ({
             name: r.name,
             success: r.success,
-            title: r.assets.metadata?.title,
-            composer: r.assets.metadata?.composer,
-            timemapEvents: r.assets.timemap?.events,
-            tempoChanges: r.assets.timemap?.tempoChanges,
-            midiSizeKB: r.assets.midi?.sizeKB,
+            title: r.title,
+            timemapEvents: r.timemapInfo?.events,
+            tempoChanges: r.timemapInfo?.tempoChanges,
             error: r.error
         }))
     };
@@ -361,14 +278,11 @@ function generateSummaryReport(results, outputPath) {
  * Main function
  */
 function main() {
-    console.log('🎵 Stratford Choir Christmas - Complete Asset Generator');
+    console.log('🎵 Stratford Choir Christmas - Timemap Generator');
     console.log('=======================================================\n');
     console.log('This will generate for each MEI file:');
-    console.log('  1. Timemap JSON (for highlighting)');
-    console.log('  2. MIDI file (for playback)');
-    console.log('  3. SVG preview (first page)');
-    console.log('  4. Metadata JSON (title, composer, stats)');
-    console.log('  5. Update scores.json (add/update entries, alphabetically sorted)');
+    console.log('  1. Timemap JSON (for highlighting synchronization)');
+    console.log('  2. Update scores.json (add/update entries, alphabetically sorted)');
     console.log('');
 
     // Check if scores directory exists
@@ -430,10 +344,7 @@ function main() {
     }
 
     console.log('\n📁 Generated assets:');
-    console.log('   • .json          - Timemap for highlighting');
-    console.log('   • .mid           - MIDI for audio playback');
-    console.log('   • -preview.svg   - First page preview');
-    console.log('   • -metadata.json - File information');
+    console.log('   • .json - Timemap for highlighting');
     console.log('\n📋 Updated scores.json:');
     console.log(`   • ${scoresUpdate.added} new entries added`);
     console.log(`   • ${scoresUpdate.updated} entries updated`);
