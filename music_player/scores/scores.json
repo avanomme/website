@@ -73,6 +73,12 @@
       "jsonPath": "/music_player/scores/011_nows_the_time/011_Nows_The_Time.json"
     },
     {
+      "id": "013-youre-a-mean-one",
+      "title": "013_Youre_a_Mean_One",
+      "path": "/music_player/scores/013_youre_a_mean_one/013_Youre_a_Mean_One.mei",
+      "jsonPath": "/music_player/scores/013_youre_a_mean_one/013_Youre_a_Mean_One.json"
+    },
+    {
       "id": "014-santa-for-a-day",
       "title": "014_Santa_For_a_Day",
       "path": "/music_player/scores/014_santa_for_a_day/014_Santa_For_a_Day.mei",
