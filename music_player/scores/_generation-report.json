@@ -1,5 +1,5 @@
 {
-  "generated": "2025-11-02T14:45:52.013Z",
+  "generated": "2025-11-03T08:24:46.414Z",
   "total": 13,
   "successful": 13,
   "failed": 0,
@@ -36,8 +36,8 @@
       "name": "004_Whatchamawho",
       "success": true,
       "title": "004_Whatchamawho",
-      "timemapEvents": 969,
-      "tempoChanges": 1
+      "timemapEvents": 968,
+      "tempoChanges": 6
     },
     {
       "name": "005_Welcome_Christmas",
