@@ -1,5 +1,5 @@
 {
-  "generated": "2025-11-03T09:07:31.214Z",
+  "generated": "2025-11-03T11:37:38.487Z",
   "total": 13,
   "successful": 13,
   "failed": 0,
@@ -21,16 +21,16 @@
     {
       "name": "002_This_Time_of_Year",
       "success": true,
-      "title": "This Time of Year",
+      "title": "002_This_Time_of_Year",
       "timemapEvents": 657,
-      "tempoChanges": 1
+      "tempoChanges": 4
     },
     {
       "name": "003_I_Hate_Christmas_Eve",
       "success": true,
-      "title": "003_I_Hate_Christmas_Eve",
-      "timemapEvents": 865,
-      "tempoChanges": 1
+      "title": "Untitled score",
+      "timemapEvents": 867,
+      "tempoChanges": 2
     },
     {
       "name": "004_Whatchamawho",
