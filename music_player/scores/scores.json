@@ -101,6 +101,18 @@
       "title": "017_One_of_a_Kind_Resprise",
       "path": "/music_player/scores/017_one_of_a_kind_reprise/017_One_of_a_Kind_Resprise.mei",
       "jsonPath": "/music_player/scores/017_one_of_a_kind_reprise/017_One_of_a_Kind_Resprise.json"
+    },
+    {
+      "id": "018-welcome-christmas-reprise",
+      "title": "018_Welcome_Christmas_Reprise",
+      "path": "/music_player/scores/018_welcome_christmas_reprise/018_Welcome_Christmas_Reprise.mei",
+      "jsonPath": "/music_player/scores/018_welcome_christmas_reprise/018_Welcome_Christmas_Reprise.json"
+    },
+    {
+      "id": "untitled-score",
+      "title": "Untitled score",
+      "path": "/music_player/scores/017a_this_time_of_year_reprise2/017a_This_Time_of_Year_Reprise2.mei",
+      "jsonPath": "/music_player/scores/017a_this_time_of_year_reprise2/017a_This_Time_of_Year_Reprise2.json"
     }
   ]
 }

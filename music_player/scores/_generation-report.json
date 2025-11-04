@@ -1,7 +1,7 @@
 {
-  "generated": "2025-11-04T09:21:28.566Z",
-  "total": 17,
-  "successful": 17,
+  "generated": "2025-11-04T12:11:22.966Z",
+  "total": 19,
+  "successful": 19,
   "failed": 0,
   "files": [
     {
@@ -122,6 +122,20 @@
       "title": "017_One_of_a_Kind_Resprise",
       "timemapEvents": 573,
       "tempoChanges": 3
+    },
+    {
+      "name": "017a_This_Time_of_Year_Reprise2",
+      "success": true,
+      "title": "Untitled score",
+      "timemapEvents": 101,
+      "tempoChanges": 1
+    },
+    {
+      "name": "018_Welcome_Christmas_Reprise",
+      "success": true,
+      "title": "018_Welcome_Christmas_Reprise",
+      "timemapEvents": 323,
+      "tempoChanges": 1
     }
   ]
 }
