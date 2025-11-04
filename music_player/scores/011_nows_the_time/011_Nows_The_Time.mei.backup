@@ -1,4 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1+basic">
    <meiHead>
       <fileDesc>
@@ -114,7 +116,7 @@
                      </staff>
                      <tempo xml:id="t1iqx9rs" type="mscore-infer-from-text" midi.bpm="120" staff="1" tstamp="1">Molto sostenuto</tempo>
                      <tempo xml:id="t1wd916q" type="mscore-infer-from-text" midi.bpm="140" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 140</tempo>
+                        <rend glyph.auth="smufl"></rend> = 70</tempo>
                      <dynam xml:id="d1aekrf6" label="p" staff="5" startid="#n1daodq1">p</dynam>
                      <slur xml:id="ss2xkv0" startid="#n1daodq1" endid="#nnb132c" />
                      <slur xml:id="s14ktzpl" startid="#n1gwczzx" endid="#njfxsr1" />

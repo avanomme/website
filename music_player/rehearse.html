@@ -1277,21 +1277,14 @@
 
         // Convert transport time to original score time
         // The timemap timestamps already have MEI tempo changes baked in.
-        // Tempo changes are scheduled correctly in Tone.Transport via schedulePlayback().
-        // We just need to account for the user's tempo factor (speed adjustment).
+        // Simple linear conversion based on user's tempo factor (speed adjustment).
         function convertTransportTimeToScoreTime(transportSeconds) {
-            // Simple linear conversion: score time = transport time * tempo factor + start offset
-            //
-            // Why this works:
-            // - At 100% speed (tempoFactor=1.0): scoreTime = transportTime (direct mapping)
-            // - At 50% speed (tempoFactor=0.5): 10s transport = 5s score (playing slower)
-            // - At 200% speed (tempoFactor=2.0): 10s transport = 20s score (playing faster)
-            //
-            // The MEI tempo changes are already:
-            // 1. Baked into timemap timestamps (tstamp values from Verovio)
-            // 2. Scheduled as BPM changes in Tone.Transport (lines 1194-1226)
-            // So we don't need to account for them in this conversion.
             return (transportSeconds * tempoFactor) + startMeasureTime;
+        }
+
+        // Convert score time to transport time (inverse)
+        function convertScoreTimeToTransportTime(scoreSeconds) {
+            return (scoreSeconds - startMeasureTime) / tempoFactor;
         }
 
         const highlightCurrentTime = function (currentSeconds) {
@@ -1489,7 +1482,7 @@
                                     note.classList.add('playing');
                                 });
 
-                                console.log('[Tempo Event] MEI tempo change to', ev.tempo, 'BPM (scaled:', actualBpm, 'BPM) - animation duration:', scaledDuration.toFixed(2) + 's');
+                                console.log('[Tempo Event] MEI tempo change to', ev.tempo, 'BPM (scaled:', actualBpm, 'BPM) at transport time', scheduledTime.toFixed(2) + 's');
                             }, scheduledTime);
                         }
                     }
@@ -1518,7 +1511,7 @@
                                 note.classList.add('playing');
                             });
 
-                            console.log('[Tempo Event] MIDI tempo change to', tempoEvent.bpm, 'BPM (scaled:', actualBpm, 'BPM) - animation duration:', scaledDuration.toFixed(2) + 's');
+                            console.log('[Tempo Event] MIDI tempo change to', tempoEvent.bpm, 'BPM (scaled:', actualBpm, 'BPM) at transport time', scheduledTime.toFixed(2) + 's');
                         }, scheduledTime);
                     }
                 });
@@ -1543,9 +1536,10 @@
                 track.notes.forEach((note) => {
                     if (note.time >= startMeasureTime) {
                         // Scale note timing by tempo factor
-                        // At 50% tempo (0.5), notes should play at 2x their original time
+                        // (Verovio's tstamp values already account for MEI tempo changes)
                         const scheduledTime = (note.time - startMeasureTime) / tempoFactor;
                         const scaledDuration = note.duration / tempoFactor;
+
                         Tone.Transport.schedule((time) => {
                             const velocity = note.velocity ?? 0.8;
                             // Note: player.volume already has track and master volume applied
@@ -1555,7 +1549,7 @@
                 });
             });
 
-            // Calculate total duration (scaled by tempo)
+            // Calculate total duration (scaled by tempo factor)
             let maxEnd = 0;
             midi.tracks.forEach(track => {
                 if (track.notes && track.notes.length > 0) {
@@ -1572,7 +1566,9 @@
                 const currentSeconds = Tone.Transport.seconds;
                 currentTime = currentSeconds;
                 highlightCurrentTime(currentSeconds);
-                updateTimeDisplay(startMeasureTime + currentSeconds);
+                // Convert transport time to score time for display
+                const currentScoreTime = (currentSeconds * tempoFactor) + startMeasureTime;
+                updateTimeDisplay(currentScoreTime);
                 if (currentSeconds >= totalDuration) {
                     stopMIDIHandler();
                 }

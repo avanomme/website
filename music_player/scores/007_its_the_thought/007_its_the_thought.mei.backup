@@ -1,4 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1+basic">
    <meiHead>
       <fileDesc>
@@ -3906,7 +3908,7 @@
                      </staff>
                      <reh xml:id="ri3s3b5" startid="#m3algok">50</reh>
                      <tempo xml:id="t16nkcrg" type="mscore-infer-from-text" midi.bpm="120" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 120</tempo>
+                        <rend glyph.auth="smufl"></rend> = 130</tempo>
                   </measure>
                   <measure xml:id="mzzfj4p" n="38">
                      <staff xml:id="m38s1" n="1">
@@ -5058,7 +5060,7 @@
                      </staff>
                      <reh xml:id="rr60qc0" startid="#mgm9g04">51</reh>
                      <tempo xml:id="tfwz1hh" type="mscore-infer-from-text" midi.bpm="120" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 120</tempo>
+                        <rend glyph.auth="smufl"></rend> = 116</tempo>
                      <dir xml:id="do74587" type="mscore-staff-text" startid="#mgm9g04">(The Ground a a entwice)</dir>
                   </measure>
                   <measure xml:id="mjt0gpg" n="54">
@@ -8837,7 +8839,7 @@
                            </note>
                         </layer>
                      </staff>
-                     <dir xml:id="d1lmjhdq" type="mscore-staff-text" startid="#rwhmt2m" />
+                     <dir xml:id="d1lmjhdq" type="mscore-staff-text" startid="#rwhmt2m"></dir>
                      <tie xml:id="ts4yxox" startid="#nt2p3wx" endid="#n8d84yf" />
                   </measure>
                   <pb />

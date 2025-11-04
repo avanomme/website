@@ -1,4 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1+basic">
    <meiHead>
       <fileDesc>
@@ -1537,7 +1539,7 @@
                         </layer>
                      </staff>
                      <tempo xml:id="t1qehwyj" type="mscore-infer-from-text" midi.bpm="204" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 204 </tempo>
+                        <rend glyph.auth="smufl"></rend> = 102 </tempo>
                      <dynam xml:id="d154b9gc" label="f" staff="4" startid="#ccvqua6">f</dynam>
                   </measure>
                   <measure xml:id="m1or2dqk" n="29">
@@ -4040,7 +4042,7 @@
                         </layer>
                      </staff>
                      <tempo xml:id="t1s9gni9" type="mscore-infer-from-text" midi.bpm="208" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 208</tempo>
+                        <rend glyph.auth="smufl"></rend> = 104</tempo>
                      <tie xml:id="tkws6pr" startid="#nj9y2tp" endid="#nyhanrq" />
                   </measure>
                   <measure xml:id="m1ivisbn" n="57">
@@ -6490,7 +6492,7 @@
                         </layer>
                      </staff>
                      <tempo xml:id="t9zsvet" type="mscore-infer-from-text" midi.bpm="208" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 208</tempo>
+                        <rend glyph.auth="smufl"></rend> = 104</tempo>
                      <dir xml:id="dp59bpe" type="mscore-staff-text" startid="#nglrtiw">al fine</dir>
                      <tie xml:id="t1vnbboq" startid="#nglrtiw" endid="#ngf59th" />
                   </measure>

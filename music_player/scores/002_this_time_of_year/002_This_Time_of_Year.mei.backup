@@ -1,4 +1,6 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://relaxng.org/ns/structure/1.0"?>
+<?xml-model href="https://music-encoding.org/schema/5.1/mei-basic.rng" type="application/xml" schematypens="http://purl.oclc.org/dsdl/schematron"?>
 <mei xmlns="http://www.music-encoding.org/ns/mei" meiversion="5.1+basic">
    <meiHead>
       <fileDesc>
@@ -6859,7 +6861,7 @@
                      </staff>
                      <reh xml:id="r14zcneh" startid="#mjtrf37">70</reh>
                      <tempo xml:id="tzo8uq5" type="mscore-infer-from-text" midi.bpm="140" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 140</tempo>
+                        <rend glyph.auth="smufl"></rend> = 70</tempo>
                      <dynam xml:id="dmlmx5t" label="f" staff="3" startid="#r1gmwhqc">f</dynam>
                   </measure>
                   <sb />
@@ -7311,7 +7313,7 @@
                         </layer>
                      </staff>
                      <tempo xml:id="t101cf4a" type="mscore-infer-from-text" midi.bpm="176" staff="1" tstamp="1">
-                        <rend glyph.auth="smufl"></rend> = 176</tempo>
+                        <rend glyph.auth="smufl"></rend> = 88</tempo>
                      <tie xml:id="t1l9uerh" startid="#nannn7f" endid="#n16ppsw9" />
                      <tie xml:id="t161oo5w" startid="#nxwb5dc" endid="#nmt2imy" />
                   </measure>
