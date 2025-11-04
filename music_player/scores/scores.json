@@ -109,6 +109,18 @@
       "jsonPath": "/music_player/scores/018_welcome_christmas_reprise/018_Welcome_Christmas_Reprise.json"
     },
     {
+      "id": "019-finale",
+      "title": "019_Finale",
+      "path": "/music_player/scores/019_finale/019_Finale.mei",
+      "jsonPath": "/music_player/scores/019_finale/019_Finale.json"
+    },
+    {
+      "id": "020-bows",
+      "title": "020_Bows",
+      "path": "/music_player/scores/020_bows/020_Bows.mei",
+      "jsonPath": "/music_player/scores/020_bows/020_Bows.json"
+    },
+    {
       "id": "untitled-score",
       "title": "Untitled score",
       "path": "/music_player/scores/017a_this_time_of_year_reprise2/017a_This_Time_of_Year_Reprise2.mei",

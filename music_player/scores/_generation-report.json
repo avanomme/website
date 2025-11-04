@@ -1,7 +1,7 @@
 {
-  "generated": "2025-11-04T12:11:22.966Z",
-  "total": 19,
-  "successful": 19,
+  "generated": "2025-11-04T13:42:47.782Z",
+  "total": 21,
+  "successful": 21,
   "failed": 0,
   "files": [
     {
@@ -136,6 +136,20 @@
       "title": "018_Welcome_Christmas_Reprise",
       "timemapEvents": 323,
       "tempoChanges": 1
+    },
+    {
+      "name": "019_Finale",
+      "success": true,
+      "title": "019_Finale",
+      "timemapEvents": 326,
+      "tempoChanges": 2
+    },
+    {
+      "name": "020_Bows",
+      "success": true,
+      "title": "020_Bows",
+      "timemapEvents": 0,
+      "tempoChanges": 0
     }
   ]
 }
