@@ -1,8 +1,8 @@
 {
-  "generated": "2025-11-04T14:09:01.270Z",
+  "generated": "2025-11-04T20:53:38.221Z",
   "total": 21,
-  "successful": 21,
-  "failed": 0,
+  "successful": 14,
+  "failed": 7,
   "files": [
     {
       "name": "000_opening",
@@ -104,52 +104,45 @@
     },
     {
       "name": "015A_Youre_A_Mean_One_Reprise",
-      "success": true,
-      "title": "015A_Youre_A_Mean_One_Reprise",
-      "timemapEvents": 217,
-      "tempoChanges": 1
+      "success": false,
+      "title": null,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/015a_youre_a_mean_one_reprise/015A_Youre_A_Mean_One_Reprise.mei\" -t timemap --xml-id-seed 0 -o \"/Users/adam/projects/website/music_player/scores/015a_youre_a_mean_one_reprise/015A_Youre_A_Mean_One_Reprise.json\"\nUnable to write timemap to /Users/adam/projects/website/music_player/scores/015a_youre_a_mean_one_reprise/015A_Youre_A_Mean_One_Reprise.json.\n"
     },
     {
       "name": "016_Who_Likes_Christmas_Reprise",
-      "success": true,
-      "title": "016_Who_Likes_Christmas_Reprise",
-      "timemapEvents": 407,
-      "tempoChanges": 2
+      "success": false,
+      "title": null,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/016_whos_like_christmas_reprise/016_Who_Likes_Christmas_Reprise.mei\" -t timemap --xml-id-seed 0 -o \"/Users/adam/projects/website/music_player/scores/016_whos_like_christmas_reprise/016_Who_Likes_Christmas_Reprise.json\"\nUnable to write timemap to /Users/adam/projects/website/music_player/scores/016_whos_like_christmas_reprise/016_Who_Likes_Christmas_Reprise.json.\n"
     },
     {
       "name": "017_One_of_a_Kind_Resprise",
-      "success": true,
-      "title": "017_One_of_a_Kind_Resprise",
-      "timemapEvents": 573,
-      "tempoChanges": 3
+      "success": false,
+      "title": null,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/017_one_of_a_kind_reprise/017_One_of_a_Kind_Resprise.mei\" -t timemap --xml-id-seed 0 -o \"/Users/adam/projects/website/music_player/scores/017_one_of_a_kind_reprise/017_One_of_a_Kind_Resprise.json\"\nUnable to write timemap to /Users/adam/projects/website/music_player/scores/017_one_of_a_kind_reprise/017_One_of_a_Kind_Resprise.json.\n"
     },
     {
       "name": "017a_This_Time_of_Year_Reprise2",
-      "success": true,
-      "title": "Untitled score",
-      "timemapEvents": 101,
-      "tempoChanges": 1
+      "success": false,
+      "title": null,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/017a_this_time_of_year_reprise2/017a_This_Time_of_Year_Reprise2.mei\" -t timemap --xml-id-seed 0 -o \"/Users/adam/projects/website/music_player/scores/017a_this_time_of_year_reprise2/017a_This_Time_of_Year_Reprise2.json\"\nUnable to write timemap to /Users/adam/projects/website/music_player/scores/017a_this_time_of_year_reprise2/017a_This_Time_of_Year_Reprise2.json.\n"
     },
     {
       "name": "018_Welcome_Christmas_Reprise",
-      "success": true,
-      "title": "018_Welcome_Christmas_Reprise",
-      "timemapEvents": 323,
-      "tempoChanges": 1
+      "success": false,
+      "title": null,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/018_welcome_christmas_reprise/018_Welcome_Christmas_Reprise.mei\" -t timemap --xml-id-seed 0 -o \"/Users/adam/projects/website/music_player/scores/018_welcome_christmas_reprise/018_Welcome_Christmas_Reprise.json\"\n[Warning] trill with @xml:id t15t4e4e will not get rendered as it has identical values in @startid and @endid\n[Warning] Syllable with underline extender under one single note 'n1fo77l4'\n[Warning] Syllable with underline extender under one single note 'nlvwmbs'\n[Warning] Syllable with underline extender under one single note 'n1s8gaaf'\n[Warning] Syllable with underline extender under one single note 'n1m7m5do'\n[Warning] Syllable with underline extender under one single note 'n3pqm7k'\n[Warning] Syllable with underline extender under one single note 'n1ikig0b'\nUnable to write timemap to /Users/adam/projects/website/music_player/scores/018_welcome_christmas_reprise/018_Welcome_Christmas_Reprise.json.\n"
     },
     {
       "name": "019_Finale",
-      "success": true,
-      "title": "019_Finale",
-      "timemapEvents": 326,
-      "tempoChanges": 2
+      "success": false,
+      "title": null,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/019_finale/019_Finale.mei\" -t timemap --xml-id-seed 0 -o \"/Users/adam/projects/website/music_player/scores/019_finale/019_Finale.json\"\nUnable to write timemap to /Users/adam/projects/website/music_player/scores/019_finale/019_Finale.json.\n"
     },
     {
       "name": "020_Bows",
-      "success": true,
-      "title": "020_Bows",
-      "timemapEvents": 0,
-      "tempoChanges": 0
+      "success": false,
+      "title": null,
+      "error": "Command failed: \"verovio\" \"/Users/adam/projects/website/music_player/scores/020_bows/020_Bows.mei\" -t timemap --xml-id-seed 0 -o \"/Users/adam/projects/website/music_player/scores/020_bows/020_Bows.json\"\n[Warning] Unsupported '<section>' within <scoreDef>\nUnable to write timemap to /Users/adam/projects/website/music_player/scores/020_bows/020_Bows.json.\n"
     }
   ]
 }

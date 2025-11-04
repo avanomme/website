@@ -26,3 +26,4 @@ temp.*
 
 # Optional: do not upload tests/docs heavy folders
 lib/**/tests
+.claude
