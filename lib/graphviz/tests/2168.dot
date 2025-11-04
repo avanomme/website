@@ -1,5 +1,0 @@
-digraph {
-  splines=true;
-  node1 -> node2:sw;
-  node1 -> node2:ne;
-}

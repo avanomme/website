@@ -1,5 +1,0 @@
-graph {
-  a -- b -- c -- d;
-  c -- e;
-  "some other node that is not attached";
-}

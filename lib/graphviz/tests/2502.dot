@@ -1,4 +1,0 @@
-digraph "test" {
-"A" -> "B";
-"A" [label="✅"];
-}

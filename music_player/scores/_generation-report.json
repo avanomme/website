@@ -1,7 +1,7 @@
 {
-  "generated": "2025-11-03T17:59:19.862Z",
-  "total": 14,
-  "successful": 14,
+  "generated": "2025-11-04T01:47:37.361Z",
+  "total": 17,
+  "successful": 17,
   "failed": 0,
   "files": [
     {
@@ -101,6 +101,27 @@
       "title": "014_Santa_For_a_Day",
       "timemapEvents": 422,
       "tempoChanges": 1
+    },
+    {
+      "name": "015A_Youre_A_Mean_One_Reprise",
+      "success": true,
+      "title": "015A_Youre_A_Mean_One_Reprise",
+      "timemapEvents": 217,
+      "tempoChanges": 1
+    },
+    {
+      "name": "016_Who_Likes_Christmas_Reprise",
+      "success": true,
+      "title": "016_Who_Likes_Christmas_Reprise",
+      "timemapEvents": 407,
+      "tempoChanges": 2
+    },
+    {
+      "name": "017_One_of_a_Kind_Resprise",
+      "success": true,
+      "title": "017_One_of_a_Kind_Resprise",
+      "timemapEvents": 594,
+      "tempoChanges": 3
     }
   ]
 }

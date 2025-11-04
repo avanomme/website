@@ -1,5 +1,0 @@
-digraph {
-  splines=true;
-  node [shape=octagon peripheries=2];
-  node1 -> node2:sw;
-}
