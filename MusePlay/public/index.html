@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MusePlay - Native MuseScore Web Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary { background: #48bb78; }
+        .btn-secondary:hover { background: #38a169; }
+
+        .btn-danger { background: #f56565; }
+        .btn-danger:hover { background: #e53e3e; }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            padding: 10px 20px;
+            border-radius: 6px;
+            background: #764ba2;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .file-label:hover {
+            background: #653a8a;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .info-panel.hidden {
+            display: none;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .score-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: auto;
+            flex: 1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .status.loading {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status.ready {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status.error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 MusePlay</h1>
+        <div class="subtitle">
+            Native MuseScore Player - Built from MuseScore source, no external plugins
+            <span id="status" class="status loading">Loading WASM...</span>
+        </div>
+        <div class="controls">
+            <label class="file-label" for="file-input">
+                📂 Load Score
+            </label>
+            <input type="file" id="file-input" accept=".mscz,.mscx,.musicxml,.xml,.mxl">
+
+            <button class="btn btn-secondary" id="play-btn" disabled>▶ Play</button>
+            <button class="btn btn-danger" id="pause-btn" disabled>⏸ Pause</button>
+            <button class="btn" id="stop-btn" disabled>⏹ Stop</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="info-panel hidden" id="info-panel">
+            <div class="info-row">
+                <span class="info-label">Title:</span>
+                <span id="info-title">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Composer:</span>
+                <span id="info-composer">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Measures:</span>
+                <span id="info-measures">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Parts:</span>
+                <span id="info-parts">-</span>
+            </div>
+        </div>
+
+        <div class="score-container" id="score-container">
+            <div class="loading">
+                <h2>Welcome to MusePlay</h2>
+                <p>Native MuseScore playback built from source</p>
+                <p style="margin-top: 20px; color: #999;">
+                    Load a .mscz, .mscx, or MusicXML file to get started
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Load WebAssembly module (will be built) -->
+    <script src="wasm/musescore_core.js"></script>
+
+    <!-- Player interface -->
+    <script src="player.js"></script>
+
+    <!-- Main application -->
+    <script>
+        let player;
+
+        async function init() {
+            const statusEl = document.getElementById('status');
+
+            try {
+                // Initialize player
+                player = new MusePlayPlayer();
+                const success = await player.initialize();
+
+                if (success) {
+                    statusEl.textContent = 'Ready';
+                    statusEl.className = 'status ready';
+                    console.log('✓ MusePlay ready');
+                } else {
+                    throw new Error('Failed to initialize');
+                }
+            } catch (error) {
+                statusEl.textContent = 'Error loading WASM';
+                statusEl.className = 'status error';
+                console.error('Initialization error:', error);
+            }
+        }
+
+        // File input handler
+        document.getElementById('file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
+                const metadata = await player.loadFile(file);
+
+                // Display metadata
+                document.getElementById('info-title').textContent = metadata.title;
+                document.getElementById('info-composer').textContent = metadata.composer;
+                document.getElementById('info-measures').textContent = metadata.measureCount;
+                document.getElementById('info-parts').textContent = metadata.partCount;
+                document.getElementById('info-panel').classList.remove('hidden');
+
+                // Render score
+                const svg = player.renderPage(1);
+                document.getElementById('score-container').innerHTML = svg;
+
+                // Enable playback controls
+                document.getElementById('play-btn').disabled = false;
+
+            } catch (error) {
+                console.error('Error loading file:', error);
+                alert('Error loading file: ' + error.message);
+            }
+        });
+
+        // Playback controls
+        document.getElementById('play-btn').addEventListener('click', () => {
+            player.play();
+            document.getElementById('play-btn').disabled = true;
+            document.getElementById('pause-btn').disabled = false;
+            document.getElementById('stop-btn').disabled = false;
+        });
+
+        document.getElementById('pause-btn').addEventListener('click', () => {
+            player.pause();
+            document.getElementById('play-btn').disabled = false;
+            document.getElementById('pause-btn').disabled = true;
+        });
+
+        document.getElementById('stop-btn').addEventListener('click', () => {
+            player.stop();
+            document.getElementById('play-btn').disabled = false;
+            document.getElementById('pause-btn').disabled = true;
+            document.getElementById('stop-btn').disabled = true;
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

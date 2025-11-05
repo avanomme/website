@@ -270,6 +270,18 @@
     <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.7/build/opensheetmusicdisplay.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 
+    <!-- MuseScore Player (from music_player directory) -->
+    <script type="module">
+        // Import the MuseScore MIDI player if available
+        try {
+            const playerModule = await import('../music_player/musescore-player/web/js/musescore-player-complete.js');
+            window.createPlayer = playerModule.createPlayer;
+            console.log('✓ MuseScore player library loaded');
+        } catch (error) {
+            console.log('⚠ Could not load MuseScore player library, using fallback');
+        }
+    </script>
+
     <!-- Main Application -->
     <script src="player.js"></script>
 </body>
