@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sheet Music Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #667eea;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #48bb78;
+        }
+
+        .btn-secondary:hover {
+            background: #38a169;
+        }
+
+        .btn-danger {
+            background: #f56565;
+        }
+
+        .btn-danger:hover {
+            background: #e53e3e;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-label {
+            padding: 10px 20px;
+            border-radius: 6px;
+            background: #764ba2;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .file-label:hover {
+            background: #653a8a;
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-group label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        input[type="range"] {
+            width: 150px;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .score-container {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            overflow: auto;
+            flex: 1;
+        }
+
+        #osmd-container {
+            width: 100%;
+            min-height: 400px;
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .info-panel.hidden {
+            display: none;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #666;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 10px 0;
+            cursor: pointer;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            width: 0%;
+            transition: width 0.1s linear;
+        }
+
+        /* OpenSheetMusicDisplay styling overrides */
+        .opensheetmusicdisplay-cursor {
+            fill: #667eea !important;
+            opacity: 0.5 !important;
+        }
+
+        /* Loading state */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 3px solid rgba(0,0,0,0.1);
+            border-top-color: #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎵 Sheet Music Player</h1>
+        <div class="controls">
+            <label class="file-label" for="file-input">
+                📂 Load File
+            </label>
+            <input type="file" id="file-input" accept=".musicxml,.xml,.mxl,.mscz,.mscx">
+
+            <button class="btn btn-secondary" id="play-btn" disabled>▶ Play</button>
+            <button class="btn btn-danger" id="pause-btn" disabled>⏸ Pause</button>
+            <button class="btn" id="stop-btn" disabled>⏹ Stop</button>
+
+            <div class="slider-group">
+                <label for="tempo-slider">Tempo:</label>
+                <input type="range" id="tempo-slider" min="25" max="200" value="100" step="5">
+                <span id="tempo-value">100%</span>
+            </div>
+
+            <div class="slider-group">
+                <label for="volume-slider">Volume:</label>
+                <input type="range" id="volume-slider" min="0" max="100" value="80" step="1">
+                <span id="volume-value">80%</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="info-panel hidden" id="info-panel">
+            <div class="info-row">
+                <span class="info-label">Title:</span>
+                <span id="info-title">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Composer:</span>
+                <span id="info-composer">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Duration:</span>
+                <span id="info-duration">-</span>
+            </div>
+            <div class="info-row">
+                <span class="info-label">Current Time:</span>
+                <span id="info-current">0:00</span>
+            </div>
+            <div class="progress-bar" id="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="score-container">
+            <div id="osmd-container">
+                <div class="loading">
+                    <h2>Welcome to Sheet Music Player</h2>
+                    <p>Load a MusicXML or MuseScore file to get started</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/opensheetmusicdisplay@1.8.7/build/opensheetmusicdisplay.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+
+    <!-- Main Application -->
+    <script src="player.js"></script>
+</body>
+</html>

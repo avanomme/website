@@ -1,0 +1,24 @@
+{
+  "name": "sheet-music-player",
+  "version": "1.0.0",
+  "description": "Custom sheet music player with MIDI playback and score display",
+  "main": "index.html",
+  "scripts": {
+    "dev": "python3 -m http.server 8000",
+    "serve": "npx http-server -p 8000 -c-1"
+  },
+  "keywords": [
+    "music",
+    "midi",
+    "sheet-music",
+    "musicxml",
+    "musescore"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "opensheetmusicdisplay": "^1.8.7",
+    "tone": "^14.8.49",
+    "jszip": "^3.10.1"
+  }
+}
