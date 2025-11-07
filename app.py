@@ -30,6 +30,11 @@ app = Flask(__name__)
 # Get the absolute path to the project directory
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
+# Favicon route
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(PROJECT_DIR, 'static'), 'favicon.ico', mimetype='image/x-icon')
+
 # Serve static files from flash_cards directory
 @app.route('/flash_cards/<path:filename>')
 def flash_cards_static(filename):
@@ -105,7 +110,7 @@ def dfa():
         alph = request.form['alphabet']
         nodes = request.form['states']
         initial = request.form['initial']
-        dead = request.form['dead']
+        dead = request.form.get('dead', '')  # Optional field
         final = request.form['final'].split()
         transitions = {}
 
