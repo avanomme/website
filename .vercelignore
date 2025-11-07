@@ -27,3 +27,9 @@ temp.*
 # Optional: do not upload tests/docs heavy folders
 lib/**/tests
 .claude
+
+# Large project directories not needed for deployment
+emsdk
+MuseScore
+MusePlay
+music_player

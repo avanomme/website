@@ -80,3 +80,8 @@ lib/graphviz/
 .DS_Store
 MuseScore
 /MusePlay/temp
+
+# Emscripten SDK - large downloaded/extracted files
+emsdk/
+*.pyc
+__pycache__
