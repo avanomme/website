@@ -80,9 +80,7 @@ lib/graphviz/
 .DS_Store
 MuseScore
 /MusePlay/temp
-*.sf2
 MusePlay/soundfonts/
-music_player/soundfonts/
 
 # Emscripten SDK - large downloaded/extracted files
 emsdk/
