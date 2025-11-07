@@ -32,4 +32,12 @@ lib/**/tests
 emsdk
 MuseScore
 MusePlay
-music_player
+
+# music_player - exclude large dependencies but keep core files
+music_player/node_modules
+music_player/soundfonts
+music_player/musescore-player
+music_player/verovio-reference-book.pdf
+
+# Exclude large soundfont files everywhere
+**/*.sf2
