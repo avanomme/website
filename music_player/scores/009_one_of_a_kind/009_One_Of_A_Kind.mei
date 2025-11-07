@@ -48,7 +48,8 @@
                         </staffDef>
                      </staffGrp>
                   </staffGrp>
-                  <section xml:id="s1">
+               </scoreDef>
+               <section xml:id="s1">
                      <measure xml:id="mgg11pu" n="1">
                         <staff xml:id="m1s1" n="1">
                            <layer xml:id="m1s1l1" n="1">
@@ -6541,8 +6542,7 @@
                         </staff>
                         <dynam xml:id="d1jd6wlb" label="sfz" staff="2" startid="#no8jjr0">sfz</dynam>
                      </measure>
-                  </section>
-               </scoreDef>
+               </section>
             </score>
          </mdiv>
       </body>
