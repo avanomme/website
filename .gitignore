@@ -86,3 +86,4 @@ MusePlay/soundfonts/
 emsdk/
 *.pyc
 __pycache__
+.venv
