@@ -79,3 +79,4 @@ sounds/
 lib/graphviz/
 .DS_Store
 MuseScore
+/MusePlay/temp
