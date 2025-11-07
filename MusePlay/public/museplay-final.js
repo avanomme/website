@@ -26,6 +26,9 @@ class MusePlayPlayer {
         this.animationFrame = null;
         this.zoomLevel = 40;  // Default zoom scale for Verovio
         this.musicxmlData = null;  // Store for re-rendering on zoom
+        this.highlightedElements = [];  // Track highlighted notes
+        this.beatsToSeconds = 1.0;  // Conversion factor
+        this.hasRepeats = false;  // Whether MIDI has repeats
     }
 
     async init() {
@@ -203,9 +206,15 @@ class MusePlayPlayer {
 
     renderCurrentPage() {
         const svg = this.verovio.renderToSVG(this.currentPage);
-        document.getElementById('score-display').innerHTML = svg;
+        const scoreDisplay = document.getElementById('score-display');
+
+        // Update the SVG
+        scoreDisplay.innerHTML = svg;
+
+        // Add click handlers to measures
         this.addMeasureClickHandlers();
 
+        // Update page navigation
         const pageInfo = document.getElementById('page-info');
         if (pageInfo) pageInfo.textContent = `Page ${this.currentPage} / ${this.totalPages}`;
 
@@ -250,6 +259,12 @@ class MusePlayPlayer {
             } else {
                 this.timemap = Array.isArray(timemapData) ? timemapData : [];
             }
+
+            console.log('✓ Timemap built:', {
+                entries: this.timemap.length,
+                firstEntry: this.timemap[0],
+                sample: this.timemap.slice(0, 3)
+            });
 
             // Debug: check timemap range and structure
             if (this.timemap.length > 0) {
@@ -381,8 +396,11 @@ class MusePlayPlayer {
 
     getInstrumentForTrack(track) {
         // Determine which sampler to use based on track instrument/name
-        const instrumentName = track.instrument?.name?.toLowerCase() || '';
-        const trackName = track.name?.toLowerCase() || '';
+        // track.instrument is a string (from setupMidi line 245)
+        const instrumentName = (track.instrument || '').toLowerCase();
+        const trackName = (track.name || '').toLowerCase();
+
+        console.log(`Track "${track.name}": instrument="${track.instrument}"`);
 
         // Check both instrument name and track name for voice/choir indicators
         if (instrumentName.includes('choir') ||
@@ -390,6 +408,7 @@ class MusePlayPlayer {
             instrumentName.includes('voice') ||
             instrumentName.includes('ahh') ||
             instrumentName.includes('ooh') ||
+            instrumentName.includes('aah') ||
             trackName.includes('choir') ||
             trackName.includes('vocal') ||
             trackName.includes('voice') ||
@@ -397,10 +416,11 @@ class MusePlayPlayer {
             trackName.includes('alto') ||
             trackName.includes('tenor') ||
             trackName.includes('bass')) {
-            console.log(`Using choir for track: ${track.name}`);
+            console.log(`✓ Using CHOIR for track: "${track.name}" (instrument: "${track.instrument}")`);
             return this.instruments.choir || this.instruments.piano;
         }
 
+        console.log(`Using piano for track: "${track.name}"`);
         return this.instruments.piano;
     }
 
@@ -498,15 +518,12 @@ class MusePlayPlayer {
     }
 
     startHighlightingLoop() {
-        const cursor = document.getElementById('playback-cursor');
-        cursor.style.display = 'block';
         let lastLogTime = 0;
-        let lastCursorLog = 0;
 
         const loop = () => {
             if (!this.isPlaying) return;
 
-            // Use Transport time for accurate sync
+            // Use Transport time for accurate sync with MIDI playback
             const currentTime = Tone.Transport.seconds;
             const currentBeats = this.beatsToSeconds ? currentTime / this.beatsToSeconds : currentTime;
 
@@ -516,16 +533,7 @@ class MusePlayPlayer {
                 lastLogTime = currentTime;
             }
 
-            // Detailed cursor logging every 2 seconds
-            if (currentTime - lastCursorLog >= 2.0) {
-                const cursorLeft = cursor.style.left;
-                const cursorTop = cursor.style.top;
-                const cursorHeight = cursor.style.height;
-                console.log(`  Cursor: left=${cursorLeft}, top=${cursorTop}, height=${cursorHeight}`);
-                lastCursorLog = currentTime;
-            }
-
-            // Update vertical cursor position
+            // Update note highlighting - this highlights notes as they play
             this.updateCursorPosition(currentTime);
 
             // Auto-advance pages based on what's actually being played
@@ -574,13 +582,21 @@ class MusePlayPlayer {
     }
 
     updateCursorPosition(currentTime) {
-        const cursor = document.getElementById('playback-cursor');
         const scoreDisplay = document.getElementById('score-display');
         const svg = scoreDisplay?.querySelector('svg');
 
-        if (!cursor || !svg || !this.timemap.length) {
+        if (!svg) {
+            console.warn('No SVG found');
             return;
         }
+
+        if (!this.timemap.length) {
+            console.warn('Timemap is empty');
+            return;
+        }
+
+        // Clear previous highlights
+        this.clearHighlights();
 
         // Convert current playback time (seconds) to beats
         let currentBeats = this.beatsToSeconds ? currentTime / this.beatsToSeconds : currentTime;
@@ -596,62 +612,73 @@ class MusePlayPlayer {
             currentBeats = currentBeats % maxBeat;
         }
 
-        // Find the timemap entry closest to but not ahead of current beat position
-        let bestEntry = null;
-        let bestBeat = -1;
+        // Find ALL notes that should be highlighted right now (within a small window)
+        const highlightWindow = 0.5; // 0.5 beats window
+        let highlightedCount = 0;
+        let candidatesChecked = 0;
+        let elementsNotFound = [];
 
         this.timemap.forEach(entry => {
             if (!entry.qstamp || !entry.on) return;
-            const entryBeat = parseFloat(entry.qstamp);
 
-            // Find the latest entry that's <= currentBeats (with small lookahead)
-            if (entryBeat <= currentBeats + 0.5 && entryBeat > bestBeat) {
-                bestBeat = entryBeat;
-                bestEntry = entry;
+            const entryBeat = parseFloat(entry.qstamp);
+            const entryDuration = parseFloat(entry.dur || 0.5);
+
+            // Check if this note is currently playing
+            if (entryBeat <= currentBeats && currentBeats < entryBeat + entryDuration + highlightWindow) {
+                candidatesChecked++;
+
+                // entry.on can be a string or an array of element IDs
+                const elementIds = Array.isArray(entry.on) ? entry.on : [entry.on];
+
+                elementIds.forEach(elementId => {
+                    // Try different selector formats
+                    let element = svg.querySelector(`[*|id="${elementId}"]`);
+                    if (!element) {
+                        element = svg.querySelector(`[id="${elementId}"]`);
+                    }
+                    if (!element) {
+                        element = svg.querySelector(`#${elementId}`);
+                    }
+
+                    if (element) {
+                        element.classList.add('highlighted');
+                        this.highlightedElements.push(element);
+                        highlightedCount++;
+                    } else {
+                        elementsNotFound.push(elementId);
+                    }
+                });
             }
         });
 
-        // If no entry found, try finding closest one
-        if (!bestEntry && this.timemap.length > 0) {
-            let minDiff = Infinity;
-            this.timemap.forEach(entry => {
-                if (!entry.qstamp || !entry.on) return;
-                const diff = Math.abs(parseFloat(entry.qstamp) - currentBeats);
-                if (diff < minDiff) {
-                    minDiff = diff;
-                    bestEntry = entry;
+        // Debug logging
+        if (candidatesChecked > 0 || currentTime - (this._lastHighlightLog || 0) >= 3.0) {
+            if (highlightedCount > 0) {
+                console.log(`✓ Highlighting ${highlightedCount}/${candidatesChecked} elements at beat ${currentBeats.toFixed(2)} (time ${currentTime.toFixed(2)}s)`);
+            } else if (candidatesChecked > 0) {
+                console.warn(`⚠ Found ${candidatesChecked} candidates but highlighted 0. Not found:`, elementsNotFound.slice(0, 3));
+                // Try to find any element with class 'note' to see what's in the SVG
+                const anyNote = svg.querySelector('.note, g.note, [class*="note"]');
+                if (anyNote) {
+                    console.log('Sample note element found:', anyNote.outerHTML.substring(0, 200));
+                }
+            } else {
+                console.log(`No candidates at beat ${currentBeats.toFixed(2)} (time ${currentTime.toFixed(2)}s)`);
+            }
+            this._lastHighlightLog = currentTime;
+        }
+    }
+
+    clearHighlights() {
+        if (this.highlightedElements) {
+            this.highlightedElements.forEach(element => {
+                if (element && element.classList) {
+                    element.classList.remove('highlighted');
                 }
             });
         }
-
-        if (bestEntry && bestEntry.on) {
-            const element = svg.querySelector(`[*|id="${bestEntry.on}"]`);
-
-            if (element) {
-                const bbox = element.getBoundingClientRect();
-                const svgBbox = svg.getBoundingClientRect();
-
-                // Position relative to SVG (parent is score-display which has position: relative)
-                const left = bbox.left - svgBbox.left;
-
-                cursor.style.left = left + 'px';
-                cursor.style.top = '0px';
-                cursor.style.height = svgBbox.height + 'px';
-                cursor.style.display = 'block';
-
-                // Debug first time
-                if (!this._cursorDebugLogged) {
-                    console.log('✓ Cursor positioned:', {
-                        left: left + 'px',
-                        height: svgBbox.height + 'px',
-                        elementId: bestEntry.on.substring(0, 30),
-                        beat: bestBeat.toFixed(2),
-                        time: currentTime.toFixed(2)
-                    });
-                    this._cursorDebugLogged = true;
-                }
-            }
-        }
+        this.highlightedElements = [];
     }
 
     pause() {
@@ -673,6 +700,9 @@ class MusePlayPlayer {
         if (this.instruments.choir) {
             this.instruments.choir.releaseAll();
         }
+
+        // Clear highlights when paused
+        this.clearHighlights();
 
         document.getElementById('play-btn').disabled = false;
         document.getElementById('pause-btn').disabled = true;
@@ -699,6 +729,7 @@ class MusePlayPlayer {
 
         if (this.animationFrame) {
             cancelAnimationFrame(this.animationFrame);
+            this.animationFrame = null;
         }
 
         // Stop all sounds
@@ -707,9 +738,8 @@ class MusePlayPlayer {
             this.instruments.choir.releaseAll();
         }
 
-        // Hide cursor
-        const cursor = document.getElementById('playback-cursor');
-        if (cursor) cursor.style.display = 'none';
+        // Clear all highlights
+        this.clearHighlights();
 
         document.getElementById('play-btn').disabled = false;
         document.getElementById('pause-btn').disabled = true;
