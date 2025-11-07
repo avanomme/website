@@ -62,7 +62,8 @@
                         </staffDef>
                      </staffGrp>
                   </staffGrp>
-                  <section xml:id="s1">
+               </scoreDef>
+               <section xml:id="s1">
                      <measure xml:id="mxdvyx0" n="1">
                         <staff xml:id="m1s1" n="1">
                            <layer xml:id="m1s1l1" n="1">
@@ -7929,8 +7930,7 @@
                            </layer>
                         </staff>
                      </measure>
-                  </section>
-               </scoreDef>
+               </section>
             </score>
          </mdiv>
       </body>
