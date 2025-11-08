@@ -1,6 +1,7 @@
 import sys
 import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'dfa', 'lib'))
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import io
@@ -9,6 +10,7 @@ import tempfile
 import uuid
 from pathlib import Path
 from werkzeug.utils import secure_filename
+from jinja2 import ChoiceLoader, FileSystemLoader
 
 # Try to import graphviz and dot2tex, but make them optional for Vercel deployment
 try:
@@ -25,35 +27,81 @@ except ImportError:
     DOT2TEX_AVAILABLE = False
     print("Warning: dot2tex not available. TikZ conversion disabled.")
 
-app = Flask(__name__)
-
 # Get the absolute path to the project directory
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Configure Flask with multiple template directories
+app = Flask(__name__)
+app.jinja_loader = ChoiceLoader([
+    FileSystemLoader(os.path.join(PROJECT_DIR, 'shared', 'templates')),
+    FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'dfa', 'templates')),
+])
+
+# ============================================================================
+# STATIC FILE ROUTES
+# ============================================================================
 
 # Favicon route
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(PROJECT_DIR, 'static'), 'favicon.ico', mimetype='image/x-icon')
+    return send_from_directory(os.path.join(PROJECT_DIR, 'shared', 'static'), 'favicon.ico', mimetype='image/x-icon')
 
-# Serve static files from flash_cards directory
+# Serve flashcards app
+@app.route('/flashcards/')
+@app.route('/flashcards/<path:filename>')
+def flashcards_static(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'flashcards'), filename)
+
+# Legacy flash_cards URL redirect
+@app.route('/flash_cards/')
 @app.route('/flash_cards/<path:filename>')
-def flash_cards_static(filename):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'flash_cards'), filename)
+def flash_cards_legacy(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'flashcards'), filename)
 
-# Serve static files from music_player directory
+# Serve Stratford music player (main music_player app)
+@app.route('/music/stratford/')
+@app.route('/music/stratford/<path:filename>')
+def music_stratford_static(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'stratford'), filename)
+
+# Legacy music_player URL redirect
+@app.route('/music_player/')
 @app.route('/music_player/<path:filename>')
-def music_player_static(filename):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'music_player'), filename)
+def music_player_legacy(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'stratford'), filename)
 
-# Serve static files from MusePlay directory
+@app.route('/grinch')
+@app.route('/grinch.html')
+def grinch():
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'stratford'), 'rehearse.html')
+
+# Serve sheet music player
+@app.route('/music/player/')
+@app.route('/music/player/<path:filename>')
+def music_player_static(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'player'), filename)
+
+# Serve MusePlay
+@app.route('/music/museplay/')
+@app.route('/music/museplay/<path:filename>')
+def museplay_static(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'public'), filename)
+
+# Legacy mplay URLs
+@app.route('/mplay')
+@app.route('/mplay/')
 @app.route('/mplay/<path:filename>')
-def museplay_static(filename):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'MusePlay', 'public'), filename)
+def museplay_legacy(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'public'), filename)
 
 # Serve MusePlay scores
 @app.route('/scores/<path:filename>')
 def museplay_scores(filename):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'MusePlay', 'scores'), filename)
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'scores'), filename)
+
+# ============================================================================
+# DFA / GRAPH VISUALIZATION
+# ============================================================================
 
 def generate_dot(alph, nodes, initial, dead, final, transitions):
     if not GRAPHVIZ_AVAILABLE:
@@ -101,6 +149,8 @@ def generate_tikz(dot):
 def index():
     return render_template('index.html')
 
+@app.route('/dfa')
+@app.route('/dfa/')
 @app.route('/dfa.html', methods=['GET', 'POST'])
 def dfa():
     if request.method == 'POST':
@@ -139,16 +189,9 @@ def dfa():
 def study():
     return render_template('study.html')
 
-@app.route('/grinch')
-@app.route('/grinch.html')
-def grinch():
-    return send_from_directory(os.path.join(PROJECT_DIR, 'music_player'), 'rehearse.html')
-
-@app.route('/mplay')
-@app.route('/mplay/')
-def museplay():
-    # Serve the new hybrid MusePlay interface
-    return send_from_directory(os.path.join(PROJECT_DIR, 'MusePlay', 'public'), 'index.html')
+# ============================================================================
+# MUSEPLAY API ENDPOINTS
+# ============================================================================
 
 # API endpoint for converting .mscz files
 @app.route('/api/convert-mscz', methods=['POST'])
@@ -169,7 +212,7 @@ def convert_mscz():
 
     try:
         # Create temporary directory for this conversion
-        temp_dir = os.path.join(PROJECT_DIR, 'MusePlay', 'temp')
+        temp_dir = os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'temp')
         os.makedirs(temp_dir, exist_ok=True)
 
         # Generate unique ID for this conversion
@@ -225,30 +268,31 @@ def convert_mscz():
 @app.route('/api/converted/<conversion_id>/<filename>')
 def serve_converted(conversion_id, filename):
     """Serve converted MusicXML or MIDI files"""
-    temp_dir = os.path.join(PROJECT_DIR, 'MusePlay', 'temp', conversion_id)
+    temp_dir = os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'temp', conversion_id)
     return send_from_directory(temp_dir, filename)
 
 # API to list available scores
 @app.route('/api/scores')
 def list_scores():
     """List all available pre-converted scores"""
-    scores_dir = os.path.join(PROJECT_DIR, 'MusePlay', 'scores')
+    scores_dir = os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'scores')
 
     # Find all .musicxml files
     scores = []
-    for filename in sorted(os.listdir(scores_dir)):
-        if filename.endswith('.musicxml'):
-            # Remove .musicxml extension (10 chars including the dot)
-            base_name = filename.replace('.musicxml', '')
-            midi_file = f"{base_name}.mid"
+    if os.path.exists(scores_dir):
+        for filename in sorted(os.listdir(scores_dir)):
+            if filename.endswith('.musicxml'):
+                # Remove .musicxml extension
+                base_name = filename.replace('.musicxml', '')
+                midi_file = f"{base_name}.mid"
 
-            # Check if corresponding MIDI exists
-            if os.path.exists(os.path.join(scores_dir, midi_file)):
-                scores.append({
-                    'name': base_name,
-                    'musicxml': f'/scores/{filename}',
-                    'midi': f'/scores/{midi_file}'
-                })
+                # Check if corresponding MIDI exists
+                if os.path.exists(os.path.join(scores_dir, midi_file)):
+                    scores.append({
+                        'name': base_name,
+                        'musicxml': f'/scores/{filename}',
+                        'midi': f'/scores/{midi_file}'
+                    })
 
     return jsonify({'scores': scores})
 

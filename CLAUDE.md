@@ -22,7 +22,28 @@ This is a multi-purpose web project (`mvo-website`) containing:
 
 ## Project Structure
 
-### Flash Cards Application (`/flash_cards/`)
+**Note**: The project was reorganized in November 2025. All applications are now in the `apps/` directory. See `PROJECT_STRUCTURE.md` for complete details.
+
+```
+/website/
+├── app.py                    # Main Flask application
+├── apps/                     # All web applications
+│   ├── dfa/                 # DFA/Graph visualization
+│   ├── flashcards/          # Study flashcards with TTS
+│   └── music/               # Music applications
+│       ├── player/          # Sheet music player
+│       ├── stratford/       # Choir rehearsal platform
+│       └── museplay/        # MuseScore WASM player
+├── shared/                   # Shared resources
+├── external/                 # Large dependencies (git-ignored)
+├── lib/                      # Python libraries (git-ignored)
+└── sounds/                   # Audio files (git-ignored)
+```
+
+### Flash Cards Application (`/flashcards/`)
+**Location**: `apps/flashcards/`
+**URL**: `http://localhost:5001/flashcards/`
+
 Standalone web app with autoplay study deck functionality:
 - **`index.html`** - Main HTML interface with controls for autoplay, speech, and navigation
 - **`app.js`** - Client-side logic for flashcard display, TTS integration, and autoplay features
@@ -33,7 +54,10 @@ Standalone web app with autoplay study deck functionality:
 
 ### Music Player Applications
 
-#### Sheet Music Player (`/sheet-music-player/`)
+#### Sheet Music Player (`/music/player/`)
+**Location**: `apps/music/player/`
+**URL**: `http://localhost:5001/music/player/`
+
 Custom-built player with direct MusicXML/MuseScore support and MIDI playback:
 - **Technology**: OpenSheetMusicDisplay + Tone.js + JSZip
 - **Supported formats**: MusicXML (.musicxml, .xml), compressed MusicXML (.mxl), MuseScore files (.mscz, .mscx)
@@ -43,13 +67,16 @@ Custom-built player with direct MusicXML/MuseScore support and MIDI playback:
 
 **Quick start:**
 ```bash
-cd sheet-music-player
+cd apps/music/player
 npm run dev
 # or
 python3 -m http.server 8000
 ```
 
-#### Music Player / Stratford Choir (`/music_player/`)
+#### Music Player / Stratford Choir (`/music/stratford/`)
+**Location**: `apps/music/stratford/`
+**URL**: `http://localhost:5001/music/stratford/`
+
 Verovio-based rehearsal platform with MIDI playback and AI vocal synthesis:
 - **Technology**: Verovio + Web Audio API + music21 (Python backend)
 - **Supported formats**: MusicXML, MEI (pre-rendered for faster loading)
@@ -58,7 +85,7 @@ Verovio-based rehearsal platform with MIDI playback and AI vocal synthesis:
 
 **Pre-render scores for faster loading:**
 ```bash
-cd music_player
+cd apps/music/stratford
 npm run prerender
 ```
 
@@ -67,30 +94,40 @@ npm run prerender
 npm run generate-all
 ```
 
-#### MusePlay (`/MusePlay/`)
+#### MusePlay (`/music/museplay/`)
+**Location**: `apps/music/museplay/`
+**URL**: `http://localhost:5001/music/museplay/`
+
 WebAssembly-based player compiled directly from MuseScore source code:
 - **Technology**: MuseScore C++ source compiled to WebAssembly with Emscripten
 - **Status**: Under development (not production-ready)
 - **Goal**: 100% MuseScore compatible rendering and playback, completely self-contained, no external dependencies
 - **Build**: Requires Emscripten SDK
 
-### Python Backend (`/`)
-- **`app.py`** - Flask server serving multiple applications (DFA/graph visualization, music_player routes, flash_cards routes)
-- **`dot2tex.py`** - Main module for converting GraphViz DOT to LaTeX (TikZ/PGF/PSTricks)
-- **`dotparsing.py`** - Parser for DOT graph format
-- **`base.py`, `pgfformat.py`, `pstricksformat.py`** - LaTeX format converters
+### DFA / Graph Visualization (`/dfa/`)
+**Location**: `apps/dfa/`
+**URL**: `http://localhost:5001/dfa/`
 
-### Next.js/React Components
-- **`/pages/`** - Next.js pages including `study.js` (FlashcardApp integration)
-- **`/components/`** - React components (FlashcardApp, QuizletApp)
-- **`/lib/parseFlashcards.js`** - Parser for `cards.md` format
+- **`templates/dfa.html`** - Web interface
+- **`lib/`** - Local dot2tex conversion library
+- **`src/dfa.ts`** - TypeScript source
+- **`dist/dfa.js`** - Compiled JavaScript
+
+### Python Backend (`/`)
+- **`app.py`** - Flask server serving multiple applications with multi-template support
 
 ### Supporting Directories
-- **`/lib/graphviz/`** - GraphViz library source (excluded from git)
-- **`/dist/`** - TypeScript build output
-- **`/templates/`**, **`/static/`** - Flask template and static files
-- **`/MuseScore/`** - MuseScore source code (for MusePlay compilation)
-- **`/emsdk/`** - Emscripten SDK for WebAssembly compilation
+- **`shared/`** - Shared resources (templates, static files, libraries, types)
+  - `templates/` - Shared Flask templates
+  - `static/` - Global static files (favicon, etc.)
+  - `lib/` - Shared JavaScript libraries
+  - `types/` - TypeScript type definitions
+- **`external/`** - Large external dependencies (git-ignored)
+  - `MuseScore/` - MuseScore source code (~500MB)
+  - `emsdk/` - Emscripten SDK for WebAssembly (~1GB)
+- **`lib/graphviz/`** - GraphViz library source (git-ignored)
+- **`sounds/`** - Audio files (git-ignored, includes 142MB SoundFont)
+- **`.archived/`** - Old/deprecated files from reorganization
 
 ## Common Commands
 
@@ -98,28 +135,28 @@ WebAssembly-based player compiled directly from MuseScore source code:
 
 Start the Coqui TTS server:
 ```bash
-cd flash_cards
+cd apps/flashcards
 ./start_tts.sh
 ```
 
 Start the MeloTTS server:
 ```bash
-cd flash_cards
+cd apps/flashcards
 python melo_server.py
 ```
 
 Precompile audio for faster loading:
 ```bash
-cd flash_cards
+cd apps/flashcards
 source .venv-tts/bin/activate
 python precompile_all_cards.py
 ```
 
 Open the flash cards app:
 ```bash
-# Simply open flash_cards/index.html in a browser
+# Simply open apps/flashcards/index.html in a browser
 # Or serve with a static server:
-cd flash_cards
+cd apps/flashcards
 python -m http.server 8000
 ```
 
@@ -127,7 +164,7 @@ python -m http.server 8000
 
 Start development server:
 ```bash
-cd sheet-music-player
+cd apps/music/player
 npm run dev
 # or
 python3 -m http.server 8000
@@ -137,19 +174,19 @@ python3 -m http.server 8000
 
 Serve the player:
 ```bash
-cd music_player
+cd apps/music/stratford
 npm run serve
 ```
 
 Pre-render MusicXML to MEI for faster loading:
 ```bash
-cd music_player
+cd apps/music/stratford
 npm run prerender
 ```
 
 Generate all assets (timemaps, MEI files):
 ```bash
-cd music_player
+cd apps/music/stratford
 npm run generate-all
 ```
 
@@ -157,14 +194,14 @@ npm run generate-all
 
 Build the WebAssembly module:
 ```bash
-cd MusePlay
-source ../emsdk/emsdk_env.sh
+cd apps/music/museplay
+source ../../../external/emsdk/emsdk_env.sh
 ./build.sh
 ```
 
 Run the player:
 ```bash
-cd MusePlay
+cd apps/music/museplay
 python3 run.py
 # or
 ./run.sh
@@ -192,7 +229,7 @@ npx tsc
 ## Architecture Notes
 
 ### Flash Cards Markdown Format
-The `cards.md` file uses a custom format parsed by `lib/parseFlashcards.js`:
+The `cards.md` file uses a custom format parsed by `apps/flashcards/lib/parseFlashcards.js`:
 - Section markers: Lines starting with `#flashcards/`
 - Question lines: Usually formatted as `**1.1** *Question text*`
 - Optional `?` separator line
@@ -209,7 +246,7 @@ The app checks servers in order and falls back to the next available option.
 
 ### Music Player Architecture Comparison
 
-#### Sheet Music Player (`/sheet-music-player/`)
+#### Sheet Music Player (`apps/music/player/`)
 **File Loading → Score Rendering → MIDI Extraction → Playback → Synchronization**
 
 1. Files parsed with JSZip (for compressed formats)
@@ -224,7 +261,7 @@ The app checks servers in order and falls back to the next available option.
 - All timing computed in real-time from score
 - Simpler architecture, easier to modify
 
-#### Music Player / Stratford (`/music_player/`)
+#### Music Player / Stratford (`apps/music/stratford/`)
 **Pre-rendering (optional) → Score Loading → Verovio Rendering → MIDI Playback**
 
 1. Optional: Pre-render MusicXML to MEI with `npm run prerender` for 5-10x faster loading
@@ -239,7 +276,7 @@ The app checks servers in order and falls back to the next available option.
 - AI vocal synthesis available via Python backend
 - Proven architecture with timemap synchronization
 
-#### MusePlay (`/MusePlay/`)
+#### MusePlay (`apps/music/museplay/`)
 **MuseScore C++ Source → Emscripten → WebAssembly**
 
 1. Actual MuseScore code compiled to WASM
@@ -256,19 +293,26 @@ The app checks servers in order and falls back to the next available option.
 **Status:** Under development, not production-ready
 
 ### DOT to LaTeX Conversion Flow
-1. User submits DOT graph data via Flask form (`/dfa.html`)
-2. `dot2tex.py` parses the DOT source using `dotparsing.py`
-3. Format converters (`Dot2TikZConv`, `Dot2PGFConv`, etc.) generate LaTeX code
+1. User submits DOT graph data via Flask form (`/dfa/`)
+2. Local dot2tex library in `apps/dfa/lib/` parses the DOT source
+3. Format converters generate LaTeX code (TikZ, PGF, etc.)
 4. Result returned as both TikZ code and SVG preview
 
 ### Flask App Routing
-The main Flask server (`app.py`) handles multiple sub-applications:
-- `/flash_cards/*` - Serves flash cards app
-- `/music_player/*` - Serves Stratford choir rehearsal app
-- `/mplay/*` - Serves MusePlay application
+The main Flask server (`app.py`) handles multiple sub-applications with multi-template support:
+- `/` - Landing page
+- `/dfa/` - DFA generator
+- `/flashcards/*` - Serves flashcards app
+- `/music/player/*` - Serves sheet music player
+- `/music/stratford/*` - Serves Stratford choir rehearsal app
+- `/music/museplay/*` - Serves MusePlay application
 - `/scores/*` - Serves MusePlay score files
-- `/dfa.html` - DOT to LaTeX converter
-- All other routes directed to `app.py`
+
+**Legacy URL redirects (backwards compatibility):**
+- `/flash_cards/*` → `/flashcards/*`
+- `/music_player/*` → `/music/stratford/*`
+- `/mplay/*` → `/music/museplay/*`
+- `/grinch` → `/music/stratford/rehearse.html`
 
 ### Deployment
 The project is configured for Vercel deployment:
@@ -287,10 +331,13 @@ The project is configured for Vercel deployment:
 Large assets are excluded from git (see `.gitignore`):
 - `lib/graphviz/` - GraphViz library source
 - `sounds/` - Audio files
-- `venv/`, `.venv-tts/` - Virtual environments
+- `external/MuseScore/` - MuseScore source (~500MB)
+- `external/emsdk/` - Emscripten SDK (~1GB)
+- `apps/flashcards/.venv-tts/` - TTS virtual environment
+- `apps/music/museplay/temp/` - Temporary conversion files
+- `apps/music/museplay/soundfonts/` - SoundFont files
+- `.archived/` - Old/deprecated files
 - `.DS_Store` - macOS system files
-- `emsdk/` - Emscripten SDK
-- `flash_cards/.venv-tts/` - TTS virtual environment
 
 ### TTS Cache Location
 Generated audio is cached in `/tmp/tts_cache/` (not persistent across reboots).
@@ -324,11 +371,13 @@ The project mixes vanilla JavaScript (flash cards, music players) with Next.js c
 **Problem**: The deployment fails with `FUNCTION_INVOCATION_FAILED` due to large files being included in the build.
 
 **Large Files to Exclude**:
-- `flash_cards/.venv-tts/` - Python virtual environment (~500MB+)
+- `apps/flashcards/.venv-tts/` - Python virtual environment (~500MB+)
 - `lib/graphviz/` - GraphViz library source (~75MB)
 - `sounds/FluidR3_GM.sf2` - SoundFont file (142MB, managed by Git LFS)
-- `emsdk/` - Emscripten SDK (~1GB+)
-- `MuseScore/` - MuseScore source code (~500MB+)
+- `external/emsdk/` - Emscripten SDK (~1GB+)
+- `external/MuseScore/` - MuseScore source code (~500MB+)
+- `apps/music/museplay/temp/` - Temporary files
+- `.archived/` - Old files
 
 **Solution**: These directories must be excluded from Vercel deployment via `.vercelignore`.
 
@@ -384,22 +433,37 @@ This allows the flashcard and music player functionality to work on Vercel even 
 
 ## Choosing the Right Music Player
 
-**Use Sheet Music Player (`/sheet-music-player/`) when:**
+**Use Sheet Music Player (`apps/music/player/`) when:**
 - You need tempo changes to work perfectly at all speeds
 - You want to load MusicXML or MuseScore files directly without preprocessing
 - You need a simple, easy-to-modify architecture
 - You're prototyping or testing new scores
 - You want real-time timing computation
 
-**Use Music Player / Stratford (`/music_player/`) when:**
+**Use Music Player / Stratford (`apps/music/stratford/`) when:**
 - You need the fastest possible loading (pre-rendered MEI)
 - You need per-voice control (muting/soloing individual SATB parts)
 - You want AI vocal synthesis capabilities
 - You're deploying for production with a fixed set of scores
 - You need proven timemap-based synchronization
 
-**Use MusePlay (`/MusePlay/`) when:**
+**Use MusePlay (`apps/music/museplay/`) when:**
 - You need 100% MuseScore desktop compatibility
 - You want native performance
 - You need a completely self-contained solution with no external dependencies
 - Note: Currently under development, not production-ready
+
+---
+
+## Project Reorganization (November 2025)
+
+The project was reorganized to improve maintainability and clarity. All applications are now in the `apps/` directory with a clean root structure. See `PROJECT_STRUCTURE.md` and `REORGANIZATION_SUMMARY.md` for complete details.
+
+**Key changes:**
+- All applications moved to `apps/` directory
+- Large dependencies moved to `external/` (git-ignored)
+- Shared resources centralized in `shared/`
+- Legacy URLs maintained via redirects
+- Root directory reduced from 50+ items to 7 main directories
+
+For migration details and the complete list of changes, see `REORGANIZATION_SUMMARY.md`.

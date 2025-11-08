@@ -71,19 +71,25 @@ node_modules/
 
 venv/
 .venv/
-flash_cards/.venv-tts/
+apps/flashcards/.venv-tts/
 .vercel
 
 # Large assets - prefer Git LFS or external hosting
 sounds/
 lib/graphviz/
 .DS_Store
-MuseScore
-/MusePlay/temp
-MusePlay/soundfonts/
 
-# Emscripten SDK - large downloaded/extracted files
-emsdk/
+# Large external dependencies (moved to external/)
+external/MuseScore/
+external/emsdk/
+
+# App-specific temp/cache directories
+apps/music/museplay/temp/
+apps/music/museplay/soundfonts/
+
+# Archived old files
+.archived/
+
+# Python
 *.pyc
 __pycache__
-.venv
