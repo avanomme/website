@@ -1,0 +1,17 @@
+{
+  "title": "This Time of Year",
+  "composer": "Mel Marvin",
+  "generated": "2025-11-02T08:53:06.018Z",
+  "assets": {
+    "mei": "002_This_Time_of_Year.mei",
+    "timemap": "002_This_Time_of_Year.json",
+    "midi": null,
+    "svgPreview": "002_This_Time_of_Year-preview.svg"
+  },
+  "stats": {
+    "timemapEvents": 657,
+    "tempoChanges": 1,
+    "midiSizeKB": null
+  },
+  "note": "MIDI generation failed due to verovio crash. Score can be viewed but not played."
+}
