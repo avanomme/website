@@ -195,7 +195,7 @@ def convert_mscz():
 
     try:
         # Create temporary directory for this conversion
-        temp_dir = os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'temp')
+        temp_dir = os.path.join(PROJECT_DIR, 'apps', 'museplay', 'temp')
         os.makedirs(temp_dir, exist_ok=True)
 
         # Generate unique ID for this conversion
@@ -251,14 +251,14 @@ def convert_mscz():
 @app.route('/api/converted/<conversion_id>/<filename>')
 def serve_converted(conversion_id, filename):
     """Serve converted MusicXML or MIDI files"""
-    temp_dir = os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'temp', conversion_id)
+    temp_dir = os.path.join(PROJECT_DIR, 'apps', 'museplay', 'temp', conversion_id)
     return send_from_directory(temp_dir, filename)
 
 # API to list available scores
 @app.route('/api/scores')
 def list_scores():
     """List all available pre-converted scores"""
-    scores_dir = os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'scores')
+    scores_dir = os.path.join(PROJECT_DIR, 'apps', 'museplay', 'scores')
 
     # Find all .musicxml files
     scores = []
