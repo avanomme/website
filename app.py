@@ -52,52 +52,35 @@ def favicon():
 def flashcards_static(filename='index.html'):
     return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'flashcards'), filename)
 
-# Legacy flash_cards URL redirect
-@app.route('/flash_cards/')
-@app.route('/flash_cards/<path:filename>')
-def flash_cards_legacy(filename='index.html'):
+# Study route (alias for flashcards)
+@app.route('/study/')
+@app.route('/study/<path:filename>')
+def study_static(filename='index.html'):
     return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'flashcards'), filename)
 
-# Serve Stratford music player (main music_player app)
-@app.route('/music/stratford/')
-@app.route('/music/stratford/<path:filename>')
-def music_stratford_static(filename='index.html'):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'stratford'), filename)
-
-# Legacy music_player URL redirect
-@app.route('/music_player/')
-@app.route('/music_player/<path:filename>')
-def music_player_legacy(filename='index.html'):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'stratford'), filename)
-
+# Grinch rehearsal player (production package)
 @app.route('/grinch')
-@app.route('/grinch.html')
-def grinch():
-    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'stratford'), 'rehearse.html')
+@app.route('/grinch/')
+@app.route('/grinch/<path:filename>')
+def grinch(filename='rehearse.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'player'), filename)
 
-# Serve sheet music player
-@app.route('/music/player/')
-@app.route('/music/player/<path:filename>')
-def music_player_static(filename='index.html'):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'player'), filename)
+# Legacy music_player paths for soundfonts and assets (needed by grinch player)
+@app.route('/music_player/<path:filename>')
+def music_player_assets(filename):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'player'), filename)
 
-# Serve MusePlay
-@app.route('/music/museplay/')
-@app.route('/music/museplay/<path:filename>')
-def museplay_static(filename='index.html'):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'public'), filename)
-
-# Legacy mplay URLs
+# Serve MusePlay (under development WebAssembly player)
 @app.route('/mplay')
 @app.route('/mplay/')
 @app.route('/mplay/<path:filename>')
-def museplay_legacy(filename='index.html'):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'public'), filename)
+def museplay_static(filename='index.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'museplay', 'public'), filename)
 
 # Serve MusePlay scores
 @app.route('/scores/<path:filename>')
 def museplay_scores(filename):
-    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'music', 'museplay', 'scores'), filename)
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'museplay', 'scores'), filename)
 
 # ============================================================================
 # DFA / GRAPH VISUALIZATION

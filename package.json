@@ -4,7 +4,7 @@
     "express": "^4.21.1",
     "flask": "^0.2.10",
     "python-shell": "^5.0.0",
-    "vercel": "^48.6.0",
+    "vercel": "^48.9.0",
     "viz.js": "^2.1.2"
   },
   "devDependencies": {

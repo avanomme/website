@@ -30,10 +30,10 @@ This is a multi-purpose web project (`mvo-website`) containing:
 ├── apps/                     # All web applications
 │   ├── dfa/                 # DFA/Graph visualization
 │   ├── flashcards/          # Study flashcards with TTS
-│   └── music/               # Music applications
-│       ├── player/          # Sheet music player
-│       ├── stratford/       # Choir rehearsal platform
-│       └── museplay/        # MuseScore WASM player
+│   ├── player/              # Sheet music player (current Grinch package)
+│   ├── museplay/            # MuseScore WASM player (under development)
+│   └── music/               # Music-specific apps
+│       └── stratford/       # Stratford Choir rehearsal platform
 ├── shared/                   # Shared resources
 ├── external/                 # Large dependencies (git-ignored)
 ├── lib/                      # Python libraries (git-ignored)
@@ -55,8 +55,9 @@ Standalone web app with autoplay study deck functionality:
 ### Music Player Applications
 
 #### Sheet Music Player (`/music/player/`)
-**Location**: `apps/music/player/`
+**Location**: `apps/player/`
 **URL**: `http://localhost:5001/music/player/`
+**Purpose**: Current Grinch package - production-ready player
 
 Custom-built player with direct MusicXML/MuseScore support and MIDI playback:
 - **Technology**: OpenSheetMusicDisplay + Tone.js + JSZip
@@ -67,21 +68,23 @@ Custom-built player with direct MusicXML/MuseScore support and MIDI playback:
 
 **Quick start:**
 ```bash
-cd apps/music/player
+cd apps/player
 npm run dev
 # or
 python3 -m http.server 8000
 ```
 
-#### Music Player / Stratford Choir (`/music/stratford/`)
+#### Stratford Choir Rehearsal Platform (`/music/stratford/`)
 **Location**: `apps/music/stratford/`
 **URL**: `http://localhost:5001/music/stratford/`
+**Purpose**: Choir-specific rehearsal platform with Grinch 2025 scores
 
-Verovio-based rehearsal platform with MIDI playback and AI vocal synthesis:
+Verovio-based rehearsal platform with MIDI playback and score library:
 - **Technology**: Verovio + Web Audio API + music21 (Python backend)
 - **Supported formats**: MusicXML, MEI (pre-rendered for faster loading)
-- **Key features**: SATB part selection, tempo adjustment (50%-150%), AI vocal synthesis via FastAPI backend
+- **Key features**: SATB part selection, tempo adjustment (50%-150%), complete Grinch 2025 song library with timemaps
 - **Optimization**: Pre-render MusicXML to MEI format for 5-10x faster loading
+- **Content**: 21 complete songs from Grinch 2025 production with synchronized playback
 
 **Pre-render scores for faster loading:**
 ```bash
@@ -95,8 +98,9 @@ npm run generate-all
 ```
 
 #### MusePlay (`/music/museplay/`)
-**Location**: `apps/music/museplay/`
+**Location**: `apps/museplay/`
 **URL**: `http://localhost:5001/music/museplay/`
+**Purpose**: Under development - next-generation WebAssembly player
 
 WebAssembly-based player compiled directly from MuseScore source code:
 - **Technology**: MuseScore C++ source compiled to WebAssembly with Emscripten
@@ -160,17 +164,17 @@ cd apps/flashcards
 python -m http.server 8000
 ```
 
-### Sheet Music Player
+### Sheet Music Player (Current Grinch Package)
 
 Start development server:
 ```bash
-cd apps/music/player
+cd apps/player
 npm run dev
 # or
 python3 -m http.server 8000
 ```
 
-### Music Player (Stratford Choir)
+### Stratford Choir Rehearsal Platform
 
 Serve the player:
 ```bash
@@ -190,18 +194,18 @@ cd apps/music/stratford
 npm run generate-all
 ```
 
-### MusePlay (WebAssembly)
+### MusePlay (Under Development)
 
 Build the WebAssembly module:
 ```bash
-cd apps/music/museplay
-source ../../../external/emsdk/emsdk_env.sh
+cd apps/museplay
+source ../../external/emsdk/emsdk_env.sh
 ./build.sh
 ```
 
 Run the player:
 ```bash
-cd apps/music/museplay
+cd apps/museplay
 python3 run.py
 # or
 ./run.sh
@@ -246,7 +250,8 @@ The app checks servers in order and falls back to the next available option.
 
 ### Music Player Architecture Comparison
 
-#### Sheet Music Player (`apps/music/player/`)
+#### Sheet Music Player (`apps/player/`)
+**Purpose**: Current Grinch package - production-ready player
 **File Loading → Score Rendering → MIDI Extraction → Playback → Synchronization**
 
 1. Files parsed with JSZip (for compressed formats)
@@ -260,8 +265,10 @@ The app checks servers in order and falls back to the next available option.
 - No conversion or preprocessing needed
 - All timing computed in real-time from score
 - Simpler architecture, easier to modify
+- Production-ready for performances
 
-#### Music Player / Stratford (`apps/music/stratford/`)
+#### Stratford Choir Rehearsal Platform (`apps/music/stratford/`)
+**Purpose**: Choir-specific platform with complete Grinch 2025 library
 **Pre-rendering (optional) → Score Loading → Verovio Rendering → MIDI Playback**
 
 1. Optional: Pre-render MusicXML to MEI with `npm run prerender` for 5-10x faster loading
@@ -272,11 +279,13 @@ The app checks servers in order and falls back to the next available option.
 
 **Advantages:**
 - MEI pre-rendering provides fastest loading
+- Complete library of 21 Grinch 2025 songs with timemaps
 - Separate MIDI files allow per-voice control (muting/soloing)
-- AI vocal synthesis available via Python backend
 - Proven architecture with timemap synchronization
+- Optimized for rehearsal and learning
 
-#### MusePlay (`apps/music/museplay/`)
+#### MusePlay (`apps/museplay/`)
+**Purpose**: Under development - next-generation WebAssembly player
 **MuseScore C++ Source → Emscripten → WebAssembly**
 
 1. Actual MuseScore code compiled to WASM
@@ -334,8 +343,8 @@ Large assets are excluded from git (see `.gitignore`):
 - `external/MuseScore/` - MuseScore source (~500MB)
 - `external/emsdk/` - Emscripten SDK (~1GB)
 - `apps/flashcards/.venv-tts/` - TTS virtual environment
-- `apps/music/museplay/temp/` - Temporary conversion files
-- `apps/music/museplay/soundfonts/` - SoundFont files
+- `apps/museplay/temp/` - Temporary conversion files
+- `apps/museplay/soundfonts/` - SoundFont files
 - `.archived/` - Old/deprecated files
 - `.DS_Store` - macOS system files
 
@@ -376,7 +385,7 @@ The project mixes vanilla JavaScript (flash cards, music players) with Next.js c
 - `sounds/FluidR3_GM.sf2` - SoundFont file (142MB, managed by Git LFS)
 - `external/emsdk/` - Emscripten SDK (~1GB+)
 - `external/MuseScore/` - MuseScore source code (~500MB+)
-- `apps/music/museplay/temp/` - Temporary files
+- `apps/museplay/temp/` - Temporary files
 - `.archived/` - Old files
 
 **Solution**: These directories must be excluded from Vercel deployment via `.vercelignore`.
@@ -433,21 +442,23 @@ This allows the flashcard and music player functionality to work on Vercel even 
 
 ## Choosing the Right Music Player
 
-**Use Sheet Music Player (`apps/music/player/`) when:**
+**Use Sheet Music Player (`apps/player/`) when:**
+- You're performing or need production-ready playback (current Grinch package)
 - You need tempo changes to work perfectly at all speeds
 - You want to load MusicXML or MuseScore files directly without preprocessing
 - You need a simple, easy-to-modify architecture
 - You're prototyping or testing new scores
 - You want real-time timing computation
 
-**Use Music Player / Stratford (`apps/music/stratford/`) when:**
+**Use Stratford Choir Rehearsal Platform (`apps/music/stratford/`) when:**
+- You're rehearsing Grinch 2025 songs (complete library of 21 songs)
 - You need the fastest possible loading (pre-rendered MEI)
 - You need per-voice control (muting/soloing individual SATB parts)
-- You want AI vocal synthesis capabilities
+- You want timemap-synchronized playback with visual highlighting
 - You're deploying for production with a fixed set of scores
 - You need proven timemap-based synchronization
 
-**Use MusePlay (`apps/music/museplay/`) when:**
+**Use MusePlay (`apps/museplay/`) when:**
 - You need 100% MuseScore desktop compatibility
 - You want native performance
 - You need a completely self-contained solution with no external dependencies
