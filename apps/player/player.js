@@ -24,6 +24,7 @@ class SheetMusicPlayer {
         this.duration = 0;
         this.tempoFactor = 1.0; // 100% = 1.0
         this.volume = 0.8;
+        this.lastAppliedBPM = null; // Track last BPM to detect tempo changes
 
         // MIDI data extracted from score
         this.midiNotes = [];
@@ -69,8 +70,9 @@ class SheetMusicPlayer {
             this.tempoFactor = e.target.value / 100;
             tempoValue.textContent = e.target.value + '%';
             if (this.isPlaying) {
-                // Update Tone.js transport BPM in real-time
-                Tone.Transport.bpm.value = this.getCurrentBPM() * this.tempoFactor;
+                // Update Tone.js transport BPM in real-time with reset logic
+                const currentBPM = this.getCurrentBPM();
+                this.applyTempo(currentBPM, this.tempoFactor);
             }
         });
 
@@ -370,6 +372,14 @@ class SheetMusicPlayer {
         return currentBPM;
     }
 
+    applyTempo(bpm, factor) {
+        // Apply tempo with reset logic to fix playback issues
+        // Reset to 100% first (baseline), then apply the desired tempo
+        Tone.Transport.bpm.rampTo(bpm, 0); // Immediate change to base BPM
+        Tone.Transport.bpm.value = bpm * factor; // Then apply the tempo factor
+        this.lastAppliedBPM = bpm;
+    }
+
     async initializeToneJS() {
         // Ensure Tone.js is started
         await Tone.start();
@@ -406,8 +416,9 @@ class SheetMusicPlayer {
         this.isPaused = false;
         this.updatePlaybackButtons();
 
-        // Set initial BPM
-        Tone.Transport.bpm.value = this.getCurrentBPM() * this.tempoFactor;
+        // Set initial BPM with reset logic
+        const initialBPM = this.getCurrentBPM();
+        this.applyTempo(initialBPM, this.tempoFactor);
 
         // Schedule all notes
         this.scheduleNotes();
@@ -438,6 +449,7 @@ class SheetMusicPlayer {
         this.isPlaying = false;
         this.isPaused = false;
         this.currentTime = 0;
+        this.lastAppliedBPM = null; // Reset tempo tracking
 
         // Stop transport
         Tone.Transport.stop();
@@ -497,6 +509,14 @@ class SheetMusicPlayer {
 
             // Update current time from Tone.Transport
             this.currentTime += Tone.Transport.seconds * this.tempoFactor;
+
+            // Check for tempo changes and apply reset logic if needed
+            const currentBPM = this.getCurrentBPM();
+            if (this.lastAppliedBPM !== null && currentBPM !== this.lastAppliedBPM) {
+                // Tempo change detected! Apply reset logic
+                console.log(`🎵 Tempo change detected: ${this.lastAppliedBPM} → ${currentBPM} BPM`);
+                this.applyTempo(currentBPM, this.tempoFactor);
+            }
 
             // Update cursor position
             this.updateCursor();

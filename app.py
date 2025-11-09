@@ -138,25 +138,55 @@ def generate_grail(alph, nodes, initial, final, transitions):
     grail.append("")
 
     # Start state declaration
-    grail.append(f"(START) |- q{initial}")
+    grail.append(f"(START) |- {initial}")
     grail.append("")
 
-    # Transitions
+    # Transitions - format: from_state symbol to_state
     for node in range(int(nodes)):
-        state_name = f"q{node}"
         if str(node) in transitions:
             for symbol in sorted(transitions[str(node)].keys()):
                 target = transitions[str(node)][symbol]
-                if target:  # Only include defined transitions
-                    grail.append(f"{state_name} {symbol} -> q{target}")
+                if target and target.strip():  # Only include defined transitions
+                    grail.append(f"{node} {symbol} {target}")
 
     grail.append("")
 
     # Final states
     for final_state in final:
-        grail.append(f"q{final_state} -| (FINAL)")
+        grail.append(f"{final_state} -| (FINAL)")
 
     return "\n".join(grail)
+
+def generate_dot_text(alph, nodes, initial, final, transitions):
+    """Generate DOT graph text representation"""
+    lines = []
+    lines.append("digraph DFA {")
+    lines.append("    rankdir=LR;")
+    lines.append("")
+
+    # Define final states
+    if final:
+        final_str = " ".join(final)
+        lines.append(f"    node [shape = doublecircle]; {final_str};")
+
+    lines.append("    node [shape = circle];")
+    lines.append("")
+
+    # Add initial state marker
+    lines.append(f"    __start [label=\"\", shape=none, width=0, height=0];")
+    lines.append(f"    __start -> {initial};")
+    lines.append("")
+
+    # Transitions
+    for node in range(int(nodes)):
+        if str(node) in transitions:
+            for symbol in sorted(transitions[str(node)].keys()):
+                target = transitions[str(node)][symbol]
+                if target and target.strip():
+                    lines.append(f"    {node} -> {target} [label=\"{symbol}\"];")
+
+    lines.append("}")
+    return "\n".join(lines)
 
 @app.route('/')
 def index():
@@ -167,9 +197,6 @@ def index():
 @app.route('/dfa.html', methods=['GET', 'POST'])
 def dfa():
     if request.method == 'POST':
-        if not GRAPHVIZ_AVAILABLE:
-            return jsonify({"error": "GraphViz not available on this server"}), 503
-
         alph = request.form['alphabet']
         nodes = request.form['states']
         initial = request.form['initial']
@@ -185,17 +212,45 @@ def dfa():
                 if key in request.form:
                     transitions[node][alph_char] = request.form[key]
 
-        dot = generate_dot(alph, nodes, initial, dead, final, transitions)
-        if dot is None:
-            return jsonify({"error": "Failed to generate graph"}), 500
-
-        tikz_graph = generate_tikz(dot)
+        # Generate Grail code (doesn't require graphviz)
         grail_code = generate_grail(alph, nodes, initial, final, transitions)
 
-        # Generate SVG for preview
-        svg = dot.pipe(format='svg').decode('utf-8')
+        # Generate DOT text representation (doesn't require graphviz)
+        dot_text = generate_dot_text(alph, nodes, initial, final, transitions)
 
-        return jsonify({"tikz": tikz_graph, "grail": grail_code, "svg": svg})
+        # Try to generate SVG and TikZ if graphviz is available
+        svg = None
+        tikz_graph = None
+
+        if GRAPHVIZ_AVAILABLE:
+            try:
+                dot = generate_dot(alph, nodes, initial, dead, final, transitions)
+                if dot:
+                    # Generate SVG for preview
+                    svg = dot.pipe(format='svg').decode('utf-8')
+
+                    # Generate TikZ code
+                    tikz_graph = generate_tikz(dot)
+            except Exception as e:
+                print(f"Error generating graphviz output: {e}")
+                # Fall back to text representation
+
+        # If SVG generation failed, create a simple text-based visualization
+        if not svg:
+            svg_fallback = f'''<div style="font-family: monospace; white-space: pre; padding: 20px; background: #f5f5f5; border: 1px solid #ccc;">
+{dot_text}
+
+Note: Graphviz not available. Install graphviz to see visual representation:
+  macOS: brew install graphviz
+  Linux: sudo apt-get install graphviz
+</div>'''
+            svg = svg_fallback
+
+        # If TikZ generation failed, provide DOT code
+        if not tikz_graph:
+            tikz_graph = f"% TikZ generation requires graphviz and dot2tex\n% DOT representation:\n\n{dot_text}"
+
+        return jsonify({"tikz": tikz_graph, "grail": grail_code, "svg": svg, "dot": dot_text})
 
     return render_template('dfa.html')
 

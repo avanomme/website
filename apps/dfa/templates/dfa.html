@@ -188,22 +188,63 @@
 
         .visual-output {
             grid-column: 1 / -1;
-            text-align: center;
             background: white;
-            padding: 30px;
+            padding: 20px;
             border: 2px solid #667eea;
+            position: relative;
+        }
+
+        .svg-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .svg-controls button {
+            padding: 8px 16px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+
+        .svg-controls button:hover {
+            background: #5568d3;
+        }
+
+        #svg-container {
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #fafafa;
+            cursor: grab;
+            position: relative;
+        }
+
+        #svg-container.grabbing {
+            cursor: grabbing;
         }
 
         #svg-output {
-            min-height: 300px;
+            width: 100%;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
+            transform-origin: center center;
+            transition: transform 0.1s ease-out;
         }
 
         #svg-output svg {
-            max-width: 100%;
+            width: 100%;
             height: auto;
+            max-width: none;
         }
 
         pre {
@@ -296,15 +337,15 @@
                 <div class="output-grid">
                     <div class="output-box visual-output">
                         <h3>Visual Representation</h3>
-                        <div id="svg-output"></div>
-                    </div>
-
-                    <div class="output-box">
-                        <h3>
-                            TikZ Code
-                            <button class="copy-btn" onclick="copyToClipboard('tikz-output')">Copy</button>
-                        </h3>
-                        <pre id="tikz-output"></pre>
+                        <div class="svg-controls">
+                            <button onclick="zoomIn()">🔍 Zoom In</button>
+                            <button onclick="zoomOut()">🔍 Zoom Out</button>
+                            <button onclick="resetZoom()">↺ Reset View</button>
+                            <button onclick="fitToWidth()">↔ Fit Width</button>
+                        </div>
+                        <div id="svg-container">
+                            <div id="svg-output"></div>
+                        </div>
                     </div>
 
                     <div class="output-box">
@@ -314,12 +355,133 @@
                         </h3>
                         <pre id="grail-output"></pre>
                     </div>
+
+                    <div class="output-box">
+                        <h3>
+                            DOT Graph
+                            <button class="copy-btn" onclick="copyToClipboard('dot-output')">Copy</button>
+                        </h3>
+                        <pre id="dot-output"></pre>
+                    </div>
+
+                    <div class="output-box">
+                        <h3>
+                            TikZ Code
+                            <button class="copy-btn" onclick="copyToClipboard('tikz-output')">Copy</button>
+                        </h3>
+                        <pre id="tikz-output"></pre>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Pan and Zoom functionality
+        let currentZoom = 1;
+        let currentPanX = 0;
+        let currentPanY = 0;
+        let isPanning = false;
+        let startX = 0;
+        let startY = 0;
+
+        function updateTransform() {
+            const svgOutput = document.getElementById('svg-output');
+            svgOutput.style.transform = `translate(${currentPanX}px, ${currentPanY}px) scale(${currentZoom})`;
+        }
+
+        function zoomIn() {
+            currentZoom = Math.min(currentZoom * 1.2, 5);
+            updateTransform();
+        }
+
+        function zoomOut() {
+            currentZoom = Math.max(currentZoom / 1.2, 0.2);
+            updateTransform();
+        }
+
+        function resetZoom() {
+            currentZoom = 1;
+            currentPanX = 0;
+            currentPanY = 0;
+            updateTransform();
+        }
+
+        function fitToWidth() {
+            const container = document.getElementById('svg-container');
+            const svgOutput = document.getElementById('svg-output');
+            const svg = svgOutput.querySelector('svg');
+
+            if (svg) {
+                const containerWidth = container.clientWidth;
+                const svgWidth = svg.getBBox().width;
+                currentZoom = (containerWidth * 0.9) / svgWidth;
+                currentPanX = 0;
+                currentPanY = 0;
+                updateTransform();
+            }
+        }
+
+        // Initialize pan and zoom when SVG container is available
+        function initPanZoom() {
+            const container = document.getElementById('svg-container');
+            const svgOutput = document.getElementById('svg-output');
+
+            // Mouse wheel zoom
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                const delta = e.deltaY > 0 ? 0.9 : 1.1;
+                currentZoom = Math.max(0.2, Math.min(5, currentZoom * delta));
+                updateTransform();
+            });
+
+            // Mouse drag pan
+            container.addEventListener('mousedown', (e) => {
+                isPanning = true;
+                startX = e.clientX - currentPanX;
+                startY = e.clientY - currentPanY;
+                container.classList.add('grabbing');
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    currentPanX = e.clientX - startX;
+                    currentPanY = e.clientY - startY;
+                    updateTransform();
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isPanning = false;
+                container.classList.remove('grabbing');
+            });
+
+            // Touch support for mobile
+            let touchStartX = 0;
+            let touchStartY = 0;
+
+            container.addEventListener('touchstart', (e) => {
+                if (e.touches.length === 1) {
+                    isPanning = true;
+                    touchStartX = e.touches[0].clientX - currentPanX;
+                    touchStartY = e.touches[0].clientY - currentPanY;
+                }
+            });
+
+            container.addEventListener('touchmove', (e) => {
+                if (isPanning && e.touches.length === 1) {
+                    e.preventDefault();
+                    currentPanX = e.touches[0].clientX - touchStartX;
+                    currentPanY = e.touches[0].clientY - touchStartY;
+                    updateTransform();
+                }
+            });
+
+            container.addEventListener('touchend', () => {
+                isPanning = false;
+            });
+        }
+
         function copyToClipboard(elementId) {
             const element = document.getElementById(elementId);
             const text = element.textContent;
@@ -332,6 +494,9 @@
                 }, 2000);
             });
         }
+
+        // Initialize pan/zoom on page load
+        document.addEventListener('DOMContentLoaded', initPanZoom);
 
         $(document).ready(function() {
             $('#generate-table').click(function() {
@@ -387,8 +552,9 @@
                 // Show loading
                 $('#output-section').removeClass('hidden');
                 $('#svg-output').html('<div class="loading">Generating DFA...</div>');
-                $('#tikz-output').text('');
                 $('#grail-output').text('');
+                $('#dot-output').text('');
+                $('#tikz-output').text('');
 
                 $.ajax({
                     url: '/dfa.html',
@@ -399,8 +565,13 @@
                             $('#svg-output').html('<div class="error">Error: ' + response.error + '</div>');
                         } else {
                             $('#svg-output').html(response.svg);
-                            $('#tikz-output').text(response.tikz);
-                            $('#grail-output').text(response.grail);
+                            $('#grail-output').text(response.grail || 'No Grail code generated');
+                            $('#dot-output').text(response.dot || 'No DOT graph generated');
+                            $('#tikz-output').text(response.tikz || 'No TikZ code generated');
+
+                            // Reset zoom and fit to width after loading new graph
+                            resetZoom();
+                            setTimeout(fitToWidth, 100);
                         }
                     },
                     error: function(xhr, status, error) {
