@@ -768,6 +768,7 @@
                     <button id="playBtn" disabled title="Play">▶</button>
                     <button id="pauseBtn" disabled title="Pause">⏸</button>
                     <button id="stopBtn" disabled title="Stop">⏹</button>
+                    <button id="resyncBtn" disabled title="Resync highlighting with audio">🔄</button>
                 </div>
 
                 <div class="progress-section">
@@ -885,6 +886,7 @@
         const playBtn = document.getElementById('playBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         const stopBtn = document.getElementById('stopBtn');
+        const resyncBtn = document.getElementById('resyncBtn');
         const progressBar = document.getElementById('progressBar');
         const progressFill = document.getElementById('progressFill');
         const currentTimeEl = document.getElementById('currentTime');
@@ -1009,6 +1011,7 @@
                 });
                 pauseBtn.addEventListener('click', pauseMIDIHandler);
                 stopBtn.addEventListener('click', stopMIDIHandler);
+                resyncBtn.addEventListener('click', resyncHandler);
                 progressBar.addEventListener('click', handleProgressClick);
                 tempoSlider.addEventListener('input', handleTempoChange);
                 zoomInBtn.addEventListener('click', handleZoomIn);
@@ -1700,6 +1703,20 @@
             }
         };
 
+        const resyncHandler = function () {
+            console.log('[Resync] Clicked - forcing highlighting to sync with audio playback');
+            if (playerState === 'playing' || playerState === 'paused') {
+                // Get current transport time
+                const currentSeconds = Tone.Transport.seconds;
+                console.log('[Resync] Current Transport time:', currentSeconds);
+
+                // Force highlight update at current position
+                highlightCurrentTime(currentSeconds);
+
+                console.log('[Resync] Highlighting resynced to audio position');
+            }
+        };
+
         function updateButtonStates() {
             console.log('[ButtonStates] Updating for state:', playerState);
             switch (playerState) {
@@ -1707,24 +1724,28 @@
                     playBtn.disabled = true;
                     pauseBtn.disabled = false;
                     stopBtn.disabled = false;
-                    console.log('[ButtonStates] Playing: play=disabled, pause=enabled, stop=enabled');
+                    resyncBtn.disabled = false; // Can resync during playback
+                    console.log('[ButtonStates] Playing: play=disabled, pause=enabled, stop=enabled, resync=enabled');
                     break;
                 case 'paused':
                     playBtn.disabled = false; // Can resume
                     pauseBtn.disabled = true; // Already paused
                     stopBtn.disabled = false; // Can stop to reset
-                    console.log('[ButtonStates] Paused: play=enabled (resume), pause=disabled, stop=enabled');
+                    resyncBtn.disabled = false; // Can resync while paused
+                    console.log('[ButtonStates] Paused: play=enabled (resume), pause=disabled, stop=enabled, resync=enabled');
                     break;
                 case 'stopped':
                     playBtn.disabled = isLoaded ? false : true;
                     pauseBtn.disabled = true;
                     stopBtn.disabled = true;
-                    console.log('[ButtonStates] Stopped: play=' + (isLoaded ? 'enabled' : 'disabled') + ', pause=disabled, stop=disabled');
+                    resyncBtn.disabled = true; // No need to resync when stopped
+                    console.log('[ButtonStates] Stopped: play=' + (isLoaded ? 'enabled' : 'disabled') + ', pause=disabled, stop=disabled, resync=disabled');
                     break;
                 case 'loading':
                     playBtn.disabled = true;
                     pauseBtn.disabled = true;
                     stopBtn.disabled = true;
+                    resyncBtn.disabled = true; // Can't resync while loading
                     console.log('[ButtonStates] Loading: all disabled');
                     break;
             }

@@ -5,13 +5,14 @@ node_modules
 # Exclude local virtualenvs and build artifacts
 venv
 .venv
-flash_cards/.venv-tts
+apps/flashcards/.venv-tts
 build
 dist
 
 # Large assets and source trees not required for frontend deployment
 lib/graphviz
 sounds
+external/
 
 # Editor / OS files
 .DS_Store
@@ -33,7 +34,11 @@ emsdk
 MuseScore
 MusePlay
 
-# music_player - exclude large dependencies but keep core files and soundfonts
-music_player/node_modules
-music_player/musescore-player
-music_player/verovio-reference-book.pdf
+# apps/player - exclude large dependencies but keep core files, soundfonts, and scores
+apps/player/node_modules
+apps/player/musescore-player
+apps/player/verovio-reference-book.pdf
+
+# apps/museplay - exclude large dependencies
+apps/museplay/node_modules
+apps/museplay/temp/
