@@ -84,8 +84,9 @@ external/MuseScore/
 external/emsdk/
 
 # App-specific temp/cache directories
-apps/music/museplay/temp/
-apps/music/museplay/soundfonts/
+apps/museplay/temp/
+apps/museplay/soundfonts/
+*.sf2
 
 # Archived old files
 .archived/
