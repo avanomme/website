@@ -1,0 +1,810 @@
+/* Stratford Choir Rehearsal App - Complete Stylesheet */
+/* Designed for accessibility (WCAG 2.1 AA compliant) and Vercel deployment */
+
+:root {
+  --primary-color: #2c5f89;
+  --primary-dark: #1a3d5c;
+  --primary-light: #4a87b8;
+  --secondary-color: #8b4789;
+  --accent-color: #d4af37;
+  --text-color: #222;
+  --text-light: #666;
+  --bg-color: #ffffff;
+  --bg-light: #f8f9fa;
+  --border-color: #ddd;
+  --success-color: #28a745;
+  --error-color: #dc3545;
+  --focus-color: #4a90e2;
+  --transition: 0.2s ease;
+}
+
+/* Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  overflow-x: hidden;
+}
+
+/* Accessibility - Visually Hidden (for screen readers) */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Skip to Main Content Link (Accessibility) */
+.skip-to-main {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--primary-color);
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  z-index: 100;
+}
+
+.skip-to-main:focus {
+  top: 0;
+}
+
+/* Focus Styles for Keyboard Navigation */
+*:focus {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+button:focus,
+a:focus,
+input:focus {
+  outline: 3px solid var(--focus-color);
+  outline-offset: 2px;
+}
+
+/* Header Styles */
+header {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+  color: white;
+  padding: 0.75rem 1.5rem 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.header-title {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+}
+
+header h1 {
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 600;
+}
+
+.header-subtitle {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.back-link {
+  display: inline-block;
+  padding: 0.4rem 0.9rem;
+  background: rgba(255, 255, 255, 0.2);
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: background var(--transition);
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Header Controls Bar */
+.header-controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.header-controls-bar .button-group {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0;
+}
+
+.header-controls-bar .slider-container {
+  flex: 0 0 auto;
+  min-width: 150px;
+  max-width: 180px;
+  margin-bottom: 0;
+}
+
+.header-controls-bar .slider-container label {
+  color: white;
+  font-size: 0.85rem;
+  margin-bottom: 0.25rem;
+}
+
+.header-controls-bar button {
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--primary-dark);
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+.header-controls-bar button:hover:not(:disabled) {
+  background: white;
+  transform: translateY(-1px);
+}
+
+/* Landing Page Styles */
+.landing-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.landing-page main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+}
+
+/* Large Rehearse Button Card */
+.big-rehearse-button {
+  display: inline-block;
+  padding: 12rem 24rem;
+  background: #ffffff;
+  color: #000000;
+  font-size: 10.5rem;
+  font-weight: 900;
+  text-decoration: none;
+  border-radius: 72px;
+  box-shadow: 0 36px 120px rgba(0, 0, 0, 0.25);
+  transition: all var(--transition);
+  cursor: pointer;
+  border: none;
+  text-align: center;
+  letter-spacing: 0.1em;
+}
+
+.big-rehearse-button:hover {
+  transform: translateY(-18px) scale(1.03);
+  box-shadow: 0 48px 150px rgba(0, 0, 0, 0.35);
+  background: #f0f0f0;
+}
+
+.big-rehearse-button:active {
+  transform: translateY(-6px) scale(1.01);
+}
+
+.landing-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.landing-container main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.rehearse-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 3rem 4rem;
+  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  color: white;
+  font-size: 2rem;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  transition: transform var(--transition), box-shadow var(--transition);
+  cursor: pointer;
+}
+
+.rehearse-button:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+}
+
+.rehearse-button .icon {
+  font-size: 3rem;
+}
+
+footer {
+  text-align: center;
+  padding: 2rem;
+  color: var(--text-light);
+  background: var(--bg-light);
+}
+
+/* Main Container Layout */
+.container {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+/* Rehearse page layout tweaks for full-height sidebars */
+body.rehearse-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+body.rehearse-page header {
+  flex-shrink: 0;
+}
+
+body.rehearse-page .container {
+  flex: 1;
+  width: 100%;
+  overflow: hidden;
+}
+
+body.rehearse-page .song-list {
+  max-height: none;
+  height: 100%;
+}
+
+body.rehearse-page .score-area {
+  height: 100%;
+}
+
+body.rehearse-page .score-container {
+  height: 100%;
+}
+
+body.rehearse-page .controls {
+  position: relative;
+  top: auto;
+  height: 100%;
+  max-height: none;
+}
+
+body.rehearse-page #scoreDisplay {
+  height: 100%;
+}
+
+/* Song List Navigation */
+.song-list {
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.song-list button {
+  padding: 1rem;
+  font-size: 1rem;
+  background: white;
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all var(--transition);
+  text-align: left;
+  font-weight: 500;
+}
+
+.song-list button:hover:not(:disabled) {
+  background: var(--primary-light);
+  color: white;
+  border-color: var(--primary-light);
+  transform: translateX(4px);
+}
+
+.song-list button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: var(--bg-light);
+}
+
+.song-list button:not(:disabled):active {
+  transform: translateX(2px);
+}
+
+/* Score Area */
+.score-area {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 1.5rem;
+}
+
+.score-container {
+  display: flex;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+/* Controls - Fixed on Left */
+.controls {
+  background: var(--bg-light);
+  padding: 1.5rem;
+  border-radius: 8px;
+  width: 300px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 1.5rem;
+  max-height: calc(100vh - 3rem);
+  overflow-y: auto;
+  align-self: flex-start;
+}
+
+/* Score Display - Scrollable on Right */
+#scoreDisplay {
+  flex: 1;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow: auto;
+  height: calc(100vh - 180px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+/* Ensure OSMD content scales to fit container */
+#scoreDisplay svg {
+  width: auto;
+  height: auto;
+  max-width: none;
+  display: block;
+}
+
+#scoreDisplay > div {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+
+/* Style OSMD cursor to highlight notes properly */
+#scoreDisplay rect[fill="#33e033"],
+#scoreDisplay rect[style*="rgb(51, 224, 51)"] {
+  opacity: 0.5 !important;
+  rx: 2 !important;
+  ry: 2 !important;
+}
+
+.placeholder {
+  color: var(--text-light);
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 3rem;
+}
+
+.controls h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--primary-dark);
+}
+
+.controls h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary-color);
+}
+
+/* Button Group */
+.button-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+/* Page Navigation */
+.page-navigation {
+  padding: 1rem;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.page-navigation h3 {
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+  color: var(--primary-color);
+}
+
+.page-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.page-controls button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+}
+
+.page-controls span {
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+button {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--transition), transform var(--transition);
+  font-weight: 500;
+}
+
+button:hover:not(:disabled) {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.download-btn {
+  background: var(--success-color);
+}
+
+.download-btn:hover {
+  background: #218838;
+}
+
+/* AI Voice Toggle */
+.ai-voice-toggle {
+  padding: 1rem;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.ai-voice-toggle label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.ai-voice-toggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.help-text {
+  font-size: 0.9rem;
+  color: var(--text-light);
+  margin-top: 0.5rem;
+  margin-left: 2rem;
+}
+
+/* Progress Indicator */
+.progress-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-light);
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Sliders */
+.slider-container,
+.seek-container {
+  margin-bottom: 1.5rem;
+}
+
+.slider-container label,
+.seek-container label {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+input[type="range"] {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: var(--border-color);
+  outline: none;
+  -webkit-appearance: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  transition: background var(--transition);
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: var(--primary-dark);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  cursor: pointer;
+  border: none;
+}
+
+/* Part Selector */
+.part-selector {
+  padding: 1rem;
+  background: white;
+  border: 2px solid var(--border-color);
+  border-radius: 6px;
+  margin-bottom: 1.5rem;
+}
+
+.part-selector label {
+  display: block;
+  padding: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background var(--transition);
+  border-radius: 4px;
+}
+
+.part-selector label:hover {
+  background: var(--bg-light);
+}
+
+.part-selector input[type="checkbox"] {
+  margin-right: 0.75rem;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Download Section */
+.download-section {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-color);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+  }
+
+  body.rehearse-page {
+    height: auto;
+    overflow: auto;
+  }
+
+  body.rehearse-page .container {
+    flex: initial;
+    overflow: visible;
+  }
+
+  body.rehearse-page .song-list,
+  body.rehearse-page .controls,
+  body.rehearse-page .score-area,
+  body.rehearse-page .score-container,
+  body.rehearse-page #scoreDisplay {
+    height: auto;
+    max-height: none;
+  }
+
+  .song-list {
+    width: 100%;
+    max-height: none;
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+  }
+
+  .song-list button {
+    min-width: 200px;
+  }
+
+  .score-area {
+    flex-direction: column;
+  }
+
+  .score-container {
+    flex-direction: column;
+  }
+
+  .controls {
+    width: 100%;
+    position: static;
+    max-height: none;
+  }
+
+  header h1 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  header {
+    padding: 1.5rem 1rem;
+  }
+
+  header h1 {
+    font-size: 1.75rem;
+  }
+
+  .container {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .controls {
+    padding: 1rem;
+  }
+
+  .rehearse-button {
+    padding: 2rem 3rem;
+    font-size: 1.5rem;
+  }
+
+  .big-rehearse-button {
+    padding: 6rem 12rem;
+    font-size: 6rem;
+    border-radius: 40px;
+    border-width: 8px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .button-group button {
+    width: 100%;
+  }
+}
+
+/* Print Styles */
+@media print {
+  header,
+  .song-list,
+  .controls,
+  footer {
+    display: none;
+  }
+
+  .score-area {
+    width: 100%;
+  }
+}
+
+/* High Contrast Mode Support */
+@media (prefers-contrast: high) {
+  :root {
+    --primary-color: #000080;
+    --border-color: #000;
+    --text-color: #000;
+  }
+
+  button {
+    border: 2px solid currentColor;
+  }
+}
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Dark Mode Support (Future Enhancement) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-color: #1a1a1a;
+    --text-color: #e0e0e0;
+    --text-light: #999;
+    --bg-light: #2a2a2a;
+    --border-color: #444;
+  }
+
+  .score-container,
+  .controls,
+  .ai-voice-toggle,
+  .part-selector {
+    background: #2a2a2a;
+  }
+
+  .song-list button {
+    background: #2a2a2a;
+    color: #e0e0e0;
+  }
+}
