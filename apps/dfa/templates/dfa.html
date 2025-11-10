@@ -329,6 +329,43 @@
             border: 1px solid #f5c6cb;
             margin: 10px 0;
         }
+
+        /* Tab Styles */
+        .tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 0;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .tab-button {
+            padding: 12px 24px;
+            background: #e9ecef;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            color: #555;
+            transition: all 0.3s;
+        }
+
+        .tab-button:hover {
+            background: #dee2e6;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -339,21 +376,34 @@
         </header>
 
         <div class="content">
-            <div class="input-section">
-                <h2>Define Your DFA</h2>
+            <!-- Tab Navigation -->
+            <div class="tabs">
+                <button class="tab-button active" onclick="switchTab('form')">📋 Define DFA</button>
+                <button class="tab-button" onclick="switchTab('visual')">🎨 Visual Editor</button>
+            </div>
+
+            <!-- Form-Based DFA Editor Tab -->
+            <div id="form-tab" class="tab-content active">
+                <div class="input-section" style="margin-top: 0; border-radius: 0 8px 8px 8px;">
+                <h2>📋 Define Your DFA (Form-Based)</h2>
 
                 <!-- Regex Input Section -->
                 <div style="margin-bottom: 25px; padding: 20px; background: #fff; border-radius: 8px; border: 2px solid #e9ecef;">
                     <h3 style="margin-bottom: 15px; color: #667eea; font-size: 1.2em;">Quick Start</h3>
-                    <div class="form-grid" style="grid-template-columns: 1fr auto;">
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
                         <div class="form-group">
                             <label for="regex-input">Regular Expression (optional):</label>
                             <input type="text" id="regex-input" name="regex-input" placeholder="(a|b)*abb">
                             <small style="color: #666; margin-top: 5px; display: block;">Enter a regex to auto-generate DFA, or use the form below for manual entry</small>
                         </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
+                            <button type="button" id="regex-to-dfa" class="btn btn-primary" style="white-space: nowrap; width: 100%;">🔄 Regex → DFA</button>
+                        </div>
+                    </div>
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-top: 15px;">
                         <div class="form-group">
                             <label for="example-select">Load Example DFA:</label>
-                            <select id="example-select" class="btn" style="padding: 10px; border: 2px solid #ddd; background: white; cursor: pointer;">
+                            <select id="example-select" style="padding: 10px; border: 2px solid #ddd; background: white; cursor: pointer; border-radius: 6px; font-size: 1em;">
                                 <option value="">-- Choose an Example --</option>
                                 <option value="strings-ending-abb">Strings ending with "abb"</option>
                                 <option value="even-as">Even number of 'a's</option>
@@ -363,8 +413,14 @@
                                 <option value="no-consecutive">No consecutive 1s</option>
                             </select>
                         </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end;">
-                            <button type="button" id="regex-to-dfa" class="btn btn-primary" style="white-space: nowrap;">🔄 Regex → DFA</button>
+                        <div class="form-group">
+                            <label for="saved-select">Load Saved DFA:</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="saved-select" style="flex: 1; padding: 10px; border: 2px solid #ddd; background: white; cursor: pointer; border-radius: 6px; font-size: 1em;">
+                                    <option value="">-- No saved DFAs --</option>
+                                </select>
+                                <button type="button" id="delete-saved" class="btn btn-secondary" style="padding: 10px 15px; white-space: nowrap;" disabled>🗑️ Delete</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -395,7 +451,52 @@
 
                 <div id="generate-buttons" class="hidden" style="margin-top: 20px;">
                     <button type="button" id="generate-graph" class="btn btn-primary">Generate DFA</button>
+                    <button type="button" id="save-dfa" class="btn btn-secondary">💾 Save DFA</button>
                     <button type="button" id="start-elimination" class="btn btn-secondary hidden">🔄 State Elimination Mode</button>
+                </div>
+                </div>
+            </div>
+
+            <!-- Visual DFA Editor Tab -->
+            <div id="visual-tab" class="tab-content">
+                <div class="input-section" style="margin-top: 0; border-radius: 0 8px 8px 8px;">
+                <h2>🎨 Visual DFA Editor</h2>
+
+                <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    <label style="font-weight: 600;">Grid:</label>
+                    <label style="display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="grid-snap" checked>
+                        <span>Snap to Grid</span>
+                    </label>
+                    <input type="number" id="grid-size" min="10" max="100" value="50" style="width: 80px; padding: 5px; border: 2px solid #ddd; border-radius: 4px;">
+                    <span>px</span>
+
+                    <button type="button" id="load-dfa-file" class="btn btn-secondary" style="margin-left: auto;">📂 Load from File</button>
+                    <button type="button" id="clear-canvas" class="btn btn-secondary">🗑️ Clear Canvas</button>
+                    <button type="button" id="generate-from-canvas" class="btn btn-primary">📝 Generate DFA Code</button>
+                    <input type="file" id="dfa-file-input" accept=".json" style="display: none;">
+                </div>
+
+                <canvas id="dfa-canvas" width="1200" height="600" style="border: 2px solid #667eea; border-radius: 8px; background: white; cursor: crosshair; display: block;"></canvas>
+
+                <div id="transition-label-input" class="hidden" style="display: none; position: fixed; z-index: 1000; background: white; padding: 15px; border: 2px solid #667eea; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Transition Label(s):</label>
+                    <input type="text" id="transition-label" placeholder="a,b or \ep for ε" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px; width: 200px;">
+                    <small style="color: #666; display: block; margin-top: 5px;">Separate multiple labels with commas. Use \ep for epsilon (ε)</small>
+                    <div style="margin-top: 10px; display: flex; gap: 8px;">
+                        <button type="button" id="confirm-transition" class="btn btn-primary" style="flex: 1;">✓ OK</button>
+                        <button type="button" id="cancel-transition" class="btn btn-secondary" style="flex: 1;">✗ Cancel</button>
+                    </div>
+                </div>
+
+                <div id="state-name-input" class="hidden" style="position: fixed; z-index: 1000; background: white; padding: 15px; border: 2px solid #667eea; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">State Name:</label>
+                    <input type="text" id="state-name" placeholder="q0" style="padding: 8px; border: 2px solid #ddd; border-radius: 4px; width: 200px;">
+                    <div style="margin-top: 10px; display: flex; gap: 8px;">
+                        <button type="button" id="confirm-state-name" class="btn btn-primary" style="flex: 1;">✓ OK</button>
+                        <button type="button" id="cancel-state-name" class="btn btn-secondary" style="flex: 1;">✗ Cancel</button>
+                    </div>
+                </div>
                 </div>
             </div>
 
@@ -498,6 +599,28 @@
     </div>
 
     <script>
+        // Tab switching function
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab content
+            if (tabName === 'form') {
+                document.getElementById('form-tab').classList.add('active');
+                document.querySelectorAll('.tab-button')[0].classList.add('active');
+            } else if (tabName === 'visual') {
+                document.getElementById('visual-tab').classList.add('active');
+                document.querySelectorAll('.tab-button')[1].classList.add('active');
+            }
+        }
+
         // Client-side GraphViz rendering using @hpcc-js/wasm
         let graphvizInstance = null;
         let graphvizLoadPromise = null;
@@ -731,6 +854,1008 @@
         document.addEventListener('DOMContentLoaded', initPanZoom);
 
         $(document).ready(function() {
+            // Initialize saved DFAs list on page load
+            updateSavedDFAsList();
+
+            // Visual DFA Editor
+            const canvas = document.getElementById('dfa-canvas');
+            const ctx = canvas.getContext('2d');
+
+            let states = [];
+            let transitions = [];
+            let nextStateId = 0;
+            let initialState = null;
+            let selectedStates = [];
+            let draggedStates = [];
+            let isDragging = false;
+            let dragStartPos = null;
+            let transitionStart = null;
+            let tempTransitionEnd = null;
+            let pendingTransition = null;
+            let draggedTransition = null;
+            let isDraggingTransition = false;
+            let selectedTransition = null;
+            let editingTransition = null;
+            let labelInput = '';
+            let cursorPosition = 0;
+            let cursorVisible = true;
+            let cursorBlinkInterval = null;
+            let labelOffsetY = 0; // Stores vertical offset based on click position (above or below line)
+
+            // Zoom and pan variables
+            let zoom = 1;
+            let panX = 0;
+            let panY = 0;
+            let isPanning = false;
+            let panStartX = 0;
+            let panStartY = 0;
+
+            // Selection rectangle variables
+            let isSelecting = false;
+            let selectionStart = null;
+            let selectionEnd = null;
+
+            const STATE_RADIUS = 25;
+            const DOUBLE_CIRCLE_OFFSET = 5;
+
+            function snapToGrid(value) {
+                if ($('#grid-snap').is(':checked')) {
+                    const gridSize = parseInt($('#grid-size').val());
+                    return Math.round(value / gridSize) * gridSize;
+                }
+                return value;
+            }
+
+            function getCanvasCoordinates(event, applySnap = false) {
+                const rect = canvas.getBoundingClientRect();
+                let x = (event.clientX - rect.left - panX) / zoom;
+                let y = (event.clientY - rect.top - panY) / zoom;
+                return {
+                    x: applySnap ? snapToGrid(x) : x,
+                    y: applySnap ? snapToGrid(y) : y
+                };
+            }
+
+            function findStateAt(x, y) {
+                // Add a bit of tolerance to make clicking easier (30px instead of 25px)
+                const hitRadius = STATE_RADIUS + 5;
+                return states.find(s => {
+                    const dx = s.x - x;
+                    const dy = s.y - y;
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+                    return distance <= hitRadius;
+                });
+            }
+
+            function distanceToLine(px, py, x1, y1, x2, y2) {
+                const A = px - x1;
+                const B = py - y1;
+                const C = x2 - x1;
+                const D = y2 - y1;
+
+                const dot = A * C + B * D;
+                const lenSq = C * C + D * D;
+                let param = -1;
+                if (lenSq !== 0) param = dot / lenSq;
+
+                let xx, yy;
+
+                if (param < 0) {
+                    xx = x1;
+                    yy = y1;
+                } else if (param > 1) {
+                    xx = x2;
+                    yy = y2;
+                } else {
+                    xx = x1 + param * C;
+                    yy = y1 + param * D;
+                }
+
+                const dx = px - xx;
+                const dy = py - yy;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+
+            function distanceToCurve(px, py, x1, y1, cx, cy, x2, y2) {
+                // Check distance to quadratic Bezier curve by sampling points
+                let minDist = Infinity;
+                const samples = 20;
+                for (let i = 0; i <= samples; i++) {
+                    const t = i / samples;
+                    const x = (1-t)*(1-t)*x1 + 2*(1-t)*t*cx + t*t*x2;
+                    const y = (1-t)*(1-t)*y1 + 2*(1-t)*t*cy + t*t*y2;
+                    const dist = Math.sqrt((px - x)**2 + (py - y)**2);
+                    minDist = Math.min(minDist, dist);
+                }
+                return minDist;
+            }
+
+            function findTransitionAt(x, y) {
+                const threshold = 15; // pixels - increased for better detection
+                let closestTransition = null;
+                let closestDistance = Infinity;
+
+                for (const t of transitions) {
+                    if (t.from === t.to) continue; // Skip self-loops for now
+
+                    const fromState = states.find(s => s.id === t.from);
+                    const toState = states.find(s => s.id === t.to);
+                    if (!fromState || !toState) continue;
+
+                    let dist;
+                    if (t.curve && (t.curve.x !== null || t.curve.y !== null)) {
+                        // For curved transitions, check distance to the Bezier curve
+                        dist = distanceToCurve(x, y, fromState.x, fromState.y, t.curve.x, t.curve.y, toState.x, toState.y);
+                    } else {
+                        // Check distance to straight line
+                        dist = distanceToLine(x, y, fromState.x, fromState.y, toState.x, toState.y);
+                    }
+
+                    if (dist < threshold && dist < closestDistance) {
+                        closestDistance = dist;
+                        closestTransition = t;
+                    }
+                }
+                return closestTransition;
+            }
+
+            function drawGrid() {
+                if (!$('#grid-snap').is(':checked')) return;
+
+                const gridSize = parseInt($('#grid-size').val());
+                ctx.strokeStyle = '#f0f0f0';
+                ctx.lineWidth = 1;
+
+                for (let x = 0; x <= canvas.width; x += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(x, 0);
+                    ctx.lineTo(x, canvas.height);
+                    ctx.stroke();
+                }
+
+                for (let y = 0; y <= canvas.height; y += gridSize) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, y);
+                    ctx.lineTo(canvas.width, y);
+                    ctx.stroke();
+                }
+            }
+
+            function drawArrow(fromX, fromY, toX, toY, label = '', isSelfLoop = false, curveOffset = null, isSelected = false) {
+                ctx.strokeStyle = isSelected ? '#ffa500' : '#333';
+                ctx.fillStyle = isSelected ? '#ffa500' : '#333';
+                ctx.lineWidth = isSelected ? 3 : 2;
+
+                if (isSelfLoop) {
+                    // Draw self-loop as a full circle around the state perimeter
+                    // Use curveOffset to determine the angle (default to top if not set)
+                    let baseAngle = -Math.PI / 2; // Default to top (-90 degrees)
+
+                    if (curveOffset && curveOffset.x !== null && curveOffset.y !== null) {
+                        // Calculate angle based on drag position relative to state center
+                        const dx = curveOffset.x - fromX;
+                        const dy = curveOffset.y - fromY;
+                        baseAngle = Math.atan2(dy, dx);
+                    }
+
+                    const loopRadius = 25; // Radius of the self-loop circle
+                    const loopCenterDistance = STATE_RADIUS + loopRadius; // Distance from state center to loop center
+
+                    // Calculate center of the self-loop circle
+                    const loopCenterX = fromX + loopCenterDistance * Math.cos(baseAngle);
+                    const loopCenterY = fromY + loopCenterDistance * Math.sin(baseAngle);
+
+                    // Draw full circle for self-loop
+                    // Start and end points where loop connects to state
+                    const connectionAngle = baseAngle + Math.PI; // Opposite side of loop center
+                    const startAngle = connectionAngle - 0.15; // Small gap for arrow
+                    const endAngle = connectionAngle + 0.15;
+
+                    const startX = fromX + STATE_RADIUS * Math.cos(startAngle);
+                    const startY = fromY + STATE_RADIUS * Math.sin(startAngle);
+                    const endX = fromX + STATE_RADIUS * Math.cos(endAngle);
+                    const endY = fromY + STATE_RADIUS * Math.sin(endAngle);
+
+                    // Draw the loop as circular arc
+                    ctx.beginPath();
+                    ctx.arc(loopCenterX, loopCenterY, loopRadius,
+                            Math.atan2(startY - loopCenterY, startX - loopCenterX),
+                            Math.atan2(endY - loopCenterY, endX - loopCenterX),
+                            false);
+                    ctx.stroke();
+
+                    // Draw arrow head at end point
+                    const headLength = 12;
+                    const arrowAngle = endAngle - Math.PI / 2; // Perpendicular to radius at end point
+
+                    ctx.beginPath();
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(
+                        endX - headLength * Math.cos(arrowAngle - Math.PI / 6),
+                        endY - headLength * Math.sin(arrowAngle - Math.PI / 6)
+                    );
+                    ctx.lineTo(
+                        endX - headLength * Math.cos(arrowAngle + Math.PI / 6),
+                        endY - headLength * Math.sin(arrowAngle + Math.PI / 6)
+                    );
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Draw label at the outer edge of the loop
+                    if (label) {
+                        ctx.fillStyle = '#667eea';
+                        ctx.font = 'bold 14px Arial';
+                        const labelX = loopCenterX + loopRadius * Math.cos(baseAngle);
+                        const labelY = loopCenterY + loopRadius * Math.sin(baseAngle);
+                        ctx.fillText(label, labelX, labelY - 5);
+                    }
+                } else {
+                    // Calculate angle
+                    const dx = toX - fromX;
+                    const dy = toY - fromY;
+                    const angle = Math.atan2(dy, dx);
+
+                    // Shorten line to not overlap circles
+                    const startX = fromX + STATE_RADIUS * Math.cos(angle);
+                    const startY = fromY + STATE_RADIUS * Math.sin(angle);
+                    const endX = toX - STATE_RADIUS * Math.cos(angle);
+                    const endY = toY - STATE_RADIUS * Math.sin(angle);
+
+                    // Calculate control point for curve
+                    let controlX, controlY, curveEndAngle;
+
+                    if (curveOffset && (curveOffset.x !== null || curveOffset.y !== null)) {
+                        // Use the dragged control point
+                        controlX = curveOffset.x;
+                        controlY = curveOffset.y;
+                    } else {
+                        // Default: straight line (control point at midpoint)
+                        controlX = (startX + endX) / 2;
+                        controlY = (startY + endY) / 2;
+                    }
+
+                    // Draw curved line using quadratic Bezier
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+                    ctx.stroke();
+
+                    // Calculate angle at the end of the curve for arrow head
+                    // Use the tangent at t=1 for quadratic Bezier
+                    const tangentX = 2 * (endX - controlX);
+                    const tangentY = 2 * (endY - controlY);
+                    curveEndAngle = Math.atan2(tangentY, tangentX);
+
+                    // Draw arrow head at curve end
+                    const headLength = 15;
+                    ctx.beginPath();
+                    ctx.moveTo(endX, endY);
+                    ctx.lineTo(
+                        endX - headLength * Math.cos(curveEndAngle - Math.PI / 6),
+                        endY - headLength * Math.sin(curveEndAngle - Math.PI / 6)
+                    );
+                    ctx.lineTo(
+                        endX - headLength * Math.cos(curveEndAngle + Math.PI / 6),
+                        endY - headLength * Math.sin(curveEndAngle + Math.PI / 6)
+                    );
+                    ctx.closePath();
+                    ctx.fill();
+
+                    // Draw label at curve midpoint (t=0.5 on quadratic Bezier)
+                    if (label) {
+                        const t = 0.5;
+                        const midX = (1-t)*(1-t)*startX + 2*(1-t)*t*controlX + t*t*endX;
+                        const midY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+                        ctx.fillStyle = '#667eea';
+                        ctx.font = 'bold 14px Arial';
+                        ctx.fillText(label, midX + 5, midY - 5);
+                    }
+
+                    // Draw control point visualization if selected (for debugging/visual feedback)
+                    if (isSelected && curveOffset && (curveOffset.x !== null || curveOffset.y !== null)) {
+                        ctx.fillStyle = 'rgba(255, 165, 0, 0.5)';
+                        ctx.beginPath();
+                        ctx.arc(controlX, controlY, 5, 0, Math.PI * 2);
+                        ctx.fill();
+                    }
+                }
+            }
+
+            function drawState(state) {
+                // Draw selection highlight
+                if (selectedStates.includes(state.id)) {
+                    ctx.strokeStyle = '#ffa500';
+                    ctx.lineWidth = 3;
+                    ctx.beginPath();
+                    ctx.arc(state.x, state.y, STATE_RADIUS + 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Draw state circle
+                ctx.strokeStyle = '#333';
+                ctx.fillStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(state.x, state.y, STATE_RADIUS, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+
+                // Draw double circle for final states
+                if (state.isFinal) {
+                    ctx.beginPath();
+                    ctx.arc(state.x, state.y, STATE_RADIUS - DOUBLE_CIRCLE_OFFSET, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                // Draw state label
+                ctx.fillStyle = '#333';
+                ctx.font = 'bold 16px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('q' + state.id, state.x, state.y);
+
+                // Draw initial state arrow
+                if (state.id === initialState) {
+                    ctx.strokeStyle = '#333';
+                    ctx.lineWidth = 2;
+                    const arrowStartX = state.x - STATE_RADIUS - 40;
+                    const arrowStartY = state.y;
+                    const arrowEndX = state.x - STATE_RADIUS;
+                    const arrowEndY = state.y;
+
+                    ctx.beginPath();
+                    ctx.moveTo(arrowStartX, arrowStartY);
+                    ctx.lineTo(arrowEndX, arrowEndY);
+                    ctx.stroke();
+
+                    // Arrow head
+                    ctx.beginPath();
+                    ctx.moveTo(arrowEndX, arrowEndY);
+                    ctx.lineTo(arrowEndX - 10, arrowEndY - 5);
+                    ctx.lineTo(arrowEndX - 10, arrowEndY + 5);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+
+            function redraw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Save context and apply zoom/pan transformations
+                ctx.save();
+                ctx.translate(panX, panY);
+                ctx.scale(zoom, zoom);
+
+                drawGrid();
+
+                // Draw states first (so transitions appear on top)
+                states.forEach(drawState);
+
+                // Draw transitions on top of states
+                transitions.forEach(t => {
+                    const fromState = states.find(s => s.id === t.from);
+                    const toState = states.find(s => s.id === t.to);
+                    if (fromState && toState) {
+                        const isSelected = selectedTransition && selectedTransition.from === t.from &&
+                                          selectedTransition.to === t.to &&
+                                          selectedTransition.labels.join(',') === t.labels.join(',');
+                        drawArrow(fromState.x, fromState.y, toState.x, toState.y, t.labels.join(','), fromState.id === toState.id, t.curve, isSelected);
+                    }
+                });
+
+                // Draw temporary transition line
+                if (transitionStart !== null && tempTransitionEnd) {
+                    const state = states.find(s => s.id === transitionStart);
+                    if (state) {
+                        ctx.strokeStyle = '#999';
+                        ctx.setLineDash([5, 5]);
+                        ctx.lineWidth = 2;
+                        ctx.beginPath();
+                        ctx.moveTo(state.x, state.y);
+                        ctx.lineTo(tempTransitionEnd.x, tempTransitionEnd.y);
+                        ctx.stroke();
+                        ctx.setLineDash([]);
+                    }
+                }
+
+                // Draw inline label editor if editing
+                if (editingTransition) {
+                    drawInlineLabelEditor();
+                }
+
+                // Restore context after zoom/pan transformations
+                ctx.restore();
+
+                // Draw selection rectangle (drawn in screen coordinates, not transformed)
+                if (isSelecting && selectionStart && selectionEnd) {
+                    const x = Math.min(selectionStart.x, selectionEnd.x);
+                    const y = Math.min(selectionStart.y, selectionEnd.y);
+                    const width = Math.abs(selectionEnd.x - selectionStart.x);
+                    const height = Math.abs(selectionEnd.y - selectionStart.y);
+
+                    ctx.strokeStyle = '#667eea';
+                    ctx.fillStyle = 'rgba(102, 126, 234, 0.1)';
+                    ctx.lineWidth = 2;
+                    ctx.setLineDash([5, 5]);
+                    ctx.fillRect(x, y, width, height);
+                    ctx.strokeRect(x, y, width, height);
+                    ctx.setLineDash([]);
+                }
+            }
+
+            function saveEditingTransition() {
+                if (!editingTransition) return;
+
+                // Save labels - convert \ep to epsilon
+                const labels = labelInput
+                    .split(',')
+                    .map(s => s.trim().replace(/\\ep/g, 'ε'))
+                    .filter(s => s);
+
+                // Always save the transition, even if it has no labels (just an arrow)
+                editingTransition.labels = labels;
+
+                editingTransition = null;
+                if (cursorBlinkInterval) {
+                    clearInterval(cursorBlinkInterval);
+                    cursorBlinkInterval = null;
+                }
+            }
+
+            function drawInlineLabelEditor() {
+                const fromState = states.find(s => s.id === editingTransition.from);
+                const toState = states.find(s => s.id === editingTransition.to);
+                if (!fromState || !toState) return;
+
+                // Calculate label position (midpoint of transition)
+                let labelX, labelY;
+                if (fromState.id === toState.id) {
+                    // Self-loop - position at outer edge of loop
+                    let baseAngle = -Math.PI / 2; // Default to top
+                    if (editingTransition.curve && editingTransition.curve.x !== null && editingTransition.curve.y !== null) {
+                        const dx = editingTransition.curve.x - fromState.x;
+                        const dy = editingTransition.curve.y - fromState.y;
+                        baseAngle = Math.atan2(dy, dx);
+                    }
+                    const loopRadius = 25;
+                    const loopCenterDistance = STATE_RADIUS + loopRadius;
+                    const loopCenterX = fromState.x + loopCenterDistance * Math.cos(baseAngle);
+                    const loopCenterY = fromState.y + loopCenterDistance * Math.sin(baseAngle);
+                    labelX = loopCenterX + loopRadius * Math.cos(baseAngle);
+                    labelY = loopCenterY + loopRadius * Math.sin(baseAngle) - 5;
+                } else if (editingTransition.curve && (editingTransition.curve.x !== null || editingTransition.curve.y !== null)) {
+                    // Curved transition - position at curve midpoint
+                    const dx = toState.x - fromState.x;
+                    const dy = toState.y - fromState.y;
+                    const angle = Math.atan2(dy, dx);
+                    const startX = fromState.x + STATE_RADIUS * Math.cos(angle);
+                    const startY = fromState.y + STATE_RADIUS * Math.sin(angle);
+                    const endX = toState.x - STATE_RADIUS * Math.cos(angle);
+                    const endY = toState.y - STATE_RADIUS * Math.sin(angle);
+                    const controlX = editingTransition.curve.x;
+                    const controlY = editingTransition.curve.y;
+                    const t = 0.5;
+                    labelX = (1-t)*(1-t)*startX + 2*(1-t)*t*controlX + t*t*endX;
+                    labelY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+                } else {
+                    // Straight line - midpoint
+                    labelX = (fromState.x + toState.x) / 2;
+                    labelY = (fromState.y + toState.y) / 2;
+                }
+
+                // Apply vertical offset based on where user clicked
+                labelY += labelOffsetY;
+
+                // Draw text input with cursor
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = '#667eea';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+
+                const text = labelInput || '';
+                ctx.fillText(text, labelX, labelY);
+
+                // Draw cursor
+                if (cursorVisible) {
+                    const textWidth = ctx.measureText(text.substring(0, cursorPosition)).width;
+                    const textTotalWidth = ctx.measureText(text).width;
+                    const cursorX = labelX - textTotalWidth / 2 + textWidth;
+
+                    ctx.strokeStyle = '#667eea';
+                    ctx.lineWidth = 2;
+                    ctx.beginPath();
+                    ctx.moveTo(cursorX, labelY - 10);
+                    ctx.lineTo(cursorX, labelY + 10);
+                    ctx.stroke();
+                }
+            }
+
+            // Canvas event handlers
+            let clickTimeout = null;
+            let clickCount = 0;
+
+            let transitionClickStartTime = 0;
+            let transitionClickPos = null;
+
+            canvas.addEventListener('mousedown', (e) => {
+                // Auto-save any active editing before processing new action
+                saveEditingTransition();
+
+                const pos = getCanvasCoordinates(e);
+                const state = findStateAt(pos.x, pos.y);
+                const transition = !state ? findTransitionAt(pos.x, pos.y) : null;
+
+                if (e.shiftKey && state) {
+                    // Shift + click on state: self-loop or start transition
+                    if (transitionStart === null) {
+                        transitionStart = state.id;
+                        tempTransitionEnd = pos;
+                        selectedStates = [];
+                        selectedTransition = null;
+                    }
+                } else if (state && (e.metaKey || e.ctrlKey)) {
+                    // Cmd/Ctrl + click: multi-select
+                    selectedTransition = null;
+                    if (selectedStates.includes(state.id)) {
+                        selectedStates = selectedStates.filter(id => id !== state.id);
+                    } else {
+                        selectedStates.push(state.id);
+                    }
+                    redraw();
+                } else if (state) {
+                    // Start dragging state
+                    isDragging = true;
+                    dragStartPos = pos;
+                    selectedTransition = null;
+                    if (!selectedStates.includes(state.id)) {
+                        selectedStates = [state.id];
+                    }
+                    draggedStates = selectedStates.map(id => ({
+                        id,
+                        startX: states.find(s => s.id === id).x,
+                        startY: states.find(s => s.id === id).y
+                    }));
+                    redraw();
+                } else if (transition) {
+                    // Click on transition: could be start of drag (to curve) or click (to edit label)
+                    // We'll determine which on mouseup
+                    selectedTransition = transition;
+                    selectedStates = [];
+                    transitionClickStartTime = Date.now();
+                    transitionClickPos = pos;
+                    isDraggingTransition = true;
+                    draggedTransition = transition;
+                    redraw();
+                } else {
+                    // Deselect on empty canvas click
+                    selectedStates = [];
+                    selectedTransition = null;
+                    redraw();
+                }
+            });
+
+            canvas.addEventListener('mousemove', (e) => {
+                const pos = getCanvasCoordinates(e);
+
+                if (isDraggingTransition && draggedTransition) {
+                    // Update curve control point
+                    if (!draggedTransition.curve) {
+                        draggedTransition.curve = { x: null, y: null };
+                    }
+                    draggedTransition.curve.x = pos.x;
+                    draggedTransition.curve.y = pos.y;
+                    redraw();
+                } else if (isDragging && draggedStates.length > 0) {
+                    // Drag selected states
+                    const dx = pos.x - dragStartPos.x;
+                    const dy = pos.y - dragStartPos.y;
+
+                    draggedStates.forEach(ds => {
+                        const state = states.find(s => s.id === ds.id);
+                        if (state) {
+                            state.x = snapToGrid(ds.startX + dx);
+                            state.y = snapToGrid(ds.startY + dy);
+                        }
+                    });
+                    redraw();
+                } else if (transitionStart !== null) {
+                    // Update temporary transition line
+                    tempTransitionEnd = pos;
+                    redraw();
+                }
+            });
+
+            canvas.addEventListener('mouseup', (e) => {
+                const pos = getCanvasCoordinates(e);
+                const state = findStateAt(pos.x, pos.y);
+
+                if (isDraggingTransition && draggedTransition) {
+                    // Determine if this was a click or a drag
+                    const clickDuration = Date.now() - transitionClickStartTime;
+                    const dragDistance = Math.sqrt(
+                        Math.pow(pos.x - transitionClickPos.x, 2) +
+                        Math.pow(pos.y - transitionClickPos.y, 2)
+                    );
+
+                    if (clickDuration < 200 && dragDistance < 5) {
+                        // This was a click - start inline label editing
+                        // Calculate if click was above or below the line
+                        const fromState = states.find(s => s.id === draggedTransition.from);
+                        const toState = states.find(s => s.id === draggedTransition.to);
+
+                        if (fromState && toState) {
+                            // Calculate the line's Y position at the click's X coordinate
+                            let lineY;
+                            if (fromState.id === toState.id) {
+                                // Self-loop - calculate position based on loop angle
+                                let baseAngle = -Math.PI / 2; // Default to top
+                                if (draggedTransition.curve && draggedTransition.curve.x !== null && draggedTransition.curve.y !== null) {
+                                    const dx = draggedTransition.curve.x - fromState.x;
+                                    const dy = draggedTransition.curve.y - fromState.y;
+                                    baseAngle = Math.atan2(dy, dx);
+                                }
+                                const loopRadius = 25;
+                                const loopCenterDistance = STATE_RADIUS + loopRadius;
+                                const loopCenterY = fromState.y + loopCenterDistance * Math.sin(baseAngle);
+                                lineY = loopCenterY + loopRadius * Math.sin(baseAngle);
+                            } else if (draggedTransition.curve && (draggedTransition.curve.x !== null || draggedTransition.curve.y !== null)) {
+                                // Curved - find Y on curve at click X (approximate)
+                                const dx = toState.x - fromState.x;
+                                const dy = toState.y - fromState.y;
+                                const angle = Math.atan2(dy, dx);
+                                const startX = fromState.x + STATE_RADIUS * Math.cos(angle);
+                                const startY = fromState.y + STATE_RADIUS * Math.sin(angle);
+                                const endX = toState.x - STATE_RADIUS * Math.cos(angle);
+                                const endY = toState.y - STATE_RADIUS * Math.sin(angle);
+                                const controlX = draggedTransition.curve.x;
+                                const controlY = draggedTransition.curve.y;
+                                // Use midpoint of curve
+                                const t = 0.5;
+                                lineY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+                            } else {
+                                // Straight line - use midpoint Y
+                                lineY = (fromState.y + toState.y) / 2;
+                            }
+
+                            // Set offset based on click position relative to line
+                            labelOffsetY = pos.y < lineY ? -20 : 20;
+                        }
+
+                        editingTransition = draggedTransition;
+                        labelInput = draggedTransition.labels.join(', ');
+                        cursorPosition = labelInput.length;
+                        cursorVisible = true;
+                        cursorBlinkInterval = setInterval(() => {
+                            cursorVisible = !cursorVisible;
+                            redraw();
+                        }, 500);
+                    }
+                    // Otherwise it was a drag - curve is already applied
+
+                    isDraggingTransition = false;
+                    draggedTransition = null;
+                    redraw();
+                } else if (transitionStart !== null) {
+                    if (state) {
+                        // Create transition - start inline editing for new transition
+                        const newTransition = {
+                            from: transitionStart,
+                            to: state.id,
+                            labels: [],
+                            curve: null,
+                            angleOffset: 0
+                        };
+                        transitions.push(newTransition);
+
+                        editingTransition = newTransition;
+                        labelInput = '';
+                        cursorPosition = 0;
+                        cursorVisible = true;
+                        labelOffsetY = 20; // Default to below for new transitions
+                        cursorBlinkInterval = setInterval(() => {
+                            cursorVisible = !cursorVisible;
+                            redraw();
+                        }, 500);
+                    }
+                    transitionStart = null;
+                    tempTransitionEnd = null;
+                    redraw();
+                }
+
+                isDragging = false;
+                draggedStates = [];
+            });
+
+            canvas.addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                const pos = getCanvasCoordinates(e);
+                const state = findStateAt(pos.x, pos.y);
+
+                if (state) {
+                    // Toggle final state
+                    state.isFinal = !state.isFinal;
+                    redraw();
+                } else {
+                    // Create new state on empty space
+                    const snappedPos = getCanvasCoordinates(e, true);
+                    const newState = {
+                        id: nextStateId++,
+                        x: snappedPos.x,
+                        y: snappedPos.y,
+                        isFinal: false
+                    };
+                    states.push(newState);
+                    if (states.length === 1) {
+                        initialState = newState.id;
+                    }
+                    selectedStates = [newState.id];
+                    redraw();
+                }
+                clickCount = 0;
+                if (clickTimeout) clearTimeout(clickTimeout);
+            });
+
+            // Keyboard handler
+            document.addEventListener('keydown', (e) => {
+                // Handle inline label editing
+                if (editingTransition) {
+                    if (e.key === 'Enter') {
+                        // Save and exit editing
+                        saveEditingTransition();
+                        redraw();
+                        e.preventDefault();
+                    } else if (e.key === 'Escape') {
+                        // Cancel editing - if transition has no labels, remove it
+                        if (editingTransition.labels.length === 0) {
+                            transitions = transitions.filter(t => t !== editingTransition);
+                        }
+                        editingTransition = null;
+                        clearInterval(cursorBlinkInterval);
+                        cursorBlinkInterval = null;
+                        redraw();
+                        e.preventDefault();
+                    } else if (e.key === 'Backspace') {
+                        // Remove character before cursor
+                        if (cursorPosition > 0) {
+                            labelInput = labelInput.slice(0, cursorPosition - 1) + labelInput.slice(cursorPosition);
+                            cursorPosition--;
+                            redraw();
+                        }
+                        e.preventDefault();
+                    } else if (e.key === 'Delete') {
+                        // Remove character after cursor
+                        if (cursorPosition < labelInput.length) {
+                            labelInput = labelInput.slice(0, cursorPosition) + labelInput.slice(cursorPosition + 1);
+                            redraw();
+                        }
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowLeft') {
+                        // Move cursor left
+                        if (cursorPosition > 0) {
+                            cursorPosition--;
+                            redraw();
+                        }
+                        e.preventDefault();
+                    } else if (e.key === 'ArrowRight') {
+                        // Move cursor right
+                        if (cursorPosition < labelInput.length) {
+                            cursorPosition++;
+                            redraw();
+                        }
+                        e.preventDefault();
+                    } else if (e.key.length === 1 && !e.ctrlKey && !e.metaKey) {
+                        // Insert character at cursor position
+                        labelInput = labelInput.slice(0, cursorPosition) + e.key + labelInput.slice(cursorPosition);
+                        cursorPosition++;
+                        redraw();
+                        e.preventDefault();
+                    }
+                    return; // Don't process other shortcuts while editing
+                }
+
+                // Shift+I for initial state
+                if (e.shiftKey && e.key === 'I' && selectedStates.length === 1) {
+                    initialState = selectedStates[0];
+                    redraw();
+                }
+
+                // Delete handler
+                if ((e.key === 'Delete' || e.key === 'Backspace') && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+
+                    // Delete selected states and their transitions
+                    if (selectedStates.length > 0) {
+                        selectedStates.forEach(stateId => {
+                            // Remove state
+                            states = states.filter(s => s.id !== stateId);
+                            // Remove all transitions to/from this state
+                            transitions = transitions.filter(t => t.from !== stateId && t.to !== stateId);
+                            // Clear initial state if it was deleted
+                            if (initialState === stateId) {
+                                initialState = null;
+                            }
+                        });
+                        selectedStates = [];
+                        redraw();
+                    }
+                    // Delete selected transition
+                    else if (selectedTransition) {
+                        transitions = transitions.filter(t =>
+                            !(t.from === selectedTransition.from &&
+                              t.to === selectedTransition.to &&
+                              t.labels.join(',') === selectedTransition.labels.join(','))
+                        );
+                        selectedTransition = null;
+                        redraw();
+                    }
+                }
+            });
+
+            // Transition label dialog handlers
+            $('#confirm-transition').click(() => {
+                if (pendingTransition) {
+                    // Convert \ep to epsilon symbol
+                    const labels = $('#transition-label').val()
+                        .split(',')
+                        .map(s => s.trim().replace(/\\ep/g, 'ε'))
+                        .filter(s => s);
+
+                    if (labels.length > 0) {
+                        if (pendingTransition.isEdit && pendingTransition.existingTransition) {
+                            // Edit existing transition labels
+                            pendingTransition.existingTransition.labels = labels;
+                        } else {
+                            // Create new transition or add to existing
+                            const existing = transitions.find(t =>
+                                t.from === pendingTransition.from && t.to === pendingTransition.to
+                            );
+                            if (existing) {
+                                existing.labels.push(...labels);
+                            } else {
+                                transitions.push({
+                                    from: pendingTransition.from,
+                                    to: pendingTransition.to,
+                                    labels,
+                                    curve: null,  // Initialize with no curve (straight line)
+                                    angleOffset: 0  // Angle offset for positioning on circumference
+                                });
+                            }
+                        }
+                        redraw();
+                    }
+                    pendingTransition = null;
+                }
+                $('#transition-label-input').addClass('hidden');
+            });
+
+            $('#cancel-transition').click(() => {
+                pendingTransition = null;
+                $('#transition-label-input').addClass('hidden');
+            });
+
+            $('#transition-label').keypress((e) => {
+                if (e.which === 13) { // Enter
+                    $('#confirm-transition').click();
+                }
+            });
+
+            // Load DFA from file
+            $('#load-dfa-file').click(() => {
+                $('#dfa-file-input').click();
+            });
+
+            $('#dfa-file-input').change((e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+
+                        // Clear existing canvas
+                        states = [];
+                        transitions = [];
+                        initialState = null;
+                        selectedStates = [];
+                        nextStateId = 0;
+
+                        // Load states
+                        if (data.states && Array.isArray(data.states)) {
+                            data.states.forEach(s => {
+                                states.push({
+                                    id: s.id,
+                                    x: s.x || 100,
+                                    y: s.y || 100,
+                                    isFinal: s.isFinal || false
+                                });
+                                if (s.id >= nextStateId) {
+                                    nextStateId = s.id + 1;
+                                }
+                            });
+                        }
+
+                        // Load initial state
+                        if (data.initialState !== undefined && data.initialState !== null) {
+                            initialState = data.initialState;
+                        }
+
+                        // Load transitions
+                        if (data.transitions && Array.isArray(data.transitions)) {
+                            data.transitions.forEach(t => {
+                                transitions.push({
+                                    from: t.from,
+                                    to: t.to,
+                                    labels: Array.isArray(t.labels) ? t.labels : [t.label || ''],
+                                    curve: t.curve || { x: null, y: null }
+                                });
+                            });
+                        }
+
+                        redraw();
+                        alert(`Loaded DFA with ${states.length} states and ${transitions.length} transitions!`);
+                    } catch (err) {
+                        alert('Error loading file: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+
+                // Reset file input so the same file can be loaded again
+                e.target.value = '';
+            });
+
+            // Clear canvas
+            $('#clear-canvas').click(() => {
+                if (confirm('Clear the entire canvas?')) {
+                    states = [];
+                    transitions = [];
+                    initialState = null;
+                    selectedStates = [];
+                    nextStateId = 0;
+                    redraw();
+                }
+            });
+
+            // Generate DFA code from canvas
+            $('#generate-from-canvas').click(() => {
+                if (states.length === 0) {
+                    alert('Please create at least one state first!');
+                    return;
+                }
+
+                // Collect all symbols
+                const alphabet = new Set();
+                transitions.forEach(t => {
+                    t.labels.forEach(label => alphabet.add(label));
+                });
+
+                // Fill in the form
+                $('#alphabet').val(Array.from(alphabet).sort().join(' '));
+                $('#states').val(states.length);
+                $('#initial').val(initialState !== null ? initialState : 0);
+                $('#final').val(states.filter(s => s.isFinal).map(s => s.id).join(' '));
+
+                // Switch to Define DFA tab to show results
+                switchTab('form');
+
+                // Generate transition table
+                $('#generate-table').click();
+
+                // Fill transitions
+                setTimeout(() => {
+                    transitions.forEach(t => {
+                        t.labels.forEach(label => {
+                            $(`input[name="transition_${t.from}_${label}"]`).val(t.to);
+                        });
+                    });
+
+                    // Scroll to form
+                    $('html, body').animate({
+                        scrollTop: $('#dfa-form').offset().top - 100
+                    }, 500);
+                }, 200);
+            });
+
             // Define example DFAs
             const examples = {
                 'strings-ending-abb': {
@@ -809,28 +1934,136 @@
                 }
             };
 
-            // Load selected example
-            $('#example-select').change(function() {
-                const exampleKey = $(this).val();
-                if (!exampleKey) return;
+            // LocalStorage functions for saving/loading DFAs
+            function getSavedDFAs() {
+                const saved = localStorage.getItem('savedDFAs');
+                return saved ? JSON.parse(saved) : {};
+            }
 
-                const example = examples[exampleKey];
+            function saveDFAToStorage(name, dfa) {
+                const saved = getSavedDFAs();
+                saved[name] = dfa;
+                localStorage.setItem('savedDFAs', JSON.stringify(saved));
+                updateSavedDFAsList();
+            }
 
+            function deleteSavedDFA(name) {
+                const saved = getSavedDFAs();
+                delete saved[name];
+                localStorage.setItem('savedDFAs', JSON.stringify(saved));
+                updateSavedDFAsList();
+            }
+
+            function loadDFAFromStorage(name) {
+                const saved = getSavedDFAs();
+                return saved[name];
+            }
+
+            function updateSavedDFAsList() {
+                const saved = getSavedDFAs();
+                const select = $('#saved-select');
+                select.empty();
+
+                if (Object.keys(saved).length === 0) {
+                    select.append('<option value="">-- No saved DFAs --</option>');
+                    $('#delete-saved').prop('disabled', true);
+                } else {
+                    select.append('<option value="">-- Choose a saved DFA --</option>');
+                    Object.keys(saved).sort().forEach(name => {
+                        select.append(`<option value="${name}">${name}</option>`);
+                    });
+                }
+            }
+
+            function getCurrentDFA() {
+                const alphabet = $('#alphabet').val();
+                const states = $('#states').val();
+                const initial = $('#initial').val();
+                const final = $('#final').val();
+
+                // Collect transitions
+                const transitions = {};
+                const alphabetArray = alphabet.split(' ').filter(s => s.length > 0);
+                for (let state = 0; state < parseInt(states); state++) {
+                    for (const symbol of alphabetArray) {
+                        const value = $(`input[name="transition_${state}_${symbol}"]`).val();
+                        if (value) {
+                            transitions[`${state}_${symbol}`] = value;
+                        }
+                    }
+                }
+
+                return {
+                    alphabet,
+                    states: parseInt(states),
+                    initial: parseInt(initial),
+                    final,
+                    transitions
+                };
+            }
+
+            function loadDFA(dfa) {
                 // Fill in form fields
-                $('#alphabet').val(example.alphabet);
-                $('#states').val(example.states);
-                $('#initial').val(example.initial);
-                $('#final').val(example.final);
+                $('#alphabet').val(dfa.alphabet);
+                $('#states').val(dfa.states);
+                $('#initial').val(dfa.initial);
+                $('#final').val(dfa.final);
 
                 // Auto-generate the table
                 $('#generate-table').click();
 
                 // Fill in the transition table
                 setTimeout(function() {
-                    for (const [key, value] of Object.entries(example.transitions)) {
+                    for (const [key, value] of Object.entries(dfa.transitions)) {
                         $(`input[name="transition_${key}"]`).val(value);
                     }
                 }, 100);
+            }
+
+            // Load selected example
+            $('#example-select').change(function() {
+                const exampleKey = $(this).val();
+                if (!exampleKey) return;
+
+                const example = examples[exampleKey];
+                loadDFA(example);
+            });
+
+            // Load saved DFA
+            $('#saved-select').change(function() {
+                const name = $(this).val();
+                if (!name) {
+                    $('#delete-saved').prop('disabled', true);
+                    return;
+                }
+
+                $('#delete-saved').prop('disabled', false);
+                const dfa = loadDFAFromStorage(name);
+                if (dfa) {
+                    loadDFA(dfa);
+                }
+            });
+
+            // Delete saved DFA
+            $('#delete-saved').click(function() {
+                const name = $('#saved-select').val();
+                if (!name) return;
+
+                if (confirm(`Delete saved DFA "${name}"?`)) {
+                    deleteSavedDFA(name);
+                    $('#saved-select').val('');
+                    $('#delete-saved').prop('disabled', true);
+                }
+            });
+
+            // Save current DFA
+            $('#save-dfa').click(function() {
+                const name = prompt('Enter a name for this DFA:');
+                if (!name) return;
+
+                const dfa = getCurrentDFA();
+                saveDFAToStorage(name, dfa);
+                alert(`DFA saved as "${name}"`);
             });
 
             // Regex to DFA
