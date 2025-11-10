@@ -2830,27 +2830,9 @@
                 const stateList = $('#state-list');
                 stateList.empty();
 
-                // Count remaining non-eliminated states
-                let remainingStates = [];
-                for (let i = 0; i < eliminationState.states; i++) {
-                    if (!eliminationState.eliminatedStates.includes(i)) {
-                        remainingStates.push(i);
-                    }
-                }
-
-                // If only initial and final states remain, allow eliminating the initial state
-                const onlyStartAndFinalLeft = remainingStates.length === 2 &&
-                    remainingStates.includes(eliminationState.initial) &&
-                    remainingStates.some(s => eliminationState.final.includes(s));
-
                 for (let i = 0; i < eliminationState.states; i++) {
                     if (eliminationState.eliminatedStates.includes(i)) continue;
-
-                    // Skip final states (never eliminate these)
-                    if (eliminationState.final.includes(i)) continue;
-
-                    // Skip initial state UNLESS only start and final states remain
-                    if (i === eliminationState.initial && !onlyStartAndFinalLeft) continue;
+                    if (eliminationState.final.includes(i)) continue; // Never eliminate final states
 
                     const button = $('<button>')
                         .addClass('btn btn-primary')
@@ -2902,8 +2884,14 @@
                         // Update UI
                         updateStateList();
                         addEliminationLogEntry(response.step);
-                        // Use html() instead of text() to preserve pipe characters
-                        $('#current-regex').html(response.regex || 'Computing...');
+
+                        // Display the new transitions added
+                        if (response.step && response.step.new_transitions && response.step.new_transitions.length > 0) {
+                            const transitionsHtml = response.step.new_transitions.map(t => `<div>${t}</div>`).join('');
+                            $('#current-regex').html(`<strong>New Transitions:</strong><br>${transitionsHtml}`);
+                        } else {
+                            $('#current-regex').html('No new transitions added.');
+                        }
 
                         // Update visual outputs in elimination section
                         if (response.svg) {
