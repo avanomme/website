@@ -2071,13 +2071,14 @@
                 'alternating': {
                     name: 'Alternating 0s and 1s',
                     alphabet: '0 1',
-                    states: 3,
+                    states: 4,
                     initial: 0,
                     final: '1 2',
                     transitions: {
                         '0_0': '1', '0_1': '2',
-                        '1_0': '1', '1_1': '2',
-                        '2_0': '1', '2_1': '2'
+                        '1_0': '3', '1_1': '2',
+                        '2_0': '1', '2_1': '3',
+                        '3_0': '3', '3_1': '3'
                     }
                 },
                 'no-consecutive': {
