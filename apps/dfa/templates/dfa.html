@@ -393,7 +393,7 @@
                     <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
                         <div class="form-group">
                             <label for="regex-input">Regular Expression (optional):</label>
-                            <input type="text" id="regex-input" name="regex-input" placeholder="(a|b)*abb">
+                            <input type="text" id="regex-input" name="regex-input" placeholder="(a+b)*abb">
                             <small style="color: #666; margin-top: 5px; display: block;">Enter a regex to auto-generate DFA, or use the form below for manual entry</small>
                         </div>
                         <div class="form-group" style="display: flex; align-items: flex-end;">
@@ -864,6 +864,7 @@
             let states = [];
             let transitions = [];
             let nextStateId = 0;
+            let deletedStateIds = []; // Track deleted state IDs for reuse
             let initialState = null;
             let selectedStates = [];
             let draggedStates = [];
@@ -1027,7 +1028,7 @@
                 ctx.lineWidth = isSelected ? 3 : 2;
 
                 if (isSelfLoop) {
-                    // Draw self-loop as a full circle around the state perimeter
+                    // Draw self-loop: arc from one point on circumference to nearby point
                     // Use curveOffset to determine the angle (default to top if not set)
                     let baseAngle = -Math.PI / 2; // Default to top (-90 degrees)
 
@@ -1038,55 +1039,54 @@
                         baseAngle = Math.atan2(dy, dx);
                     }
 
-                    const loopRadius = 25; // Radius of the self-loop circle
-                    const loopCenterDistance = STATE_RADIUS + loopRadius; // Distance from state center to loop center
+                    // Two connection points on the state circumference, close together
+                    const angleSpread = 0.4; // Angle between the two connection points (in radians)
+                    const startAngle = baseAngle - angleSpread / 2;
+                    const endAngle = baseAngle + angleSpread / 2;
 
-                    // Calculate center of the self-loop circle
-                    const loopCenterX = fromX + loopCenterDistance * Math.cos(baseAngle);
-                    const loopCenterY = fromY + loopCenterDistance * Math.sin(baseAngle);
-
-                    // Draw full circle for self-loop
-                    // Start and end points where loop connects to state
-                    const connectionAngle = baseAngle + Math.PI; // Opposite side of loop center
-                    const startAngle = connectionAngle - 0.15; // Small gap for arrow
-                    const endAngle = connectionAngle + 0.15;
-
+                    // Start and end points on state circumference
                     const startX = fromX + STATE_RADIUS * Math.cos(startAngle);
                     const startY = fromY + STATE_RADIUS * Math.sin(startAngle);
                     const endX = fromX + STATE_RADIUS * Math.cos(endAngle);
                     const endY = fromY + STATE_RADIUS * Math.sin(endAngle);
 
-                    // Draw the loop as circular arc
+                    // Control point for quadratic bezier - positioned outward from state
+                    const loopHeight = 40; // How far the loop extends outward
+                    const controlX = fromX + (STATE_RADIUS + loopHeight) * Math.cos(baseAngle);
+                    const controlY = fromY + (STATE_RADIUS + loopHeight) * Math.sin(baseAngle);
+
+                    // Draw the self-loop as a quadratic curve
                     ctx.beginPath();
-                    ctx.arc(loopCenterX, loopCenterY, loopRadius,
-                            Math.atan2(startY - loopCenterY, startX - loopCenterX),
-                            Math.atan2(endY - loopCenterY, endX - loopCenterX),
-                            false);
+                    ctx.moveTo(startX, startY);
+                    ctx.quadraticCurveTo(controlX, controlY, endX, endY);
                     ctx.stroke();
 
-                    // Draw arrow head at end point
-                    const headLength = 12;
-                    const arrowAngle = endAngle - Math.PI / 2; // Perpendicular to radius at end point
+                    // Draw arrow head at the end point
+                    const headLength = 10;
+                    // Calculate the angle of the curve at the end point
+                    // For quadratic curve, tangent at t=1 is in direction (end - control)
+                    const tangentAngle = Math.atan2(endY - controlY, endX - controlX);
 
                     ctx.beginPath();
                     ctx.moveTo(endX, endY);
                     ctx.lineTo(
-                        endX - headLength * Math.cos(arrowAngle - Math.PI / 6),
-                        endY - headLength * Math.sin(arrowAngle - Math.PI / 6)
+                        endX - headLength * Math.cos(tangentAngle - Math.PI / 6),
+                        endY - headLength * Math.sin(tangentAngle - Math.PI / 6)
                     );
                     ctx.lineTo(
-                        endX - headLength * Math.cos(arrowAngle + Math.PI / 6),
-                        endY - headLength * Math.sin(arrowAngle + Math.PI / 6)
+                        endX - headLength * Math.cos(tangentAngle + Math.PI / 6),
+                        endY - headLength * Math.sin(tangentAngle + Math.PI / 6)
                     );
                     ctx.closePath();
                     ctx.fill();
 
-                    // Draw label at the outer edge of the loop
+                    // Draw label at the apex of the loop
                     if (label) {
                         ctx.fillStyle = '#667eea';
                         ctx.font = 'bold 14px Arial';
-                        const labelX = loopCenterX + loopRadius * Math.cos(baseAngle);
-                        const labelY = loopCenterY + loopRadius * Math.sin(baseAngle);
+                        // Position label slightly beyond the control point
+                        const labelX = controlX + 5 * Math.cos(baseAngle);
+                        const labelY = controlY + 5 * Math.sin(baseAngle);
                         ctx.fillText(label, labelX, labelY - 5);
                     }
                 } else {
@@ -1317,12 +1317,11 @@
                         const dy = editingTransition.curve.y - fromState.y;
                         baseAngle = Math.atan2(dy, dx);
                     }
-                    const loopRadius = 25;
-                    const loopCenterDistance = STATE_RADIUS + loopRadius;
-                    const loopCenterX = fromState.x + loopCenterDistance * Math.cos(baseAngle);
-                    const loopCenterY = fromState.y + loopCenterDistance * Math.sin(baseAngle);
-                    labelX = loopCenterX + loopRadius * Math.cos(baseAngle);
-                    labelY = loopCenterY + loopRadius * Math.sin(baseAngle) - 5;
+                    const loopHeight = 40;
+                    const controlX = fromState.x + (STATE_RADIUS + loopHeight) * Math.cos(baseAngle);
+                    const controlY = fromState.y + (STATE_RADIUS + loopHeight) * Math.sin(baseAngle);
+                    labelX = controlX + 5 * Math.cos(baseAngle);
+                    labelY = controlY + 5 * Math.sin(baseAngle) - 5;
                 } else if (editingTransition.curve && (editingTransition.curve.x !== null || editingTransition.curve.y !== null)) {
                     // Curved transition - position at curve midpoint
                     const dx = toState.x - fromState.x;
@@ -1427,14 +1426,31 @@
                     draggedTransition = transition;
                     redraw();
                 } else {
-                    // Deselect on empty canvas click
+                    // Start panning on empty canvas click
+                    isPanning = true;
+                    const rect = canvas.getBoundingClientRect();
+                    panStartX = e.clientX - rect.left;
+                    panStartY = e.clientY - rect.top;
                     selectedStates = [];
                     selectedTransition = null;
-                    redraw();
+                    canvas.style.cursor = 'grabbing';
                 }
             });
 
             canvas.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    // Pan the canvas
+                    const rect = canvas.getBoundingClientRect();
+                    const currentX = e.clientX - rect.left;
+                    const currentY = e.clientY - rect.top;
+                    panX += currentX - panStartX;
+                    panY += currentY - panStartY;
+                    panStartX = currentX;
+                    panStartY = currentY;
+                    redraw();
+                    return;
+                }
+
                 const pos = getCanvasCoordinates(e);
 
                 if (isDraggingTransition && draggedTransition) {
@@ -1478,57 +1494,8 @@
                     );
 
                     if (clickDuration < 200 && dragDistance < 5) {
-                        // This was a click - start inline label editing
-                        // Calculate if click was above or below the line
-                        const fromState = states.find(s => s.id === draggedTransition.from);
-                        const toState = states.find(s => s.id === draggedTransition.to);
-
-                        if (fromState && toState) {
-                            // Calculate the line's Y position at the click's X coordinate
-                            let lineY;
-                            if (fromState.id === toState.id) {
-                                // Self-loop - calculate position based on loop angle
-                                let baseAngle = -Math.PI / 2; // Default to top
-                                if (draggedTransition.curve && draggedTransition.curve.x !== null && draggedTransition.curve.y !== null) {
-                                    const dx = draggedTransition.curve.x - fromState.x;
-                                    const dy = draggedTransition.curve.y - fromState.y;
-                                    baseAngle = Math.atan2(dy, dx);
-                                }
-                                const loopRadius = 25;
-                                const loopCenterDistance = STATE_RADIUS + loopRadius;
-                                const loopCenterY = fromState.y + loopCenterDistance * Math.sin(baseAngle);
-                                lineY = loopCenterY + loopRadius * Math.sin(baseAngle);
-                            } else if (draggedTransition.curve && (draggedTransition.curve.x !== null || draggedTransition.curve.y !== null)) {
-                                // Curved - find Y on curve at click X (approximate)
-                                const dx = toState.x - fromState.x;
-                                const dy = toState.y - fromState.y;
-                                const angle = Math.atan2(dy, dx);
-                                const startX = fromState.x + STATE_RADIUS * Math.cos(angle);
-                                const startY = fromState.y + STATE_RADIUS * Math.sin(angle);
-                                const endX = toState.x - STATE_RADIUS * Math.cos(angle);
-                                const endY = toState.y - STATE_RADIUS * Math.sin(angle);
-                                const controlX = draggedTransition.curve.x;
-                                const controlY = draggedTransition.curve.y;
-                                // Use midpoint of curve
-                                const t = 0.5;
-                                lineY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
-                            } else {
-                                // Straight line - use midpoint Y
-                                lineY = (fromState.y + toState.y) / 2;
-                            }
-
-                            // Set offset based on click position relative to line
-                            labelOffsetY = pos.y < lineY ? -20 : 20;
-                        }
-
-                        editingTransition = draggedTransition;
-                        labelInput = draggedTransition.labels.join(', ');
-                        cursorPosition = labelInput.length;
-                        cursorVisible = true;
-                        cursorBlinkInterval = setInterval(() => {
-                            cursorVisible = !cursorVisible;
-                            redraw();
-                        }, 500);
+                        // This was a click on existing transition - just select it (don't enter edit mode)
+                        // Transition is already selected from mousedown
                     }
                     // Otherwise it was a drag - curve is already applied
 
@@ -1562,6 +1529,12 @@
                     redraw();
                 }
 
+                // End panning
+                if (isPanning) {
+                    isPanning = false;
+                    canvas.style.cursor = 'default';
+                }
+
                 isDragging = false;
                 draggedStates = [];
             });
@@ -1575,11 +1548,66 @@
                     // Toggle final state
                     state.isFinal = !state.isFinal;
                     redraw();
+                } else if (selectedTransition) {
+                    // Double-click on selected transition - start editing label
+                    const fromState = states.find(s => s.id === selectedTransition.from);
+                    const toState = states.find(s => s.id === selectedTransition.to);
+
+                    if (fromState && toState) {
+                        // Calculate if click was above or below the line
+                        let lineY;
+                        if (fromState.id === toState.id) {
+                            // Self-loop
+                            let baseAngle = -Math.PI / 2;
+                            if (selectedTransition.curve && selectedTransition.curve.x !== null && selectedTransition.curve.y !== null) {
+                                const dx = selectedTransition.curve.x - fromState.x;
+                                const dy = selectedTransition.curve.y - fromState.y;
+                                baseAngle = Math.atan2(dy, dx);
+                            }
+                            const loopHeight = 40;
+                            const controlY = fromState.y + (STATE_RADIUS + loopHeight) * Math.sin(baseAngle);
+                            lineY = controlY;
+                        } else if (selectedTransition.curve && (selectedTransition.curve.x !== null || selectedTransition.curve.y !== null)) {
+                            // Curved transition
+                            const t = 0.5;
+                            const dx = toState.x - fromState.x;
+                            const dy = toState.y - fromState.y;
+                            const angle = Math.atan2(dy, dx);
+                            const startY = fromState.y + STATE_RADIUS * Math.sin(angle);
+                            const endY = toState.y - STATE_RADIUS * Math.sin(angle);
+                            const controlY = selectedTransition.curve.y;
+                            lineY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+                        } else {
+                            // Straight line
+                            lineY = (fromState.y + toState.y) / 2;
+                        }
+
+                        labelOffsetY = pos.y < lineY ? -20 : 20;
+
+                        editingTransition = selectedTransition;
+                        labelInput = selectedTransition.labels.join(', ');
+                        cursorPosition = labelInput.length;
+                        cursorVisible = true;
+                        cursorBlinkInterval = setInterval(() => {
+                            cursorVisible = !cursorVisible;
+                            redraw();
+                        }, 500);
+                    }
                 } else {
                     // Create new state on empty space
                     const snappedPos = getCanvasCoordinates(e, true);
+
+                    // Reuse deleted state ID if available, otherwise use next available
+                    let stateId;
+                    if (deletedStateIds.length > 0) {
+                        deletedStateIds.sort((a, b) => a - b); // Sort to reuse lowest ID first
+                        stateId = deletedStateIds.shift(); // Take the smallest deleted ID
+                    } else {
+                        stateId = nextStateId++;
+                    }
+
                     const newState = {
-                        id: nextStateId++,
+                        id: stateId,
                         x: snappedPos.x,
                         y: snappedPos.y,
                         isFinal: false
@@ -1592,6 +1620,30 @@
                     redraw();
                 }
                 clickCount = 0;
+            });
+
+            // Zoom with mouse wheel
+            canvas.addEventListener('wheel', (e) => {
+                e.preventDefault();
+
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                // Get canvas coordinates before zoom
+                const canvasX = (mouseX - panX) / zoom;
+                const canvasY = (mouseY - panY) / zoom;
+
+                // Update zoom (deltaY is positive when scrolling down, negative when scrolling up)
+                const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                const newZoom = Math.max(0.1, Math.min(5, zoom * zoomFactor));
+
+                // Adjust pan to keep mouse position fixed
+                panX = mouseX - canvasX * newZoom;
+                panY = mouseY - canvasY * newZoom;
+
+                zoom = newZoom;
+                redraw();
                 if (clickTimeout) clearTimeout(clickTimeout);
             });
 
@@ -1666,6 +1718,12 @@
                     // Delete selected states and their transitions
                     if (selectedStates.length > 0) {
                         selectedStates.forEach(stateId => {
+                            // Don't allow deleting special states s (00) and d (99)
+                            if (stateId !== 0 && stateId !== 99) {
+                                // Track deleted ID for reuse (exclude 0 and 99)
+                                deletedStateIds.push(stateId);
+                            }
+
                             // Remove state
                             states = states.filter(s => s.id !== stateId);
                             // Remove all transitions to/from this state

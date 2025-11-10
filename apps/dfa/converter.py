@@ -199,7 +199,7 @@ class Union(Regex):
                 parts.append(s)
 
         collect(self)
-        s = "|".join(parts)
+        s = "+".join(parts)
         if self.precedence() < parent_prec:
             return f"({s})"
         return s
@@ -226,8 +226,8 @@ def _add_concat_ops(pattern: str) -> str:
 
 
 def _to_postfix(pattern: str) -> List[str]:
-    """Shunting-yard to postfix: supports |, concatenation '.', and *."""
-    precedence = {'*': 3, '.': 2, '|': 1}
+    """Shunting-yard to postfix: supports +, concatenation '.', and *."""
+    precedence = {'*': 3, '.': 2, '+': 1}
     right_assoc = {'*'}  # star is postfix/unary
     output: List[str] = []
     stack: List[str] = []
@@ -288,7 +288,7 @@ def parse_regex(pattern: str) -> Regex:
             b = stack.pop()
             a = stack.pop()
             stack.append(Concat(a, b).simplify())
-        elif token == '|':
+        elif token == '+':
             if len(stack) < 2:
                 raise ValueError("Union with <2 operands")
             b = stack.pop()
