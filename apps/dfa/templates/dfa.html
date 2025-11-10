@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DFA Generator & Visualizer</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm@2.5.0/dist/graphviz.umd.js"></script>
     <style>
         * {
             margin: 0;
@@ -514,20 +514,28 @@
                     let attempts = 0;
                     const maxAttempts = 50; // 5 seconds total
 
+                    console.log("Waiting for @hpcc-js/wasm library to load...");
+
                     while (!window["@hpcc-js/wasm"] && attempts < maxAttempts) {
                         await new Promise(resolve => setTimeout(resolve, 100));
                         attempts++;
                     }
 
                     if (!window["@hpcc-js/wasm"]) {
+                        console.error("GraphViz WASM library not found in window object");
+                        console.log("Available window properties:", Object.keys(window).filter(k => k.includes('hpcc') || k.includes('graphviz') || k.includes('wasm')));
                         reject(new Error("GraphViz WASM library failed to load"));
                         return;
                     }
 
-                    // Load the Graphviz instance
-                    graphvizInstance = await window["@hpcc-js/wasm"].Graphviz.load();
+                    console.log("Loading Graphviz instance...");
+                    // Load the Graphviz instance using the UMD global
+                    const hpccWasm = window["@hpcc-js/wasm"];
+                    graphvizInstance = await hpccWasm.Graphviz.load();
+                    console.log("Graphviz instance loaded successfully");
                     resolve(graphvizInstance);
                 } catch (error) {
+                    console.error("Error initializing GraphViz:", error);
                     reject(error);
                 }
             });
@@ -547,7 +555,9 @@
                 }
 
                 // Render DOT to SVG
+                console.log("Rendering DOT to SVG...");
                 const svg = graphvizInstance.layout(dotSource, "svg", "dot");
+                console.log("SVG rendered successfully");
                 return svg;
             } catch (error) {
                 console.error("Error rendering DOT to SVG:", error);
