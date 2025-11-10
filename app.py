@@ -101,23 +101,24 @@ def generate_dot(alph, nodes, initial, dead, final, transitions):
 
     dot = Digraph(comment='DFA')
     dot.attr(rankdir='LR')
+    dot.attr('node', shape='circle')
+
+    # Add invisible start node for initial state arrow
+    dot.node('start', shape='point', style='invis')
 
     # Add nodes
     for node in range(int(nodes)):
         if str(node) in final:
-            dot.attr('node', shape='doublecircle')
+            dot.node(str(node), shape='doublecircle')
         else:
-            dot.attr('node', shape='circle')
-
-        if node == int(initial):
-            dot.attr('node', style='filled', fillcolor='lightgray')
-
-        dot.node(str(node))
+            dot.node(str(node), shape='circle')
 
     # Add dead state if specified
     if dead:
-        dot.attr('node', shape='circle')
-        dot.node('d', 'dead')
+        dot.node('d', 'dead', shape='circle')
+
+    # Add arrow to initial state
+    dot.edge('start', str(initial))
 
     # Add transitions
     for node in transitions:
