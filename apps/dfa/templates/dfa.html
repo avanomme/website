@@ -500,12 +500,46 @@
     <script>
         // Client-side GraphViz rendering using @hpcc-js/wasm
         let graphvizInstance = null;
+        let graphvizLoadPromise = null;
+
+        // Initialize GraphViz WASM library when available
+        async function initGraphviz() {
+            if (graphvizLoadPromise) {
+                return graphvizLoadPromise;
+            }
+
+            graphvizLoadPromise = new Promise(async (resolve, reject) => {
+                try {
+                    // Wait for library to be available (with timeout)
+                    let attempts = 0;
+                    const maxAttempts = 50; // 5 seconds total
+
+                    while (!window["@hpcc-js/wasm"] && attempts < maxAttempts) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        attempts++;
+                    }
+
+                    if (!window["@hpcc-js/wasm"]) {
+                        reject(new Error("GraphViz WASM library failed to load"));
+                        return;
+                    }
+
+                    // Load the Graphviz instance
+                    graphvizInstance = await window["@hpcc-js/wasm"].Graphviz.load();
+                    resolve(graphvizInstance);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+
+            return graphvizLoadPromise;
+        }
 
         async function renderDotToSvg(dotSource) {
             try {
-                // Initialize graphviz instance if not already done
-                if (!graphvizInstance && window["@hpcc-js/wasm"]) {
-                    graphvizInstance = await window["@hpcc-js/wasm"].Graphviz.load();
+                // Ensure GraphViz is initialized
+                if (!graphvizInstance) {
+                    await initGraphviz();
                 }
 
                 if (!graphvizInstance) {
@@ -687,31 +721,105 @@
         document.addEventListener('DOMContentLoaded', initPanZoom);
 
         $(document).ready(function() {
-            // Load Example DFA
-            $('#load-example').click(function() {
-                // Example DFA that accepts strings ending with "abb"
-                $('#alphabet').val('a b');
-                $('#states').val('4');
-                $('#initial').val('0');
-                $('#final').val('3');
+            // Define example DFAs
+            const examples = {
+                'strings-ending-abb': {
+                    name: 'Strings ending with "abb"',
+                    alphabet: 'a b',
+                    states: 4,
+                    initial: 0,
+                    final: '3',
+                    transitions: {
+                        '0_a': '1', '0_b': '0',
+                        '1_a': '1', '1_b': '2',
+                        '2_a': '1', '2_b': '3',
+                        '3_a': '1', '3_b': '0'
+                    }
+                },
+                'even-as': {
+                    name: 'Even number of a\'s',
+                    alphabet: 'a b',
+                    states: 2,
+                    initial: 0,
+                    final: '0',
+                    transitions: {
+                        '0_a': '1', '0_b': '0',
+                        '1_a': '0', '1_b': '1'
+                    }
+                },
+                'divisible-3': {
+                    name: 'Binary numbers divisible by 3',
+                    alphabet: '0 1',
+                    states: 3,
+                    initial: 0,
+                    final: '0',
+                    transitions: {
+                        '0_0': '0', '0_1': '1',
+                        '1_0': '2', '1_1': '0',
+                        '2_0': '1', '2_1': '2'
+                    }
+                },
+                'contains-01': {
+                    name: 'Contains substring "01"',
+                    alphabet: '0 1',
+                    states: 3,
+                    initial: 0,
+                    final: '2',
+                    transitions: {
+                        '0_0': '1', '0_1': '0',
+                        '1_0': '1', '1_1': '2',
+                        '2_0': '2', '2_1': '2'
+                    }
+                },
+                'alternating': {
+                    name: 'Alternating 0s and 1s',
+                    alphabet: '0 1',
+                    states: 5,
+                    initial: 0,
+                    final: '1 2',
+                    transitions: {
+                        '0_0': '1', '0_1': '2',
+                        '1_0': '4', '1_1': '3',
+                        '2_0': '3', '2_1': '4',
+                        '3_0': '4', '3_1': '4',
+                        '4_0': '4', '4_1': '4'
+                    }
+                },
+                'no-consecutive': {
+                    name: 'No consecutive 1s',
+                    alphabet: '0 1',
+                    states: 3,
+                    initial: 0,
+                    final: '0 1',
+                    transitions: {
+                        '0_0': '0', '0_1': '1',
+                        '1_0': '0', '1_1': '2',
+                        '2_0': '2', '2_1': '2'
+                    }
+                }
+            };
+
+            // Load selected example
+            $('#example-select').change(function() {
+                const exampleKey = $(this).val();
+                if (!exampleKey) return;
+
+                const example = examples[exampleKey];
+
+                // Fill in form fields
+                $('#alphabet').val(example.alphabet);
+                $('#states').val(example.states);
+                $('#initial').val(example.initial);
+                $('#final').val(example.final);
 
                 // Auto-generate the table
                 $('#generate-table').click();
 
                 // Fill in the transition table
                 setTimeout(function() {
-                    // State 0
-                    $('input[name="transition_0_a"]').val('1');
-                    $('input[name="transition_0_b"]').val('0');
-                    // State 1
-                    $('input[name="transition_1_a"]').val('1');
-                    $('input[name="transition_1_b"]').val('2');
-                    // State 2
-                    $('input[name="transition_2_a"]').val('1');
-                    $('input[name="transition_2_b"]').val('3');
-                    // State 3
-                    $('input[name="transition_3_a"]').val('1');
-                    $('input[name="transition_3_b"]').val('0');
+                    for (const [key, value] of Object.entries(example.transitions)) {
+                        $(`input[name="transition_${key}"]`).val(value);
+                    }
                 }, 100);
             });
 
