@@ -237,8 +237,8 @@ def generate_gnfa_dot(gnfa, initial, final, eliminated_states=None):
             dot.node(str(state), str(state), shape='circle')
 
     # Add initial state marker
-    dot.node('__start', '', shape='none', width='0', height='0')
-    dot.edge('__start', str(initial))
+    dot.node('start', shape='point', style='invis')
+    dot.edge('start', str(initial))
 
     # Add transitions with regex labels (skip transitions to/from eliminated states)
     for from_state in sorted(gnfa.keys(), key=str):

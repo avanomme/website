@@ -863,7 +863,7 @@
 
             let states = [];
             let transitions = [];
-            let nextStateId = 0;
+            let nextStateId = 1; // Start at 1, since 0 is reserved for 's' and 100 for 'd'
             let deletedStateIds = []; // Track deleted state IDs for reuse
             let initialState = null;
             let selectedStates = [];
@@ -1193,11 +1193,11 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // Display special labels for s (q0) and d (q99)
+                // Display special labels for s (q0) and d (q100)
                 let label;
                 if (state.id === 0) {
                     label = 's';
-                } else if (state.id === 99) {
+                } else if (state.id === 100) {
                     label = 'd';
                 } else {
                     label = 'q' + state.id;
@@ -1504,8 +1504,54 @@
                     );
 
                     if (clickDuration < 200 && dragDistance < 5) {
-                        // This was a click on existing transition - just select it (don't enter edit mode)
-                        // Transition is already selected from mousedown
+                        // This was a click on existing transition
+                        // If Shift key is pressed, enter edit mode
+                        if (e.shiftKey && selectedTransition) {
+                            const fromState = states.find(s => s.id === selectedTransition.from);
+                            const toState = states.find(s => s.id === selectedTransition.to);
+
+                            if (fromState && toState) {
+                                // Calculate if click was above or below the line
+                                let lineY;
+                                if (fromState.id === toState.id) {
+                                    // Self-loop
+                                    let baseAngle = -Math.PI / 2;
+                                    if (selectedTransition.curve && selectedTransition.curve.x !== null && selectedTransition.curve.y !== null) {
+                                        const dx = selectedTransition.curve.x - fromState.x;
+                                        const dy = selectedTransition.curve.y - fromState.y;
+                                        baseAngle = Math.atan2(dy, dx);
+                                    }
+                                    const loopHeight = 40;
+                                    const controlY = fromState.y + (STATE_RADIUS + loopHeight) * Math.sin(baseAngle);
+                                    lineY = controlY;
+                                } else if (selectedTransition.curve && (selectedTransition.curve.x !== null || selectedTransition.curve.y !== null)) {
+                                    // Curved transition
+                                    const t = 0.5;
+                                    const dx = toState.x - fromState.x;
+                                    const dy = toState.y - fromState.y;
+                                    const angle = Math.atan2(dy, dx);
+                                    const startY = fromState.y + STATE_RADIUS * Math.sin(angle);
+                                    const endY = toState.y - STATE_RADIUS * Math.sin(angle);
+                                    const controlY = selectedTransition.curve.y;
+                                    lineY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+                                } else {
+                                    // Straight line
+                                    lineY = (fromState.y + toState.y) / 2;
+                                }
+
+                                labelOffsetY = pos.y < lineY ? -20 : 20;
+
+                                editingTransition = selectedTransition;
+                                labelInput = selectedTransition.labels.join(', ');
+                                cursorPosition = labelInput.length;
+                                cursorVisible = true;
+                                cursorBlinkInterval = setInterval(() => {
+                                    cursorVisible = !cursorVisible;
+                                    redraw();
+                                }, 500);
+                            }
+                        }
+                        // Otherwise just select it (transition is already selected from mousedown)
                     }
                     // Otherwise it was a drag - curve is already applied
 
@@ -1728,9 +1774,9 @@
                     // Delete selected states and their transitions
                     if (selectedStates.length > 0) {
                         selectedStates.forEach(stateId => {
-                            // Don't allow deleting special states s (00) and d (99)
-                            if (stateId !== 0 && stateId !== 99) {
-                                // Track deleted ID for reuse (exclude 0 and 99)
+                            // Don't allow deleting special states s (0) and d (100)
+                            if (stateId !== 0 && stateId !== 100) {
+                                // Track deleted ID for reuse (exclude 0 and 100)
                                 deletedStateIds.push(stateId);
                             }
 
@@ -1758,7 +1804,7 @@
                     }
                 }
 
-                // Shift+S: Convert selected state to start state (s = q00)
+                // Shift+S: Convert selected state to start state (s = q0)
                 if (e.key === 'S' && e.shiftKey && !e.target.matches('input, textarea')) {
                     e.preventDefault();
                     if (selectedStates.length === 1) {
@@ -1767,15 +1813,15 @@
                             // Remove old state, create new one with id=0
                             const oldId = currentState.id;
 
-                            // Check if q00 already exists
+                            // Check if q0 already exists
                             const existingStartState = states.find(s => s.id === 0);
                             if (existingStartState) {
                                 alert('Start state (s) already exists! Delete it first.');
                                 return;
                             }
 
-                            // Track old ID for reuse (unless it's already 0 or 99)
-                            if (oldId !== 0 && oldId !== 99) {
+                            // Track old ID for reuse (unless it's already 0 or 100)
+                            if (oldId !== 0 && oldId !== 100) {
                                 deletedStateIds.push(oldId);
                             }
 
@@ -1805,49 +1851,84 @@
                     }
                 }
 
-                // Shift+D: Convert selected state to dead state (d = q99)
+                // Shift+D: Convert selected state to/from dead state (d = q100)
                 if (e.key === 'D' && e.shiftKey && !e.target.matches('input, textarea')) {
                     e.preventDefault();
                     if (selectedStates.length === 1) {
                         const currentState = states.find(s => s.id === selectedStates[0]);
                         if (currentState) {
-                            // Remove old state, create new one with id=99
                             const oldId = currentState.id;
 
-                            // Check if q99 already exists
-                            const existingDeadState = states.find(s => s.id === 99);
-                            if (existingDeadState) {
-                                alert('Dead state (d) already exists! Delete it first.');
-                                return;
+                            // If already a dead state (id=100), convert back to regular state
+                            if (oldId === 100) {
+                                // Find next available state ID
+                                let newId;
+                                if (deletedStateIds.length > 0) {
+                                    deletedStateIds.sort((a, b) => a - b);
+                                    newId = deletedStateIds.shift();
+                                } else {
+                                    newId = nextStateId++;
+                                }
+
+                                // Update all transitions
+                                transitions.forEach(t => {
+                                    if (t.from === oldId) t.from = newId;
+                                    if (t.to === oldId) t.to = newId;
+                                });
+
+                                // Update initial state if needed
+                                if (initialState === oldId) {
+                                    initialState = newId;
+                                }
+
+                                // Create new state with regular ID
+                                states = states.filter(s => s.id !== oldId);
+                                states.push({
+                                    id: newId,
+                                    x: currentState.x,
+                                    y: currentState.y,
+                                    isFinal: currentState.isFinal
+                                });
+
+                                selectedStates = [newId];
+                                redraw();
+                            } else {
+                                // Convert to dead state
+                                // Check if q100 already exists
+                                const existingDeadState = states.find(s => s.id === 100);
+                                if (existingDeadState) {
+                                    alert('Dead state (d) already exists! Delete it first.');
+                                    return;
+                                }
+
+                                // Track old ID for reuse (unless it's already 0 or 100)
+                                if (oldId !== 0 && oldId !== 100) {
+                                    deletedStateIds.push(oldId);
+                                }
+
+                                // Update all transitions pointing to/from old state
+                                transitions.forEach(t => {
+                                    if (t.from === oldId) t.from = 100;
+                                    if (t.to === oldId) t.to = 100;
+                                });
+
+                                // Update initial state if needed
+                                if (initialState === oldId) {
+                                    initialState = 100;
+                                }
+
+                                // Create new state with id=100
+                                states = states.filter(s => s.id !== oldId);
+                                states.push({
+                                    id: 100,
+                                    x: currentState.x,
+                                    y: currentState.y,
+                                    isFinal: currentState.isFinal
+                                });
+
+                                selectedStates = [100];
+                                redraw();
                             }
-
-                            // Track old ID for reuse (unless it's already 0 or 99)
-                            if (oldId !== 0 && oldId !== 99) {
-                                deletedStateIds.push(oldId);
-                            }
-
-                            // Update all transitions pointing to/from old state
-                            transitions.forEach(t => {
-                                if (t.from === oldId) t.from = 99;
-                                if (t.to === oldId) t.to = 99;
-                            });
-
-                            // Update initial state if needed
-                            if (initialState === oldId) {
-                                initialState = 99;
-                            }
-
-                            // Create new state with id=99
-                            states = states.filter(s => s.id !== oldId);
-                            states.push({
-                                id: 99,
-                                x: currentState.x,
-                                y: currentState.y,
-                                isFinal: currentState.isFinal
-                            });
-
-                            selectedStates = [99];
-                            redraw();
                         }
                     }
                 }
