@@ -472,6 +472,7 @@
                     <span>px</span>
 
                     <button type="button" id="load-dfa-file" class="btn btn-secondary" style="margin-left: auto;">📂 Load from File</button>
+                    <button type="button" id="save-canvas-png" class="btn btn-secondary">💾 Save as PNG</button>
                     <button type="button" id="clear-canvas" class="btn btn-secondary">🗑️ Clear Canvas</button>
                     <button type="button" id="generate-from-canvas" class="btn btn-primary">📝 Generate DFA Code</button>
                     <input type="file" id="dfa-file-input" accept=".json" style="display: none;">
@@ -534,6 +535,8 @@
                                 <button onclick="zoomOut()">🔍 Zoom Out</button>
                                 <button onclick="resetZoom()">↺ Reset View</button>
                                 <button onclick="fitToWidth()">↔ Fit Width</button>
+                                <button type="button" id="save-current-step-png" class="btn btn-secondary">💾 Save Current Step</button>
+                                <button type="button" id="save-all-steps-png" class="btn btn-primary">💾 Save All Steps</button>
                             </div>
                             <div id="elimination-svg-container" style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; overflow: hidden; position: relative; cursor: grab;">
                                 <div id="elimination-svg-output" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-origin: center center; transition: transform 0.1s ease-out;">
@@ -2059,6 +2062,83 @@
                 }
             });
 
+            // Save canvas as PNG
+            $('#save-canvas-png').click(() => {
+                const canvas = document.getElementById('dfa-canvas');
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                link.download = `dfa-visual-${timestamp}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+
+            // Save current elimination step as PNG
+            $('#save-current-step-png').click(() => {
+                const svgContainer = document.getElementById('elimination-svg-output');
+                const svgElement = svgContainer.querySelector('svg');
+
+                if (!svgElement) {
+                    alert('No elimination step to save. Please eliminate a state first.');
+                    return;
+                }
+
+                // Convert SVG to PNG
+                convertSvgToPng(svgElement, `elimination-step-${eliminationHistory.length}`);
+            });
+
+            // Save all elimination steps as PNG files
+            $('#save-all-steps-png').click(() => {
+                if (eliminationHistory.length === 0) {
+                    alert('No elimination steps to save. Please eliminate states first.');
+                    return;
+                }
+
+                // Save each step with a delay to avoid browser blocking
+                eliminationHistory.forEach((step, index) => {
+                    setTimeout(() => {
+                        // Temporarily render this step's SVG
+                        const tempDiv = document.createElement('div');
+                        tempDiv.innerHTML = step.svg;
+                        const svgElement = tempDiv.querySelector('svg');
+
+                        if (svgElement) {
+                            convertSvgToPng(svgElement, `elimination-step-${index + 1}-removed-q${step.removedState}`);
+                        }
+                    }, index * 300); // 300ms delay between downloads
+                });
+
+                alert(`Saving ${eliminationHistory.length} elimination steps as PNG files...`);
+            });
+
+            // Helper function to convert SVG to PNG
+            function convertSvgToPng(svgElement, filename) {
+                const svgData = new XMLSerializer().serializeToString(svgElement);
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+
+                // Get SVG dimensions
+                const svgWidth = svgElement.width.baseVal.value || 800;
+                const svgHeight = svgElement.height.baseVal.value || 600;
+
+                canvas.width = svgWidth;
+                canvas.height = svgHeight;
+
+                img.onload = function() {
+                    ctx.fillStyle = 'white';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0);
+
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    link.download = `${filename}-${timestamp}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                };
+
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            }
+
             // Generate DFA code from canvas
             $('#generate-from-canvas').click(() => {
                 if (states.length === 0) {
@@ -2488,6 +2568,9 @@
                 steps: []
             };
 
+            // Track elimination history for PNG export
+            let eliminationHistory = [];
+
             $('#start-elimination').click(function() {
                 // Collect current DFA state
                 const formData = {};
@@ -2582,6 +2665,16 @@
                         eliminationState.eliminatedStates.push(stateToEliminate);
                         eliminationState.steps.push(response.step);
 
+                        // Save to history for PNG export
+                        if (response.svg) {
+                            eliminationHistory.push({
+                                removedState: stateToEliminate,
+                                svg: response.svg,
+                                regex: response.regex || '',
+                                step: response.step
+                            });
+                        }
+
                         // Update UI
                         updateStateList();
                         addEliminationLogEntry(response.step);
@@ -2631,6 +2724,7 @@
             $('#reset-elimination').click(function() {
                 eliminationState.eliminatedStates = [];
                 eliminationState.steps = [];
+                eliminationHistory = []; // Clear history for PNG export
                 updateStateList();
                 $('#elimination-log').html('<p style="color: #999;">No states eliminated yet. Click a state to begin.</p>');
                 $('#current-regex').text('Ready to eliminate states...');
