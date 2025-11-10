@@ -237,8 +237,8 @@ def generate_gnfa_dot(gnfa, initial, final, eliminated_states=None):
             dot.node(str(state), str(state), shape='circle')
 
     # Add initial state marker
-    dot.node('start', shape='point', style='invis')
-    dot.edge('start', str(initial))
+    dot.node('__start', '', shape='none', width='0', height='0')
+    dot.edge('__start', str(initial))
 
     # Add transitions with regex labels (skip transitions to/from eliminated states)
     for from_state in sorted(gnfa.keys(), key=str):
@@ -664,7 +664,7 @@ def eliminate_state():
                     target = int(key[1:])  # Remove underscore prefix
                     regex = value
                     if gnfa[state][target]:
-                        gnfa[state][target] = f"({gnfa[state][target]}|{regex})"
+                        gnfa[state][target] = f"({gnfa[state][target]}+{regex})"
                     else:
                         gnfa[state][target] = regex
                 else:
@@ -672,7 +672,7 @@ def eliminate_state():
                     target = int(value)
                     symbol = key
                     if gnfa[state][target]:
-                        gnfa[state][target] = f"({gnfa[state][target]}|{symbol})"
+                        gnfa[state][target] = f"({gnfa[state][target]}+{symbol})"
                     else:
                         gnfa[state][target] = symbol
 
@@ -711,7 +711,7 @@ def eliminate_state():
 
                 if R4:
                     if new_regex:
-                        new_regex = f"({new_regex}|{R4})"
+                        new_regex = f"({new_regex}+{R4})"
                     else:
                         new_regex = R4
 
