@@ -451,6 +451,7 @@
 
                 <div id="generate-buttons" class="hidden" style="margin-top: 20px;">
                     <button type="button" id="generate-graph" class="btn btn-primary">Generate DFA</button>
+                    <button type="button" id="export-to-visual" class="btn btn-secondary">📥 Export to Visual Editor</button>
                     <button type="button" id="save-dfa" class="btn btn-secondary">💾 Save DFA</button>
                     <button type="button" id="start-elimination" class="btn btn-secondary hidden">🔄 State Elimination Mode</button>
                 </div>
@@ -472,7 +473,9 @@
                     <span>px</span>
 
                     <button type="button" id="load-dfa-file" class="btn btn-secondary" style="margin-left: auto;">📂 Load from File</button>
-                    <button type="button" id="save-canvas-png" class="btn btn-secondary">💾 Save as PNG</button>
+                    <button type="button" id="save-dfa-file" class="btn btn-secondary">💾 Save to File</button>
+                    <button type="button" id="save-canvas-png" class="btn btn-secondary">📸 Save as PNG</button>
+                    <button type="button" id="import-generated" class="btn btn-secondary">📥 Import Generated DFA</button>
                     <button type="button" id="clear-canvas" class="btn btn-secondary">🗑️ Clear Canvas</button>
                     <button type="button" id="generate-from-canvas" class="btn btn-primary">📝 Generate DFA Code</button>
                     <input type="file" id="dfa-file-input" accept=".json" style="display: none;">
@@ -866,8 +869,10 @@
 
             let states = [];
             let transitions = [];
-            let nextStateId = 1; // Start at 1, since 0 is reserved for 's' and 100 for 'd'
+            let nextStateId = 1; // Start at 1 for regular states (q1, q2, q3, ...)
             let deletedStateIds = []; // Track deleted state IDs for reuse
+            const START_STATE_ID = 0; // Internal ID for 's' state (q0 - when user converts with Shift+S)
+            const DEAD_STATE_ID = 99;  // Internal ID for 'd' state (q99 - when user converts with Shift+D)
             let initialState = null;
             let selectedStates = [];
             let draggedStates = [];
@@ -1196,11 +1201,11 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // Display special labels for s (q0) and d (q100)
+                // Display special labels for s (q100) and d (q999)
                 let label;
-                if (state.id === 0) {
+                if (state.id === START_STATE_ID) {
                     label = 's';
-                } else if (state.id === 100) {
+                } else if (state.id === DEAD_STATE_ID) {
                     label = 'd';
                 } else {
                     label = 'q' + state.id;
@@ -1777,9 +1782,9 @@
                     // Delete selected states and their transitions
                     if (selectedStates.length > 0) {
                         selectedStates.forEach(stateId => {
-                            // Don't allow deleting special states s (0) and d (100)
-                            if (stateId !== 0 && stateId !== 100) {
-                                // Track deleted ID for reuse (exclude 0 and 100)
+                            // Don't allow deleting special states s (0) and d (99)
+                            if (stateId !== START_STATE_ID && stateId !== DEAD_STATE_ID) {
+                                // Track deleted ID for reuse (exclude 0 and 99)
                                 deletedStateIds.push(stateId);
                             }
 
@@ -1813,48 +1818,48 @@
                     if (selectedStates.length === 1) {
                         const currentState = states.find(s => s.id === selectedStates[0]);
                         if (currentState) {
-                            // Remove old state, create new one with id=0
+                            // Remove old state, create new one with id=0 (START_STATE_ID)
                             const oldId = currentState.id;
 
-                            // Check if q0 already exists
-                            const existingStartState = states.find(s => s.id === 0);
+                            // Check if s (q0) already exists
+                            const existingStartState = states.find(s => s.id === START_STATE_ID);
                             if (existingStartState) {
                                 alert('Start state (s) already exists! Delete it first.');
                                 return;
                             }
 
-                            // Track old ID for reuse (unless it's already 0 or 100)
-                            if (oldId !== 0 && oldId !== 100) {
+                            // Track old ID for reuse (unless it's already 0 or 99)
+                            if (oldId !== START_STATE_ID && oldId !== DEAD_STATE_ID) {
                                 deletedStateIds.push(oldId);
                             }
 
                             // Update all transitions pointing to/from old state
                             transitions.forEach(t => {
-                                if (t.from === oldId) t.from = 0;
-                                if (t.to === oldId) t.to = 0;
+                                if (t.from === oldId) t.from = START_STATE_ID;
+                                if (t.to === oldId) t.to = START_STATE_ID;
                             });
 
                             // Update initial state if needed
                             if (initialState === oldId) {
-                                initialState = 0;
+                                initialState = START_STATE_ID;
                             }
 
-                            // Create new state with id=0
+                            // Create new state with id=0 (START_STATE_ID)
                             states = states.filter(s => s.id !== oldId);
                             states.push({
-                                id: 0,
+                                id: START_STATE_ID,
                                 x: currentState.x,
                                 y: currentState.y,
                                 isFinal: currentState.isFinal
                             });
 
-                            selectedStates = [0];
+                            selectedStates = [START_STATE_ID];
                             redraw();
                         }
                     }
                 }
 
-                // Shift+D: Convert selected state to/from dead state (d = q100)
+                // Shift+D: Convert selected state to/from dead state (d = q99)
                 if (e.key === 'D' && e.shiftKey && !e.target.matches('input, textarea')) {
                     e.preventDefault();
                     if (selectedStates.length === 1) {
@@ -1862,8 +1867,8 @@
                         if (currentState) {
                             const oldId = currentState.id;
 
-                            // If already a dead state (id=100), convert back to regular state
-                            if (oldId === 100) {
+                            // If already a dead state (id=99), convert back to regular state
+                            if (oldId === DEAD_STATE_ID) {
                                 // Find next available state ID
                                 let newId;
                                 if (deletedStateIds.length > 0) {
@@ -1897,39 +1902,39 @@
                                 redraw();
                             } else {
                                 // Convert to dead state
-                                // Check if q100 already exists
-                                const existingDeadState = states.find(s => s.id === 100);
+                                // Check if d (q99) already exists
+                                const existingDeadState = states.find(s => s.id === DEAD_STATE_ID);
                                 if (existingDeadState) {
                                     alert('Dead state (d) already exists! Delete it first.');
                                     return;
                                 }
 
-                                // Track old ID for reuse (unless it's already 0 or 100)
-                                if (oldId !== 0 && oldId !== 100) {
+                                // Track old ID for reuse (unless it's already 0 or 99)
+                                if (oldId !== START_STATE_ID && oldId !== DEAD_STATE_ID) {
                                     deletedStateIds.push(oldId);
                                 }
 
                                 // Update all transitions pointing to/from old state
                                 transitions.forEach(t => {
-                                    if (t.from === oldId) t.from = 100;
-                                    if (t.to === oldId) t.to = 100;
+                                    if (t.from === oldId) t.from = DEAD_STATE_ID;
+                                    if (t.to === oldId) t.to = DEAD_STATE_ID;
                                 });
 
                                 // Update initial state if needed
                                 if (initialState === oldId) {
-                                    initialState = 100;
+                                    initialState = DEAD_STATE_ID;
                                 }
 
-                                // Create new state with id=100
+                                // Create new state with id=99 (DEAD_STATE_ID)
                                 states = states.filter(s => s.id !== oldId);
                                 states.push({
-                                    id: 100,
+                                    id: DEAD_STATE_ID,
                                     x: currentState.x,
                                     y: currentState.y,
                                     isFinal: currentState.isFinal
                                 });
 
-                                selectedStates = [100];
+                                selectedStates = [DEAD_STATE_ID];
                                 redraw();
                             }
                         }
@@ -2050,6 +2055,207 @@
                 e.target.value = '';
             });
 
+            // Save DFA to file
+            $('#save-dfa-file').click(() => {
+                if (states.length === 0) {
+                    alert('Nothing to save! Create a DFA first.');
+                    return;
+                }
+
+                const dfaData = {
+                    version: '1.0',
+                    states: states.map(s => ({
+                        id: s.id,
+                        x: s.x,
+                        y: s.y,
+                        isFinal: s.isFinal
+                    })),
+                    transitions: transitions.map(t => ({
+                        from: t.from,
+                        to: t.to,
+                        labels: t.labels,
+                        curve: t.curve
+                    })),
+                    initialState: initialState,
+                    nextStateId: nextStateId
+                };
+
+                const jsonStr = JSON.stringify(dfaData, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                link.download = `dfa-visual-${timestamp}.json`;
+                link.href = URL.createObjectURL(blob);
+                link.click();
+                URL.revokeObjectURL(link.href);
+            });
+
+            // Export to Visual Editor (from Define DFA tab)
+            $('#export-to-visual').click(() => {
+                // Check if there's a generated DFA available
+                const alphabet = $('#alphabet').val().trim();
+                const numStates = parseInt($('#states').val());
+                const initialStateNum = parseInt($('#initial').val());
+                const finalStates = $('#final').val().trim().split(/\s+/).map(s => parseInt(s)).filter(n => !isNaN(n));
+
+                if (!alphabet || isNaN(numStates) || numStates === 0) {
+                    alert('Please generate a DFA first using the "Define DFA" tab!');
+                    return;
+                }
+
+                // Collect transitions from the form
+                const symbols = alphabet.split(/\s+/);
+                const transitionMap = {};
+
+                for (let state = 0; state < numStates; state++) {
+                    transitionMap[state] = {};
+                    symbols.forEach(symbol => {
+                        const inputName = `transition_${state}_${symbol}`;
+                        const target = $(`input[name="${inputName}"]`).val();
+                        if (target !== '') {
+                            const targetNum = parseInt(target);
+                            if (!isNaN(targetNum)) {
+                                if (!transitionMap[state][targetNum]) {
+                                    transitionMap[state][targetNum] = [];
+                                }
+                                transitionMap[state][targetNum].push(symbol);
+                            }
+                        }
+                    });
+                }
+
+                // Clear current canvas
+                states = [];
+                transitions = [];
+                selectedStates = [];
+                nextStateId = numStates;
+
+                // Create states in a circular layout
+                const centerX = 600;
+                const centerY = 300;
+                const radius = Math.min(250, 150 + numStates * 10);
+
+                for (let i = 0; i < numStates; i++) {
+                    const angle = (i / numStates) * 2 * Math.PI - Math.PI / 2;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+
+                    states.push({
+                        id: i,
+                        x: Math.round(x),
+                        y: Math.round(y),
+                        isFinal: finalStates.includes(i)
+                    });
+                }
+
+                // Set initial state
+                initialState = initialStateNum;
+
+                // Create transitions
+                Object.keys(transitionMap).forEach(fromStr => {
+                    const from = parseInt(fromStr);
+                    Object.keys(transitionMap[from]).forEach(toStr => {
+                        const to = parseInt(toStr);
+                        const labels = transitionMap[from][to];
+
+                        transitions.push({
+                            from: from,
+                            to: to,
+                            labels: labels,
+                            curve: { x: null, y: null }
+                        });
+                    });
+                });
+
+                // Switch to visual tab
+                switchTab('visual');
+                redraw();
+                alert(`Exported DFA with ${states.length} states and ${transitions.length} transitions to Visual Editor! You can now drag states to rearrange them.`);
+            });
+
+            // Import from generated DFA (from Visual Editor tab)
+            $('#import-generated').click(() => {
+                // Check if there's a generated DFA available
+                const alphabet = $('#alphabet').val().trim();
+                const numStates = parseInt($('#states').val());
+                const initialStateNum = parseInt($('#initial').val());
+                const finalStates = $('#final').val().trim().split(/\s+/).map(s => parseInt(s)).filter(n => !isNaN(n));
+
+                if (!alphabet || isNaN(numStates) || numStates === 0) {
+                    alert('Please generate a DFA first using the "Define DFA" tab!');
+                    return;
+                }
+
+                // Collect transitions from the form
+                const symbols = alphabet.split(/\s+/);
+                const transitionMap = {};
+
+                for (let state = 0; state < numStates; state++) {
+                    transitionMap[state] = {};
+                    symbols.forEach(symbol => {
+                        const inputName = `transition_${state}_${symbol}`;
+                        const target = $(`input[name="${inputName}"]`).val();
+                        if (target !== '') {
+                            const targetNum = parseInt(target);
+                            if (!isNaN(targetNum)) {
+                                if (!transitionMap[state][targetNum]) {
+                                    transitionMap[state][targetNum] = [];
+                                }
+                                transitionMap[state][targetNum].push(symbol);
+                            }
+                        }
+                    });
+                }
+
+                // Clear current canvas
+                states = [];
+                transitions = [];
+                selectedStates = [];
+                nextStateId = numStates;
+
+                // Create states in a circular layout
+                const centerX = 600;
+                const centerY = 300;
+                const radius = Math.min(250, 150 + numStates * 10);
+
+                for (let i = 0; i < numStates; i++) {
+                    const angle = (i / numStates) * 2 * Math.PI - Math.PI / 2;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+
+                    states.push({
+                        id: i,
+                        x: Math.round(x),
+                        y: Math.round(y),
+                        isFinal: finalStates.includes(i)
+                    });
+                }
+
+                // Set initial state
+                initialState = initialStateNum;
+
+                // Create transitions
+                Object.keys(transitionMap).forEach(fromStr => {
+                    const from = parseInt(fromStr);
+                    Object.keys(transitionMap[from]).forEach(toStr => {
+                        const to = parseInt(toStr);
+                        const labels = transitionMap[from][to];
+
+                        transitions.push({
+                            from: from,
+                            to: to,
+                            labels: labels,
+                            curve: { x: null, y: null }
+                        });
+                    });
+                });
+
+                // Switch to visual tab
+                switchTab('visual');
+                redraw();
+                alert(`Imported DFA with ${states.length} states and ${transitions.length} transitions! You can now drag states to rearrange them.`);
+            });
+
             // Clear canvas
             $('#clear-canvas').click(() => {
                 if (confirm('Clear the entire canvas?')) {
@@ -2057,7 +2263,8 @@
                     transitions = [];
                     initialState = null;
                     selectedStates = [];
-                    nextStateId = 0;
+                    nextStateId = 1;
+                    deletedStateIds = [];
                     redraw();
                 }
             });
