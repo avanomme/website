@@ -664,7 +664,7 @@ def eliminate_state():
                     target = int(key[1:])  # Remove underscore prefix
                     regex = value
                     if gnfa[state][target]:
-                        gnfa[state][target] = f"({gnfa[state][target]}+{regex})"
+                        gnfa[state][target] = f"({gnfa[state][target]}|{regex})"
                     else:
                         gnfa[state][target] = regex
                 else:
@@ -672,7 +672,7 @@ def eliminate_state():
                     target = int(value)
                     symbol = key
                     if gnfa[state][target]:
-                        gnfa[state][target] = f"({gnfa[state][target]}+{symbol})"
+                        gnfa[state][target] = f"({gnfa[state][target]}|{symbol})"
                     else:
                         gnfa[state][target] = symbol
 
@@ -711,7 +711,7 @@ def eliminate_state():
 
                 if R4:
                     if new_regex:
-                        new_regex = f"({new_regex}+{R4})"
+                        new_regex = f"({new_regex}|{R4})"
                     else:
                         new_regex = R4
 
@@ -835,7 +835,7 @@ def compute_current_regex(gnfa, initial, finals):
 
                     if R4:
                         if new_regex:
-                            new_regex = f"({new_regex}+{R4})"
+                            new_regex = f"({new_regex}|{R4})"
                         else:
                             new_regex = R4
 

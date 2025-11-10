@@ -1662,11 +1662,11 @@
                     state.isFinal = !state.isFinal;
                     redraw();
                 } else {
-                    // Check if we clicked on a transition
+                    // Try to find a transition at this position
                     const transition = findTransitionAt(pos.x, pos.y);
 
                     if (transition) {
-                        // Double-click on transition - start editing label directly
+                        // Double-click on transition - start editing label
                         const fromState = states.find(s => s.id === transition.from);
                         const toState = states.find(s => s.id === transition.to);
 
@@ -1701,6 +1701,9 @@
 
                             labelOffsetY = pos.y < lineY ? -20 : 20;
 
+                            // Select and start editing the transition
+                            selectedTransition = transition;
+                            selectedStates = [];
                             editingTransition = transition;
                             labelInput = transition.labels.join(', ');
                             cursorPosition = labelInput.length;
@@ -1829,8 +1832,8 @@
                     redraw();
                 }
 
-                // Delete handler - only Delete key (not Backspace)
-                if (e.key === 'Delete' && !e.target.matches('input, textarea')) {
+                // Delete handler
+                if ((e.key === 'Delete' || e.key === 'Backspace') && !e.target.matches('input, textarea')) {
                     e.preventDefault();
 
                     // Delete selected states and their transitions
@@ -2899,7 +2902,8 @@
                         // Update UI
                         updateStateList();
                         addEliminationLogEntry(response.step);
-                        $('#current-regex').text(response.regex || 'Computing...');
+                        // Use html() instead of text() to preserve pipe characters
+                        $('#current-regex').html(response.regex || 'Computing...');
 
                         // Update visual outputs in elimination section
                         if (response.svg) {
