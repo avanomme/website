@@ -1192,7 +1192,17 @@
                 ctx.font = 'bold 16px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('q' + state.id, state.x, state.y);
+
+                // Display special labels for s (q0) and d (q99)
+                let label;
+                if (state.id === 0) {
+                    label = 's';
+                } else if (state.id === 99) {
+                    label = 'd';
+                } else {
+                    label = 'q' + state.id;
+                }
+                ctx.fillText(label, state.x, state.y);
 
                 // Draw initial state arrow
                 if (state.id === initialState) {
@@ -1747,6 +1757,100 @@
                         redraw();
                     }
                 }
+
+                // Shift+S: Convert selected state to start state (s = q00)
+                if (e.key === 'S' && e.shiftKey && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    if (selectedStates.length === 1) {
+                        const currentState = states.find(s => s.id === selectedStates[0]);
+                        if (currentState) {
+                            // Remove old state, create new one with id=0
+                            const oldId = currentState.id;
+
+                            // Check if q00 already exists
+                            const existingStartState = states.find(s => s.id === 0);
+                            if (existingStartState) {
+                                alert('Start state (s) already exists! Delete it first.');
+                                return;
+                            }
+
+                            // Track old ID for reuse (unless it's already 0 or 99)
+                            if (oldId !== 0 && oldId !== 99) {
+                                deletedStateIds.push(oldId);
+                            }
+
+                            // Update all transitions pointing to/from old state
+                            transitions.forEach(t => {
+                                if (t.from === oldId) t.from = 0;
+                                if (t.to === oldId) t.to = 0;
+                            });
+
+                            // Update initial state if needed
+                            if (initialState === oldId) {
+                                initialState = 0;
+                            }
+
+                            // Create new state with id=0
+                            states = states.filter(s => s.id !== oldId);
+                            states.push({
+                                id: 0,
+                                x: currentState.x,
+                                y: currentState.y,
+                                isFinal: currentState.isFinal
+                            });
+
+                            selectedStates = [0];
+                            redraw();
+                        }
+                    }
+                }
+
+                // Shift+D: Convert selected state to dead state (d = q99)
+                if (e.key === 'D' && e.shiftKey && !e.target.matches('input, textarea')) {
+                    e.preventDefault();
+                    if (selectedStates.length === 1) {
+                        const currentState = states.find(s => s.id === selectedStates[0]);
+                        if (currentState) {
+                            // Remove old state, create new one with id=99
+                            const oldId = currentState.id;
+
+                            // Check if q99 already exists
+                            const existingDeadState = states.find(s => s.id === 99);
+                            if (existingDeadState) {
+                                alert('Dead state (d) already exists! Delete it first.');
+                                return;
+                            }
+
+                            // Track old ID for reuse (unless it's already 0 or 99)
+                            if (oldId !== 0 && oldId !== 99) {
+                                deletedStateIds.push(oldId);
+                            }
+
+                            // Update all transitions pointing to/from old state
+                            transitions.forEach(t => {
+                                if (t.from === oldId) t.from = 99;
+                                if (t.to === oldId) t.to = 99;
+                            });
+
+                            // Update initial state if needed
+                            if (initialState === oldId) {
+                                initialState = 99;
+                            }
+
+                            // Create new state with id=99
+                            states = states.filter(s => s.id !== oldId);
+                            states.push({
+                                id: 99,
+                                x: currentState.x,
+                                y: currentState.y,
+                                isFinal: currentState.isFinal
+                            });
+
+                            selectedStates = [99];
+                            redraw();
+                        }
+                    }
+                }
             });
 
             // Transition label dialog handlers
@@ -1967,15 +2071,13 @@
                 'alternating': {
                     name: 'Alternating 0s and 1s',
                     alphabet: '0 1',
-                    states: 5,
+                    states: 3,
                     initial: 0,
                     final: '1 2',
                     transitions: {
                         '0_0': '1', '0_1': '2',
-                        '1_0': '4', '1_1': '3',
-                        '2_0': '3', '2_1': '4',
-                        '3_0': '4', '3_1': '4',
-                        '4_0': '4', '4_1': '4'
+                        '1_0': '1', '1_1': '2',
+                        '2_0': '1', '2_1': '2'
                     }
                 },
                 'no-consecutive': {
