@@ -835,7 +835,7 @@ def compute_current_regex(gnfa, initial, finals):
 
                     if R4:
                         if new_regex:
-                            new_regex = f"({new_regex}|{R4})"
+                            new_regex = f"({new_regex}+{R4})"
                         else:
                             new_regex = R4
 

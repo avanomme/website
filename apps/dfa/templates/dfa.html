@@ -538,6 +538,7 @@
                                 <button onclick="zoomOut()">🔍 Zoom Out</button>
                                 <button onclick="resetZoom()">↺ Reset View</button>
                                 <button onclick="fitToWidth()">↔ Fit Width</button>
+                                <button type="button" id="open-in-visual-editor" class="btn btn-secondary">📐 Open in Visual Editor</button>
                                 <button type="button" id="save-current-step-png" class="btn btn-secondary">💾 Save Current Step</button>
                                 <button type="button" id="save-all-steps-png" class="btn btn-primary">💾 Save All Steps</button>
                             </div>
@@ -869,10 +870,8 @@
 
             let states = [];
             let transitions = [];
-            let nextStateId = 1; // Start at 1 for regular states (q1, q2, q3, ...)
+            let nextStateId = 0;
             let deletedStateIds = []; // Track deleted state IDs for reuse
-            const START_STATE_ID = 0; // Internal ID for 's' state (q0 - when user converts with Shift+S)
-            const DEAD_STATE_ID = 99;  // Internal ID for 'd' state (q99 - when user converts with Shift+D)
             let initialState = null;
             let selectedStates = [];
             let draggedStates = [];
@@ -1178,9 +1177,42 @@
                         const t = 0.5;
                         const midX = (1-t)*(1-t)*startX + 2*(1-t)*t*controlX + t*t*endX;
                         const midY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+
+                        // Calculate tangent at midpoint for perpendicular offset
+                        // Derivative of Bezier: B'(t) = 2(1-t)(P1-P0) + 2t(P2-P1)
+                        const tangentX = 2*(1-t)*(controlX - startX) + 2*t*(endX - controlX);
+                        const tangentY = 2*(1-t)*(controlY - startY) + 2*t*(endY - controlY);
+
+                        // Perpendicular vector (rotate 90 degrees)
+                        const perpX = -tangentY;
+                        const perpY = tangentX;
+
+                        // Normalize and scale for offset distance
+                        const perpLength = Math.sqrt(perpX * perpX + perpY * perpY);
+                        const offsetDist = 15; // Distance from curve
+                        const labelOffsetX = (perpX / perpLength) * offsetDist;
+                        const labelOffsetY = (perpY / perpLength) * offsetDist;
+
                         ctx.fillStyle = '#667eea';
                         ctx.font = 'bold 14px Arial';
-                        ctx.fillText(label, midX + 5, midY - 5);
+                        ctx.textAlign = 'center';
+                        ctx.textBaseline = 'middle';
+
+                        // Draw background for better readability
+                        ctx.save();
+                        const metrics = ctx.measureText(label);
+                        const padding = 4;
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+                        ctx.fillRect(
+                            midX + labelOffsetX - metrics.width/2 - padding,
+                            midY + labelOffsetY - 7 - padding,
+                            metrics.width + padding * 2,
+                            14 + padding * 2
+                        );
+                        ctx.restore();
+
+                        ctx.fillStyle = '#667eea';
+                        ctx.fillText(label, midX + labelOffsetX, midY + labelOffsetY);
                     }
 
                     // Draw control point visualization if selected (for debugging/visual feedback)
@@ -1225,16 +1257,8 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // Display special labels for s (ID 0) and d (ID 99)
-                // Regular states (ID 1, 2, 3...) display as q0, q1, q2...
-                let label;
-                if (state.id === START_STATE_ID) {
-                    label = 's';
-                } else if (state.id === DEAD_STATE_ID) {
-                    label = 'd';
-                } else {
-                    label = 'q' + (state.id - 1);
-                }
+                // Display state label as q0, q1, q2, etc.
+                const label = 'q' + state.id;
                 ctx.fillText(label, state.x, state.y);
 
                 // Draw initial state arrow
@@ -1637,76 +1661,81 @@
                     // Toggle final state
                     state.isFinal = !state.isFinal;
                     redraw();
-                } else if (selectedTransition) {
-                    // Double-click on selected transition - start editing label
-                    const fromState = states.find(s => s.id === selectedTransition.from);
-                    const toState = states.find(s => s.id === selectedTransition.to);
+                } else {
+                    // Check if we clicked on a transition
+                    const transition = findTransitionAt(pos.x, pos.y);
 
-                    if (fromState && toState) {
-                        // Calculate if click was above or below the line
-                        let lineY;
-                        if (fromState.id === toState.id) {
-                            // Self-loop
-                            let baseAngle = -Math.PI / 2;
-                            if (selectedTransition.curve && selectedTransition.curve.x !== null && selectedTransition.curve.y !== null) {
-                                const dx = selectedTransition.curve.x - fromState.x;
-                                const dy = selectedTransition.curve.y - fromState.y;
-                                baseAngle = Math.atan2(dy, dx);
+                    if (transition) {
+                        // Double-click on transition - start editing label directly
+                        const fromState = states.find(s => s.id === transition.from);
+                        const toState = states.find(s => s.id === transition.to);
+
+                        if (fromState && toState) {
+                            // Calculate if click was above or below the line
+                            let lineY;
+                            if (fromState.id === toState.id) {
+                                // Self-loop
+                                let baseAngle = -Math.PI / 2;
+                                if (transition.curve && transition.curve.x !== null && transition.curve.y !== null) {
+                                    const dx = transition.curve.x - fromState.x;
+                                    const dy = transition.curve.y - fromState.y;
+                                    baseAngle = Math.atan2(dy, dx);
+                                }
+                                const loopHeight = 40;
+                                const controlY = fromState.y + (STATE_RADIUS + loopHeight) * Math.sin(baseAngle);
+                                lineY = controlY;
+                            } else if (transition.curve && (transition.curve.x !== null || transition.curve.y !== null)) {
+                                // Curved transition
+                                const t = 0.5;
+                                const dx = toState.x - fromState.x;
+                                const dy = toState.y - fromState.y;
+                                const angle = Math.atan2(dy, dx);
+                                const startY = fromState.y + STATE_RADIUS * Math.sin(angle);
+                                const endY = toState.y - STATE_RADIUS * Math.sin(angle);
+                                const controlY = transition.curve.y;
+                                lineY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+                            } else {
+                                // Straight line
+                                lineY = (fromState.y + toState.y) / 2;
                             }
-                            const loopHeight = 40;
-                            const controlY = fromState.y + (STATE_RADIUS + loopHeight) * Math.sin(baseAngle);
-                            lineY = controlY;
-                        } else if (selectedTransition.curve && (selectedTransition.curve.x !== null || selectedTransition.curve.y !== null)) {
-                            // Curved transition
-                            const t = 0.5;
-                            const dx = toState.x - fromState.x;
-                            const dy = toState.y - fromState.y;
-                            const angle = Math.atan2(dy, dx);
-                            const startY = fromState.y + STATE_RADIUS * Math.sin(angle);
-                            const endY = toState.y - STATE_RADIUS * Math.sin(angle);
-                            const controlY = selectedTransition.curve.y;
-                            lineY = (1-t)*(1-t)*startY + 2*(1-t)*t*controlY + t*t*endY;
+
+                            labelOffsetY = pos.y < lineY ? -20 : 20;
+
+                            editingTransition = transition;
+                            labelInput = transition.labels.join(', ');
+                            cursorPosition = labelInput.length;
+                            cursorVisible = true;
+                            cursorBlinkInterval = setInterval(() => {
+                                cursorVisible = !cursorVisible;
+                                redraw();
+                            }, 500);
+                        }
+                    } else {
+                        // Create new state on empty space
+                        const snappedPos = getCanvasCoordinates(e, true);
+
+                        // Reuse deleted state ID if available, otherwise use next available
+                        let stateId;
+                        if (deletedStateIds.length > 0) {
+                            deletedStateIds.sort((a, b) => a - b); // Sort to reuse lowest ID first
+                            stateId = deletedStateIds.shift(); // Take the smallest deleted ID
                         } else {
-                            // Straight line
-                            lineY = (fromState.y + toState.y) / 2;
+                            stateId = nextStateId++;
                         }
 
-                        labelOffsetY = pos.y < lineY ? -20 : 20;
-
-                        editingTransition = selectedTransition;
-                        labelInput = selectedTransition.labels.join(', ');
-                        cursorPosition = labelInput.length;
-                        cursorVisible = true;
-                        cursorBlinkInterval = setInterval(() => {
-                            cursorVisible = !cursorVisible;
-                            redraw();
-                        }, 500);
+                        const newState = {
+                            id: stateId,
+                            x: snappedPos.x,
+                            y: snappedPos.y,
+                            isFinal: false
+                        };
+                        states.push(newState);
+                        if (states.length === 1) {
+                            initialState = newState.id;
+                        }
+                        selectedStates = [newState.id];
+                        redraw();
                     }
-                } else {
-                    // Create new state on empty space
-                    const snappedPos = getCanvasCoordinates(e, true);
-
-                    // Reuse deleted state ID if available, otherwise use next available
-                    let stateId;
-                    if (deletedStateIds.length > 0) {
-                        deletedStateIds.sort((a, b) => a - b); // Sort to reuse lowest ID first
-                        stateId = deletedStateIds.shift(); // Take the smallest deleted ID
-                    } else {
-                        stateId = nextStateId++;
-                    }
-
-                    const newState = {
-                        id: stateId,
-                        x: snappedPos.x,
-                        y: snappedPos.y,
-                        isFinal: false
-                    };
-                    states.push(newState);
-                    if (states.length === 1) {
-                        initialState = newState.id;
-                    }
-                    selectedStates = [newState.id];
-                    redraw();
                 }
                 clickCount = 0;
             });
@@ -1800,18 +1829,15 @@
                     redraw();
                 }
 
-                // Delete handler
-                if ((e.key === 'Delete' || e.key === 'Backspace') && !e.target.matches('input, textarea')) {
+                // Delete handler - only Delete key (not Backspace)
+                if (e.key === 'Delete' && !e.target.matches('input, textarea')) {
                     e.preventDefault();
 
                     // Delete selected states and their transitions
                     if (selectedStates.length > 0) {
                         selectedStates.forEach(stateId => {
-                            // Don't allow deleting special states s (0) and d (99)
-                            if (stateId !== START_STATE_ID && stateId !== DEAD_STATE_ID) {
-                                // Track deleted ID for reuse (exclude 0 and 99)
-                                deletedStateIds.push(stateId);
-                            }
+                            // Track deleted ID for reuse
+                            deletedStateIds.push(stateId);
 
                             // Remove state
                             states = states.filter(s => s.id !== stateId);
@@ -1837,134 +1863,6 @@
                     }
                 }
 
-                // Shift+S: Convert selected state to start state (s = q0)
-                if (e.key === 'S' && e.shiftKey && !e.target.matches('input, textarea')) {
-                    e.preventDefault();
-                    if (selectedStates.length === 1) {
-                        const currentState = states.find(s => s.id === selectedStates[0]);
-                        if (currentState) {
-                            // Remove old state, create new one with id=0 (START_STATE_ID)
-                            const oldId = currentState.id;
-
-                            // Check if s (q0) already exists
-                            const existingStartState = states.find(s => s.id === START_STATE_ID);
-                            if (existingStartState) {
-                                alert('Start state (s) already exists! Delete it first.');
-                                return;
-                            }
-
-                            // Track old ID for reuse (unless it's already 0 or 99)
-                            if (oldId !== START_STATE_ID && oldId !== DEAD_STATE_ID) {
-                                deletedStateIds.push(oldId);
-                            }
-
-                            // Update all transitions pointing to/from old state
-                            transitions.forEach(t => {
-                                if (t.from === oldId) t.from = START_STATE_ID;
-                                if (t.to === oldId) t.to = START_STATE_ID;
-                            });
-
-                            // Update initial state if needed
-                            if (initialState === oldId) {
-                                initialState = START_STATE_ID;
-                            }
-
-                            // Create new state with id=0 (START_STATE_ID)
-                            states = states.filter(s => s.id !== oldId);
-                            states.push({
-                                id: START_STATE_ID,
-                                x: currentState.x,
-                                y: currentState.y,
-                                isFinal: currentState.isFinal
-                            });
-
-                            selectedStates = [START_STATE_ID];
-                            redraw();
-                        }
-                    }
-                }
-
-                // Shift+D: Convert selected state to/from dead state (d = q99)
-                if (e.key === 'D' && e.shiftKey && !e.target.matches('input, textarea')) {
-                    e.preventDefault();
-                    if (selectedStates.length === 1) {
-                        const currentState = states.find(s => s.id === selectedStates[0]);
-                        if (currentState) {
-                            const oldId = currentState.id;
-
-                            // If already a dead state (id=99), convert back to regular state
-                            if (oldId === DEAD_STATE_ID) {
-                                // Find next available state ID
-                                let newId;
-                                if (deletedStateIds.length > 0) {
-                                    deletedStateIds.sort((a, b) => a - b);
-                                    newId = deletedStateIds.shift();
-                                } else {
-                                    newId = nextStateId++;
-                                }
-
-                                // Update all transitions
-                                transitions.forEach(t => {
-                                    if (t.from === oldId) t.from = newId;
-                                    if (t.to === oldId) t.to = newId;
-                                });
-
-                                // Update initial state if needed
-                                if (initialState === oldId) {
-                                    initialState = newId;
-                                }
-
-                                // Create new state with regular ID
-                                states = states.filter(s => s.id !== oldId);
-                                states.push({
-                                    id: newId,
-                                    x: currentState.x,
-                                    y: currentState.y,
-                                    isFinal: currentState.isFinal
-                                });
-
-                                selectedStates = [newId];
-                                redraw();
-                            } else {
-                                // Convert to dead state
-                                // Check if d (q99) already exists
-                                const existingDeadState = states.find(s => s.id === DEAD_STATE_ID);
-                                if (existingDeadState) {
-                                    alert('Dead state (d) already exists! Delete it first.');
-                                    return;
-                                }
-
-                                // Track old ID for reuse (unless it's already 0 or 99)
-                                if (oldId !== START_STATE_ID && oldId !== DEAD_STATE_ID) {
-                                    deletedStateIds.push(oldId);
-                                }
-
-                                // Update all transitions pointing to/from old state
-                                transitions.forEach(t => {
-                                    if (t.from === oldId) t.from = DEAD_STATE_ID;
-                                    if (t.to === oldId) t.to = DEAD_STATE_ID;
-                                });
-
-                                // Update initial state if needed
-                                if (initialState === oldId) {
-                                    initialState = DEAD_STATE_ID;
-                                }
-
-                                // Create new state with id=99 (DEAD_STATE_ID)
-                                states = states.filter(s => s.id !== oldId);
-                                states.push({
-                                    id: DEAD_STATE_ID,
-                                    x: currentState.x,
-                                    y: currentState.y,
-                                    isFinal: currentState.isFinal
-                                });
-
-                                selectedStates = [DEAD_STATE_ID];
-                                redraw();
-                            }
-                        }
-                    }
-                }
             });
 
             // Transition label dialog handlers
@@ -2117,7 +2015,6 @@
 
             // Export to Visual Editor (from Define DFA tab)
             $('#export-to-visual').click(() => {
-                // Check if there's a generated DFA available
                 const alphabet = $('#alphabet').val().trim();
                 const numStates = parseInt($('#states').val());
                 const initialStateNum = parseInt($('#initial').val());
@@ -2340,6 +2237,80 @@
                 });
 
                 alert(`Saving ${eliminationHistory.length} elimination steps as PNG files...`);
+            });
+
+            // Open current elimination step in Visual Editor
+            $('#open-in-visual-editor').click(() => {
+                if (eliminationState.states === 0 || Object.keys(eliminationState.transitions).length === 0) {
+                    alert('No elimination in progress. Please start state elimination first.');
+                    return;
+                }
+
+                // Clear current canvas
+                states = [];
+                transitions = [];
+                selectedStates = [];
+
+                // Get remaining states (not eliminated)
+                const remainingStates = [];
+                for (let i = 0; i < eliminationState.states; i++) {
+                    if (!eliminationState.eliminatedStates.includes(i)) {
+                        remainingStates.push(i);
+                    }
+                }
+
+                if (remainingStates.length === 0) {
+                    alert('All states have been eliminated!');
+                    return;
+                }
+
+                // Create states in a circular layout
+                const centerX = 600;
+                const centerY = 300;
+                const radius = Math.min(250, 150 + remainingStates.length * 10);
+
+                remainingStates.forEach((stateId, index) => {
+                    const angle = (index / remainingStates.length) * 2 * Math.PI - Math.PI / 2;
+                    const x = centerX + radius * Math.cos(angle);
+                    const y = centerY + radius * Math.sin(angle);
+
+                    states.push({
+                        id: stateId,
+                        x: Math.round(x),
+                        y: Math.round(y),
+                        isFinal: eliminationState.final.includes(stateId)
+                    });
+                });
+
+                // Update nextStateId
+                nextStateId = Math.max(...remainingStates, -1) + 1;
+
+                // Set initial state
+                initialState = eliminationState.initial;
+
+                // Create transitions from eliminationState.transitions
+                Object.keys(eliminationState.transitions).forEach(fromStr => {
+                    const from = parseInt(fromStr);
+                    Object.keys(eliminationState.transitions[from]).forEach(toStr => {
+                        const to = parseInt(toStr);
+                        const regexLabel = eliminationState.transitions[from][to];
+
+                        // Only add if both states still exist
+                        if (remainingStates.includes(from) && remainingStates.includes(to)) {
+                            transitions.push({
+                                from: from,
+                                to: to,
+                                labels: [regexLabel], // Store regex as a single label
+                                curve: { x: null, y: null }
+                            });
+                        }
+                    });
+                });
+
+                // Switch to visual tab
+                switchTab('visual');
+                redraw();
+                alert(`Loaded current elimination step with ${states.length} remaining states into Visual Editor! You can now rearrange them.`);
             });
 
             // Helper function to convert SVG to PNG
@@ -2685,11 +2656,11 @@
                     return;
                 }
 
-                let table = '<table><tr><th>State</th>';
+                let table = '<table class="transition-table"><thead><tr><th>State</th>';
                 alphabet.forEach(function(symbol) {
                     table += '<th>' + symbol + '</th>';
                 });
-                table += '</tr>';
+                table += '</tr></thead><tbody>';
 
                 for (let i = 0; i < states; i++) {
                     table += '<tr>';
@@ -2704,7 +2675,7 @@
                     });
                     table += '</tr>';
                 }
-                table += '</table>';
+                table += '</tbody></table>';
 
                 $('#transition-table').html(table);
                 $('#generate-buttons').removeClass('hidden');
@@ -2856,14 +2827,32 @@
                 const stateList = $('#state-list');
                 stateList.empty();
 
+                // Count remaining non-eliminated states
+                let remainingStates = [];
+                for (let i = 0; i < eliminationState.states; i++) {
+                    if (!eliminationState.eliminatedStates.includes(i)) {
+                        remainingStates.push(i);
+                    }
+                }
+
+                // If only initial and final states remain, allow eliminating the initial state
+                const onlyStartAndFinalLeft = remainingStates.length === 2 &&
+                    remainingStates.includes(eliminationState.initial) &&
+                    remainingStates.some(s => eliminationState.final.includes(s));
+
                 for (let i = 0; i < eliminationState.states; i++) {
                     if (eliminationState.eliminatedStates.includes(i)) continue;
-                    if (i === eliminationState.initial || eliminationState.final.includes(i)) continue;
+
+                    // Skip final states (never eliminate these)
+                    if (eliminationState.final.includes(i)) continue;
+
+                    // Skip initial state UNLESS only start and final states remain
+                    if (i === eliminationState.initial && !onlyStartAndFinalLeft) continue;
 
                     const button = $('<button>')
                         .addClass('btn btn-primary')
                         .css({'width': '100%', 'text-align': 'left'})
-                        .text(`State ${i}`)
+                        .text(`Eliminate q${i}`)
                         .click(function() {
                             eliminateState(i);
                         });
@@ -2872,7 +2861,7 @@
                 }
 
                 if (stateList.children().length === 0) {
-                    stateList.html('<p style="color: #999; padding: 20px; text-align: center;">All eliminable states have been removed!</p>');
+                    stateList.html('<p style="color: #4ade80; padding: 20px; text-align: center; font-weight: bold;">✓ State elimination complete! Check the final regex above.</p>');
                 }
             }
 
