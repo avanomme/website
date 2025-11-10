@@ -27,10 +27,10 @@ echo "✓ Emscripten found: $(emcc --version | head -n 1)"
 echo ""
 
 # Check for MuseScore source
-if [ ! -d "../MuseScore" ]; then
+if [ ! -d "../../external/MuseScore" ]; then
     echo "❌ MuseScore source not found!"
-    echo "Expected at: ../MuseScore"
-    echo "The MuseScore directory should be at the same level as MusePlay"
+    echo "Expected at: ../../external/MuseScore"
+    echo "The MuseScore directory should be in the external folder"
     exit 1
 fi
 

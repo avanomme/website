@@ -241,10 +241,12 @@
             transition: transform 0.1s ease-out;
         }
 
-        #svg-output svg {
-            width: 100%;
+        #svg-output svg,
+        #elimination-svg-output svg {
+            max-width: 100%;
+            max-height: 100%;
             height: auto;
-            max-width: none;
+            width: auto;
         }
 
         pre {
@@ -253,10 +255,13 @@
             padding: 20px;
             border-radius: 6px;
             overflow-x: auto;
+            overflow-y: auto;
             font-family: 'Courier New', monospace;
             font-size: 0.9em;
             line-height: 1.5;
             max-height: 400px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .copy-btn {
@@ -271,6 +276,37 @@
 
         .copy-btn:hover {
             background: #5568d3;
+        }
+
+        .transition-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: white;
+        }
+
+        .transition-table th,
+        .transition-table td {
+            border: 1px solid #dee2e6;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .transition-table thead th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+
+        .transition-table tbody th {
+            background: #f1f3f5;
+            font-weight: 600;
+        }
+
+        .transition-table td {
+            font-size: 0.95em;
+            color: #2d3748;
         }
 
         .hidden {
@@ -304,23 +340,40 @@
         <div class="content">
             <div class="input-section">
                 <h2>Define Your DFA</h2>
+
+                <!-- Regex Input Section -->
+                <div style="margin-bottom: 25px; padding: 20px; background: #fff; border-radius: 8px; border: 2px solid #e9ecef;">
+                    <h3 style="margin-bottom: 15px; color: #667eea; font-size: 1.2em;">Quick Start</h3>
+                    <div class="form-grid" style="grid-template-columns: 1fr auto;">
+                        <div class="form-group">
+                            <label for="regex-input">Regular Expression (optional):</label>
+                            <input type="text" id="regex-input" name="regex-input" placeholder="(a|b)*abb">
+                            <small style="color: #666; margin-top: 5px; display: block;">Enter a regex to auto-generate DFA, or use the form below for manual entry</small>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end; gap: 10px; flex-direction: row;">
+                            <button type="button" id="load-example" class="btn btn-secondary" style="white-space: nowrap;">📝 Load Example</button>
+                            <button type="button" id="regex-to-dfa" class="btn btn-primary" style="white-space: nowrap;">🔄 Regex → DFA</button>
+                        </div>
+                    </div>
+                </div>
+
                 <form id="dfa-form">
                     <div class="form-grid">
                         <div class="form-group">
                             <label for="alphabet">Alphabet (space-separated):</label>
-                            <input type="text" id="alphabet" name="alphabet" placeholder="a b c" required>
+                            <input type="text" id="alphabet" name="alphabet" placeholder="a b" required>
                         </div>
                         <div class="form-group">
                             <label for="states">Number of States:</label>
-                            <input type="number" id="states" name="states" min="1" value="3" required>
+                            <input type="number" id="states" name="states" min="1" placeholder="3" required>
                         </div>
                         <div class="form-group">
                             <label for="initial">Initial State:</label>
-                            <input type="number" id="initial" name="initial" min="0" value="0" required>
+                            <input type="number" id="initial" name="initial" min="0" placeholder="0" required>
                         </div>
                         <div class="form-group">
                             <label for="final">Final States (space-separated):</label>
-                            <input type="text" id="final" name="final" placeholder="0 2" required>
+                            <input type="text" id="final" name="final" placeholder="2" required>
                         </div>
                     </div>
                     <button type="button" id="generate-table" class="btn btn-primary">Generate Transition Table</button>
@@ -330,7 +383,55 @@
 
                 <div id="generate-buttons" class="hidden" style="margin-top: 20px;">
                     <button type="button" id="generate-graph" class="btn btn-primary">Generate DFA</button>
+                    <button type="button" id="start-elimination" class="btn btn-secondary hidden">🔄 State Elimination Mode</button>
                 </div>
+            </div>
+
+            <!-- State Elimination Section -->
+            <div id="elimination-section" class="input-section hidden">
+                <h2>State Elimination - Interactive Regex Computation</h2>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Click on a state in the list below to eliminate it. The DFA will update and show the new regex expressions on the transitions.
+                </p>
+
+                <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 20px;">
+                    <div>
+                        <h3 style="color: #667eea; margin-bottom: 10px;">Available States</h3>
+                        <div id="state-list" style="display: flex; flex-direction: column; gap: 10px;">
+                            <!-- State buttons will be added here -->
+                        </div>
+                        <button type="button" id="reset-elimination" class="btn btn-secondary" style="margin-top: 20px; width: 100%;">↺ Reset</button>
+                    </div>
+
+                    <div>
+                        <h3 style="color: #667eea; margin-bottom: 10px;">Elimination Steps</h3>
+                        <div id="elimination-log" style="background: #f8f9fa; padding: 20px; border-radius: 8px; max-height: 400px; overflow-y: auto;">
+                            <p style="color: #999;">No states eliminated yet. Click a state to begin.</p>
+                        </div>
+
+                        <div style="margin-top: 20px; padding: 20px; background: #e7f3ff; border-radius: 8px; border-left: 4px solid #667eea;">
+                            <h4 style="margin-bottom: 10px; color: #667eea;">Current Regular Expression:</h4>
+                            <pre id="current-regex" style="background: #2d2d2d; color: #4ade80; padding: 15px; border-radius: 6px; font-size: 1.2em;">Computing...</pre>
+                        </div>
+
+                        <div style="margin-top: 20px; padding: 20px; background: #fff; border-radius: 8px; border: 2px solid #667eea;">
+                            <h4 style="margin-bottom: 10px; color: #667eea;">Updated DFA with Regex Transitions:</h4>
+                            <div class="svg-controls" style="margin-bottom: 10px;">
+                                <button onclick="zoomIn()">🔍 Zoom In</button>
+                                <button onclick="zoomOut()">🔍 Zoom Out</button>
+                                <button onclick="resetZoom()">↺ Reset View</button>
+                                <button onclick="fitToWidth()">↔ Fit Width</button>
+                            </div>
+                            <div id="elimination-svg-container" style="width: 100%; height: 500px; border: 1px solid #ddd; border-radius: 4px; background: #fafafa; overflow: hidden; position: relative; cursor: grab;">
+                                <div id="elimination-svg-output" style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; transform-origin: center center; transition: transform 0.1s ease-out;">
+                                    <p style="color: #999; text-align: center; padding: 80px 20px;">DFA will appear after first elimination.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="button" id="back-to-dfa" class="btn btn-secondary" style="margin-top: 20px;">← Back to DFA View</button>
             </div>
 
             <div id="output-section" class="output-section hidden">
@@ -354,6 +455,14 @@
                             <button class="copy-btn" onclick="copyToClipboard('grail-output')">Copy</button>
                         </h3>
                         <pre id="grail-output"></pre>
+                    </div>
+
+                    <div class="output-box">
+                        <h3>
+                            Regular Expression
+                            <button class="copy-btn" onclick="copyToClipboard('regex-output')">Copy</button>
+                        </h3>
+                        <pre id="regex-output" style="font-size: 1.1em; background: #2d2d2d; color: #4ade80; padding: 20px;">Computing...</pre>
                     </div>
 
                     <div class="output-box">
@@ -387,7 +496,11 @@
 
         function updateTransform() {
             const svgOutput = document.getElementById('svg-output');
+            const eliminationSvgOutput = document.getElementById('elimination-svg-output');
             svgOutput.style.transform = `translate(${currentPanX}px, ${currentPanY}px) scale(${currentZoom})`;
+            if (eliminationSvgOutput) {
+                eliminationSvgOutput.style.transform = `translate(${currentPanX}px, ${currentPanY}px) scale(${currentZoom})`;
+            }
         }
 
         function zoomIn() {
@@ -408,24 +521,49 @@
         }
 
         function fitToWidth() {
-            const container = document.getElementById('svg-container');
-            const svgOutput = document.getElementById('svg-output');
+            // Check which view is active
+            const eliminationSection = document.getElementById('elimination-section');
+            const isElimination = !eliminationSection.classList.contains('hidden');
+
+            let container, svgOutput;
+            if (isElimination) {
+                container = document.getElementById('elimination-svg-container');
+                svgOutput = document.getElementById('elimination-svg-output');
+            } else {
+                container = document.getElementById('svg-container');
+                svgOutput = document.getElementById('svg-output');
+            }
+
             const svg = svgOutput.querySelector('svg');
 
-            if (svg) {
-                const containerWidth = container.clientWidth;
-                const svgWidth = svg.getBBox().width;
-                currentZoom = (containerWidth * 0.9) / svgWidth;
-                currentPanX = 0;
-                currentPanY = 0;
-                updateTransform();
+            if (svg && container) {
+                try {
+                    const containerWidth = container.clientWidth;
+                    const containerHeight = container.clientHeight;
+                    const bbox = svg.getBBox();
+                    const svgWidth = bbox.width;
+                    const svgHeight = bbox.height;
+
+                    // Calculate zoom to fit both width and height with 10% padding
+                    const zoomX = (containerWidth * 0.9) / svgWidth;
+                    const zoomY = (containerHeight * 0.9) / svgHeight;
+                    currentZoom = Math.min(zoomX, zoomY, 2); // Cap at 2x zoom
+                    currentPanX = 0;
+                    currentPanY = 0;
+                    updateTransform();
+                } catch (e) {
+                    // Fallback if getBBox fails
+                    currentZoom = 0.8;
+                    currentPanX = 0;
+                    currentPanY = 0;
+                    updateTransform();
+                }
             }
         }
 
-        // Initialize pan and zoom when SVG container is available
-        function initPanZoom() {
-            const container = document.getElementById('svg-container');
-            const svgOutput = document.getElementById('svg-output');
+        // Initialize pan and zoom for a container
+        function setupPanZoom(container) {
+            if (!container) return;
 
             // Mouse wheel zoom
             container.addEventListener('wheel', (e) => {
@@ -441,19 +579,6 @@
                 startX = e.clientX - currentPanX;
                 startY = e.clientY - currentPanY;
                 container.classList.add('grabbing');
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (isPanning) {
-                    currentPanX = e.clientX - startX;
-                    currentPanY = e.clientY - startY;
-                    updateTransform();
-                }
-            });
-
-            document.addEventListener('mouseup', () => {
-                isPanning = false;
-                container.classList.remove('grabbing');
             });
 
             // Touch support for mobile
@@ -482,6 +607,34 @@
             });
         }
 
+        // Initialize pan and zoom when SVG container is available
+        function initPanZoom() {
+            const container = document.getElementById('svg-container');
+            const eliminationContainer = document.getElementById('elimination-svg-container');
+
+            setupPanZoom(container);
+            setupPanZoom(eliminationContainer);
+
+            // Global mouse events
+            document.addEventListener('mousemove', (e) => {
+                if (isPanning) {
+                    currentPanX = e.clientX - startX;
+                    currentPanY = e.clientY - startY;
+                    updateTransform();
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isPanning) {
+                    isPanning = false;
+                    const mainContainer = document.getElementById('svg-container');
+                    const elimContainer = document.getElementById('elimination-svg-container');
+                    mainContainer.classList.remove('grabbing');
+                    elimContainer.classList.remove('grabbing');
+                }
+            });
+        }
+
         function copyToClipboard(elementId) {
             const element = document.getElementById(elementId);
             const text = element.textContent;
@@ -499,6 +652,88 @@
         document.addEventListener('DOMContentLoaded', initPanZoom);
 
         $(document).ready(function() {
+            // Load Example DFA
+            $('#load-example').click(function() {
+                // Example DFA that accepts strings ending with "abb"
+                $('#alphabet').val('a b');
+                $('#states').val('4');
+                $('#initial').val('0');
+                $('#final').val('3');
+
+                // Auto-generate the table
+                $('#generate-table').click();
+
+                // Fill in the transition table
+                setTimeout(function() {
+                    // State 0
+                    $('input[name="transition_0_a"]').val('1');
+                    $('input[name="transition_0_b"]').val('0');
+                    // State 1
+                    $('input[name="transition_1_a"]').val('1');
+                    $('input[name="transition_1_b"]').val('2');
+                    // State 2
+                    $('input[name="transition_2_a"]').val('1');
+                    $('input[name="transition_2_b"]').val('3');
+                    // State 3
+                    $('input[name="transition_3_a"]').val('1');
+                    $('input[name="transition_3_b"]').val('0');
+                }, 100);
+            });
+
+            // Regex to DFA
+            $('#regex-to-dfa').click(function() {
+                const regex = $('#regex-input').val().trim();
+                if (!regex) {
+                    alert('Please enter a regular expression first');
+                    return;
+                }
+
+                // Call API to convert regex to DFA
+                $.ajax({
+                    url: '/regex-to-dfa',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ regex: regex }),
+                    success: function(response) {
+                        if (response.error) {
+                            alert('Error: ' + response.error);
+                            return;
+                        }
+
+                        // Fill in the form with the DFA
+                        $('#alphabet').val(response.alphabet);
+                        $('#states').val(response.states);
+                        $('#initial').val(response.initial);
+                        $('#final').val(response.final);
+
+                        // Generate the table
+                        $('#generate-table').click();
+
+                        // Fill in transitions
+                        setTimeout(function() {
+                            for (const key in response.transitions) {
+                                const parts = key.split('_');
+                                const state = parts[0];
+                                const symbol = parts[1];
+                                $('input[name="transition_' + state + '_' + symbol + '"]').val(response.transitions[key]);
+                            }
+
+                            // Show message if there is one
+                            if (response.message) {
+                                alert(response.message);
+                            }
+                        }, 100);
+                    },
+                    error: function(xhr, status, error) {
+                        let errorMsg = 'Failed to convert regex to DFA';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMsg = xhr.responseJSON.error;
+                        }
+                        alert(errorMsg);
+                    }
+                });
+            });
+
             $('#generate-table').click(function() {
                 const alphabet = $('#alphabet').val().split(/\s+/).filter(s => s.length > 0);
                 const states = parseInt($('#states').val());
@@ -537,6 +772,21 @@
             });
 
             $('#generate-graph').click(function() {
+                // Exit state elimination mode if active
+                $('#elimination-section').addClass('hidden');
+                $('#output-section').removeClass('hidden');
+
+                // Reset elimination state
+                eliminationState = {
+                    alphabet: '',
+                    states: 0,
+                    initial: 0,
+                    final: [],
+                    transitions: {},
+                    eliminatedStates: [],
+                    steps: []
+                };
+
                 const formData = {};
 
                 // Collect form data
@@ -550,9 +800,9 @@
                 });
 
                 // Show loading
-                $('#output-section').removeClass('hidden');
                 $('#svg-output').html('<div class="loading">Generating DFA...</div>');
                 $('#grail-output').text('');
+                $('#regex-output').text('Computing...');
                 $('#dot-output').text('');
                 $('#tikz-output').text('');
 
@@ -566,12 +816,16 @@
                         } else {
                             $('#svg-output').html(response.svg);
                             $('#grail-output').text(response.grail || 'No Grail code generated');
+                            $('#regex-output').text(response.regex || 'Regex computation not yet implemented');
                             $('#dot-output').text(response.dot || 'No DOT graph generated');
                             $('#tikz-output').text(response.tikz || 'No TikZ code generated');
 
                             // Reset zoom and fit to width after loading new graph
                             resetZoom();
                             setTimeout(fitToWidth, 100);
+
+                            // Show state elimination button
+                            $('#start-elimination').removeClass('hidden');
                         }
                     },
                     error: function(xhr, status, error) {
@@ -582,6 +836,172 @@
                         $('#svg-output').html('<div class="error">' + errorMsg + '</div>');
                     }
                 });
+            });
+
+            // State Elimination Mode
+            let eliminationState = {
+                alphabet: '',
+                states: 0,
+                initial: 0,
+                final: [],
+                transitions: {},
+                eliminatedStates: [],
+                steps: []
+            };
+
+            $('#start-elimination').click(function() {
+                // Collect current DFA state
+                const formData = {};
+                $('#dfa-form').serializeArray().forEach(item => {
+                    formData[item.name] = item.value;
+                });
+                $('#transition-table input').each(function() {
+                    formData[$(this).attr('name')] = $(this).val();
+                });
+
+                // Initialize elimination state
+                eliminationState.alphabet = formData.alphabet;
+                eliminationState.states = parseInt(formData.states);
+                eliminationState.initial = parseInt(formData.initial);
+                eliminationState.final = formData.final.split(/\s+/).map(Number);
+                eliminationState.transitions = {};
+                eliminationState.eliminatedStates = [];
+                eliminationState.steps = [];
+
+                // Extract transitions
+                for (let i = 0; i < eliminationState.states; i++) {
+                    eliminationState.transitions[i] = {};
+                    const alphabet = formData.alphabet.split(/\s+/);
+                    for (const symbol of alphabet) {
+                        const key = `transition_${i}_${symbol}`;
+                        if (formData[key]) {
+                            eliminationState.transitions[i][symbol] = formData[key];
+                        }
+                    }
+                }
+
+                // Hide DFA view, show elimination view
+                $('#output-section').addClass('hidden');
+                $('#elimination-section').removeClass('hidden');
+
+                // Copy the current DFA visualization to the elimination section
+                const currentSVG = $('#svg-output').html();
+                $('#elimination-svg-output').html(currentSVG);
+
+                // Reset zoom and fit to width for elimination view
+                resetZoom();
+                setTimeout(fitToWidth, 100);
+
+                // Populate state list
+                updateStateList();
+                $('#elimination-log').html('<p style="color: #999;">No states eliminated yet. Click a state to begin.</p>');
+                $('#current-regex').text('Ready to eliminate states...');
+            });
+
+            function updateStateList() {
+                const stateList = $('#state-list');
+                stateList.empty();
+
+                for (let i = 0; i < eliminationState.states; i++) {
+                    if (eliminationState.eliminatedStates.includes(i)) continue;
+                    if (i === eliminationState.initial || eliminationState.final.includes(i)) continue;
+
+                    const button = $('<button>')
+                        .addClass('btn btn-primary')
+                        .css({'width': '100%', 'text-align': 'left'})
+                        .text(`State ${i}`)
+                        .click(function() {
+                            eliminateState(i);
+                        });
+
+                    stateList.append(button);
+                }
+
+                if (stateList.children().length === 0) {
+                    stateList.html('<p style="color: #999; padding: 20px; text-align: center;">All eliminable states have been removed!</p>');
+                }
+            }
+
+            function eliminateState(stateToEliminate) {
+                // Call backend to eliminate this state
+                $.ajax({
+                    url: '/eliminate-state',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        state: stateToEliminate,
+                        dfa: eliminationState
+                    }),
+                    success: function(response) {
+                        if (response.error) {
+                            alert('Error: ' + response.error);
+                            return;
+                        }
+
+                        // Update elimination state
+                        eliminationState.transitions = response.transitions;
+                        eliminationState.eliminatedStates.push(stateToEliminate);
+                        eliminationState.steps.push(response.step);
+
+                        // Update UI
+                        updateStateList();
+                        addEliminationLogEntry(response.step);
+                        $('#current-regex').text(response.regex || 'Computing...');
+
+                        // Update visual outputs in elimination section
+                        if (response.svg) {
+                            $('#elimination-svg-output').html(response.svg);
+                            // Also update the main output section
+                            $('#svg-output').html(response.svg);
+                            fitToWidth();
+                        }
+
+                        if (response.grail) {
+                            $('#grail-output').text(response.grail);
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Failed to eliminate state');
+                    }
+                });
+            }
+
+            function addEliminationLogEntry(step) {
+                const log = $('#elimination-log');
+                if (log.find('p').first().text().includes('No states')) {
+                    log.empty();
+                }
+
+                const entry = $('<div>')
+                    .css({
+                        'padding': '15px',
+                        'margin-bottom': '10px',
+                        'background': 'white',
+                        'border-left': '4px solid #667eea',
+                        'border-radius': '4px'
+                    })
+                    .html(`
+                        <strong style="color: #667eea;">Step ${eliminationState.steps.length}: Eliminated State ${step.state}</strong><br>
+                        <span style="color: #666; font-size: 0.9em;">${step.description}</span>
+                    `);
+
+                log.append(entry);
+                log.scrollTop(log[0].scrollHeight);
+            }
+
+            $('#reset-elimination').click(function() {
+                eliminationState.eliminatedStates = [];
+                eliminationState.steps = [];
+                updateStateList();
+                $('#elimination-log').html('<p style="color: #999;">No states eliminated yet. Click a state to begin.</p>');
+                $('#current-regex').text('Ready to eliminate states...');
+                $('#elimination-svg-output').html('<p style="color: #999; text-align: center; padding: 80px 20px;">DFA will appear after first elimination.</p>');
+                $('#start-elimination').click();
+            });
+
+            $('#back-to-dfa').click(function() {
+                $('#elimination-section').addClass('hidden');
+                $('#output-section').removeClass('hidden');
             });
         });
     </script>
