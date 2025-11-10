@@ -351,8 +351,19 @@
                             <input type="text" id="regex-input" name="regex-input" placeholder="(a|b)*abb">
                             <small style="color: #666; margin-top: 5px; display: block;">Enter a regex to auto-generate DFA, or use the form below for manual entry</small>
                         </div>
-                        <div class="form-group" style="display: flex; align-items: flex-end; gap: 10px; flex-direction: row;">
-                            <button type="button" id="load-example" class="btn btn-secondary" style="white-space: nowrap;">📝 Load Example</button>
+                        <div class="form-group">
+                            <label for="example-select">Load Example DFA:</label>
+                            <select id="example-select" class="btn" style="padding: 10px; border: 2px solid #ddd; background: white; cursor: pointer;">
+                                <option value="">-- Choose an Example --</option>
+                                <option value="strings-ending-abb">Strings ending with "abb"</option>
+                                <option value="even-as">Even number of 'a's</option>
+                                <option value="divisible-3">Binary numbers divisible by 3</option>
+                                <option value="contains-01">Contains substring "01"</option>
+                                <option value="alternating">Alternating 0s and 1s</option>
+                                <option value="no-consecutive">No consecutive 1s</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: flex-end;">
                             <button type="button" id="regex-to-dfa" class="btn btn-primary" style="white-space: nowrap;">🔄 Regex → DFA</button>
                         </div>
                     </div>
