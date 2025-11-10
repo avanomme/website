@@ -1225,14 +1225,15 @@
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
-                // Display special labels for s (q100) and d (q999)
+                // Display special labels for s (ID 0) and d (ID 99)
+                // Regular states (ID 1, 2, 3...) display as q0, q1, q2...
                 let label;
                 if (state.id === START_STATE_ID) {
                     label = 's';
                 } else if (state.id === DEAD_STATE_ID) {
                     label = 'd';
                 } else {
-                    label = 'q' + state.id;
+                    label = 'q' + (state.id - 1);
                 }
                 ctx.fillText(label, state.x, state.y);
 
