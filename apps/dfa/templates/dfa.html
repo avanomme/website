@@ -985,14 +985,33 @@
                 let closestDistance = Infinity;
 
                 for (const t of transitions) {
-                    if (t.from === t.to) continue; // Skip self-loops for now
-
                     const fromState = states.find(s => s.id === t.from);
                     const toState = states.find(s => s.id === t.to);
                     if (!fromState || !toState) continue;
 
                     let dist;
-                    if (t.curve && (t.curve.x !== null || t.curve.y !== null)) {
+
+                    if (t.from === t.to) {
+                        // Self-loop: check distance to the circular arc
+                        const curveOffset = t.curve || { x: null, y: null };
+                        let baseAngle = -Math.PI / 2;
+
+                        if (curveOffset && curveOffset.x !== null && curveOffset.y !== null) {
+                            const dx = curveOffset.x - fromState.x;
+                            const dy = curveOffset.y - fromState.y;
+                            baseAngle = Math.atan2(dy, dx);
+                        }
+
+                        const loopRadius = 18;
+                        const loopCenterX = fromState.x + (STATE_RADIUS + loopRadius) * Math.cos(baseAngle);
+                        const loopCenterY = fromState.y + (STATE_RADIUS + loopRadius) * Math.sin(baseAngle);
+
+                        // Distance to the loop center circle
+                        const dx = x - loopCenterX;
+                        const dy = y - loopCenterY;
+                        const distToCenter = Math.sqrt(dx * dx + dy * dy);
+                        dist = Math.abs(distToCenter - loopRadius);
+                    } else if (t.curve && (t.curve.x !== null || t.curve.y !== null)) {
                         // For curved transitions, check distance to the Bezier curve
                         dist = distanceToCurve(x, y, fromState.x, fromState.y, t.curve.x, t.curve.y, toState.x, toState.y);
                     } else {
@@ -1036,7 +1055,7 @@
                 ctx.lineWidth = isSelected ? 3 : 2;
 
                 if (isSelfLoop) {
-                    // Draw self-loop: arc from one point on circumference to nearby point
+                    // Draw self-loop as a circular arc
                     // Use curveOffset to determine the angle (default to top if not set)
                     let baseAngle = -Math.PI / 2; // Default to top (-90 degrees)
 
@@ -1047,54 +1066,59 @@
                         baseAngle = Math.atan2(dy, dx);
                     }
 
-                    // Two connection points on the state circumference, close together
-                    const angleSpread = 0.4; // Angle between the two connection points (in radians)
-                    const startAngle = baseAngle - angleSpread / 2;
-                    const endAngle = baseAngle + angleSpread / 2;
+                    // Self-loop parameters
+                    const loopRadius = 18; // Radius of the circular loop (25% smaller)
+                    const arcSpan = Math.PI * 1.5; // How much of a circle (270 degrees)
 
-                    // Start and end points on state circumference
-                    const startX = fromX + STATE_RADIUS * Math.cos(startAngle);
-                    const startY = fromY + STATE_RADIUS * Math.sin(startAngle);
-                    const endX = fromX + STATE_RADIUS * Math.cos(endAngle);
-                    const endY = fromY + STATE_RADIUS * Math.sin(endAngle);
+                    // Center of the loop circle - positioned outside the state
+                    const loopCenterX = fromX + (STATE_RADIUS + loopRadius) * Math.cos(baseAngle);
+                    const loopCenterY = fromY + (STATE_RADIUS + loopRadius) * Math.sin(baseAngle);
 
-                    // Control point for quadratic bezier - positioned outward from state
-                    const loopHeight = 40; // How far the loop extends outward
-                    const controlX = fromX + (STATE_RADIUS + loopHeight) * Math.cos(baseAngle);
-                    const controlY = fromY + (STATE_RADIUS + loopHeight) * Math.sin(baseAngle);
+                    // Calculate where the arc should start/end to connect to the state circumference
+                    // The angle from loop center back to state center
+                    const angleToState = baseAngle + Math.PI;
 
-                    // Draw the self-loop as a quadratic curve
+                    // Gap size in radians (small opening at the state)
+                    const gapAngle = 0.3; // About 17 degrees on each side
+
+                    // Start and end angles for the arc (relative to loop center)
+                    // Arc starts at one side of the gap and ends at the other
+                    const arcStartAngle = angleToState + gapAngle;
+                    const arcEndAngle = angleToState + 2 * Math.PI - gapAngle;
+
+                    // Draw the circular arc
                     ctx.beginPath();
-                    ctx.moveTo(startX, startY);
-                    ctx.quadraticCurveTo(controlX, controlY, endX, endY);
+                    ctx.arc(loopCenterX, loopCenterY, loopRadius, arcStartAngle, arcEndAngle);
                     ctx.stroke();
 
-                    // Draw arrow head at the end point
+                    // Calculate arrow head position at the end of the arc
+                    const arrowX = loopCenterX + loopRadius * Math.cos(arcEndAngle);
+                    const arrowY = loopCenterY + loopRadius * Math.sin(arcEndAngle);
+
+                    // Arrow head points in the tangent direction of the circle at the end point
+                    const tangentAngle = arcEndAngle + Math.PI / 2; // Tangent is perpendicular to radius
                     const headLength = 10;
-                    // Calculate the angle of the curve at the end point
-                    // For quadratic curve, tangent at t=1 is in direction (end - control)
-                    const tangentAngle = Math.atan2(endY - controlY, endX - controlX);
 
                     ctx.beginPath();
-                    ctx.moveTo(endX, endY);
+                    ctx.moveTo(arrowX, arrowY);
                     ctx.lineTo(
-                        endX - headLength * Math.cos(tangentAngle - Math.PI / 6),
-                        endY - headLength * Math.sin(tangentAngle - Math.PI / 6)
+                        arrowX - headLength * Math.cos(tangentAngle - Math.PI / 6),
+                        arrowY - headLength * Math.sin(tangentAngle - Math.PI / 6)
                     );
                     ctx.lineTo(
-                        endX - headLength * Math.cos(tangentAngle + Math.PI / 6),
-                        endY - headLength * Math.sin(tangentAngle + Math.PI / 6)
+                        arrowX - headLength * Math.cos(tangentAngle + Math.PI / 6),
+                        arrowY - headLength * Math.sin(tangentAngle + Math.PI / 6)
                     );
                     ctx.closePath();
                     ctx.fill();
 
-                    // Draw label at the apex of the loop
+                    // Draw label at the farthest point of the loop
                     if (label) {
                         ctx.fillStyle = '#667eea';
                         ctx.font = 'bold 14px Arial';
-                        // Position label slightly beyond the control point
-                        const labelX = controlX + 5 * Math.cos(baseAngle);
-                        const labelY = controlY + 5 * Math.sin(baseAngle);
+                        // Position label at the apex (farthest point from state center)
+                        const labelX = loopCenterX + loopRadius * Math.cos(baseAngle);
+                        const labelY = loopCenterY + loopRadius * Math.sin(baseAngle);
                         ctx.fillText(label, labelX, labelY - 5);
                     }
                 } else {
