@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DFA Generator & Visualizer</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@hpcc-js/wasm/dist/graphviz.umd.js"></script>
     <style>
         * {
             margin: 0;
@@ -486,6 +487,20 @@
     </div>
 
     <script>
+        // Client-side GraphViz rendering using @hpcc-js/wasm
+        let graphvizInstance = null;
+
+        async function renderDotToSvg(dotSource) {
+            // Initialize graphviz instance if not already done
+            if (!graphvizInstance) {
+                graphvizInstance = await window["@hpcc-js/wasm"].Graphviz.load();
+            }
+
+            // Render DOT to SVG
+            const svg = graphvizInstance.layout(dotSource, "svg", "dot");
+            return svg;
+        }
+
         // Pan and Zoom functionality
         let currentZoom = 1;
         let currentPanX = 0;
@@ -810,11 +825,22 @@
                     url: '/dfa.html',
                     method: 'POST',
                     data: formData,
-                    success: function(response) {
+                    success: async function(response) {
                         if (response.error) {
                             $('#svg-output').html('<div class="error">Error: ' + response.error + '</div>');
                         } else {
-                            $('#svg-output').html(response.svg);
+                            // If server didn't provide SVG (e.g., on Vercel), render it client-side
+                            if (!response.svg && response.dot) {
+                                try {
+                                    const svg = await renderDotToSvg(response.dot);
+                                    $('#svg-output').html(svg);
+                                } catch (e) {
+                                    $('#svg-output').html('<div class="error">Failed to render graph: ' + e.message + '</div>');
+                                }
+                            } else {
+                                $('#svg-output').html(response.svg || '<div class="error">No visualization available</div>');
+                            }
+
                             $('#grail-output').text(response.grail || 'No Grail code generated');
                             $('#regex-output').text(response.regex || 'Regex computation not yet implemented');
                             $('#dot-output').text(response.dot || 'No DOT graph generated');
