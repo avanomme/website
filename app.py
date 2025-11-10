@@ -580,21 +580,11 @@ def dfa():
                 print(f"Error generating graphviz output: {e}")
                 # Fall back to text representation
 
-        # If SVG generation failed, create a simple text-based visualization
-        if not svg:
-            svg_fallback = f'''<div style="font-family: monospace; white-space: pre; padding: 20px; background: #f5f5f5; border: 1px solid #ccc;">
-{dot_text}
-
-Note: Graphviz not available. Install graphviz to see visual representation:
-  macOS: brew install graphviz
-  Linux: sudo apt-get install graphviz
-</div>'''
-            svg = svg_fallback
-
         # If TikZ generation failed, provide DOT code
         if not tikz_graph:
             tikz_graph = f"% TikZ generation requires graphviz and dot2tex\n% DOT representation:\n\n{dot_text}"
 
+        # Return JSON with svg=None if not available (client will render from DOT)
         return jsonify({"tikz": tikz_graph, "grail": grail_code, "regex": regex_output, "svg": svg, "dot": dot_text})
 
     return render_template('dfa.html')

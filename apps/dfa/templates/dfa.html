@@ -491,14 +491,23 @@
         let graphvizInstance = null;
 
         async function renderDotToSvg(dotSource) {
-            // Initialize graphviz instance if not already done
-            if (!graphvizInstance) {
-                graphvizInstance = await window["@hpcc-js/wasm"].Graphviz.load();
-            }
+            try {
+                // Initialize graphviz instance if not already done
+                if (!graphvizInstance && window["@hpcc-js/wasm"]) {
+                    graphvizInstance = await window["@hpcc-js/wasm"].Graphviz.load();
+                }
 
-            // Render DOT to SVG
-            const svg = graphvizInstance.layout(dotSource, "svg", "dot");
-            return svg;
+                if (!graphvizInstance) {
+                    throw new Error("GraphViz WASM library not loaded");
+                }
+
+                // Render DOT to SVG
+                const svg = graphvizInstance.layout(dotSource, "svg", "dot");
+                return svg;
+            } catch (error) {
+                console.error("Error rendering DOT to SVG:", error);
+                throw error;
+            }
         }
 
         // Pan and Zoom functionality
