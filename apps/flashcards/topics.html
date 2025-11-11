@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Study Topics - Flash Cards</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    .topics-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .topics-header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .topics-header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .topics-header p {
+      color: var(--text-secondary, #888);
+      font-size: 1.1rem;
+    }
+
+    .topics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .topic-card {
+      background: var(--surface, #222);
+      border: 1px solid var(--border, #333);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .topic-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      border-color: var(--accent, #0066cc);
+    }
+
+    .topic-card h2 {
+      font-size: 1.4rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary, #fff);
+    }
+
+    .topic-card p {
+      color: var(--text-secondary, #aaa);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .topic-card .topic-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-tertiary, #666);
+    }
+
+    .topic-card .topic-meta span {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    .section-title {
+      font-size: 1.8rem;
+      margin: 2rem 0 1rem 0;
+      color: var(--text-primary, #fff);
+      border-bottom: 2px solid var(--border, #333);
+      padding-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body class="theme-dark">
+  <div class="topics-container">
+    <header class="topics-header">
+      <h1>📚 Study Topics</h1>
+      <p>Select a topic to begin studying with interactive flashcards</p>
+    </header>
+
+    <main>
+      <section>
+        <h2 class="section-title">Machine Learning</h2>
+        <div class="topics-grid">
+          <a href="study.html?topic=ml_midterm&type=cards" class="topic-card">
+            <h2>Machine Learning Midterm 2</h2>
+            <p>Comprehensive review of ML algorithms including Linear Regression, Decision Trees, Neural Networks, PCA, and more.</p>
+            <div class="topic-meta">
+              <span>📝 Q&A Cards</span>
+              <span>📋 Review Cards</span>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <section>
+        <h2 class="section-title">Software Engineering</h2>
+        <div class="topics-grid">
+          <a href="index.html" class="topic-card">
+            <h2>Software Engineering Midterm</h2>
+            <p>Complete coverage of SE topics including requirements gathering, project management, design patterns, and architectural styles.</p>
+            <div class="topic-meta">
+              <span>📝 Q&A Cards</span>
+            </div>
+          </a>
+        </div>
+      </section>
+    </main>
+  </div>
+</body>
+</html>

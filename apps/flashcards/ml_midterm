@@ -1,0 +1,49 @@
+
+### **🔹 Master Algorithm Summary Table**
+
+| *Algorithm*                                   | *Main Idea*                                                                                            | *Advantages*                                                                     | *Disadvantages*                                                        | *Loss / Cost Function*                                                                  |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Linear Regression**                         | Fits a straight line to predict continuous values using least squares.                                 | Simple, interpretable, efficient, works well with linear relationships.          | Sensitive to outliers, assumes linearity, poor with non-linear data.   | Mean Squared Error (MSE):  J(\theta) = \frac{1}{2m}\sum (h_\theta(x^{(i)}) - y^{(i)})^2 |
+| **Gradient Descent**                          | Iteratively adjusts parameters to minimize cost function.                                              | Works for many models, simple concept, scalable.                                 | Can converge to local minima, sensitive to learning rate α.            | Indirectly minimizes the chosen cost (e.g., MSE for regression).                        |
+| **Logistic Regression**                       | Uses the sigmoid function to model binary outcomes; outputs probability between 0 and 1.               | Probabilistic interpretation, simple and fast, good baseline for classification. | Fails for non-linear separability, assumes independence of features.   | Binary Cross-Entropy:  L(h_\theta(x),y) = -y\log h_\theta(x) - (1-y)\log(1-h_\theta(x)) |
+| **Decision Trees (ID3)**                      | Recursively splits data by attributes that maximize information gain (entropy reduction).              | Easy to interpret, handles non-linear relations, robust to outliers.             | Overfits easily, biased toward features with many values.              | Entropy-based Information Gain:  \text{Entropy}(S) = -p_+\log_2p_+ - p_-\log_2p_-       |
+| **Random Forests**                            | Ensemble of decision trees using bagging and feature randomness.                                       | Reduces overfitting, robust to noise, good accuracy.                             | Computationally heavy, less interpretable.                             | Sum of tree-level entropy or Gini impurity across ensemble.                             |
+| **K-Means Clustering**                        | Partitions data into K clusters by minimizing within-cluster variance.                                 | Simple, fast, easy to implement.                                                 | Requires K, sensitive to initialization, fails on non-convex clusters. | Sum of Squared Error (SSE):  $begin:math:text$ J = \sum_i                               |
+| **DBSCAN (Density-Based Spatial Clustering)** | Groups points by density; defines clusters as dense regions separated by sparse regions.               | Finds arbitrary-shaped clusters, robust to noise, no need to predefine K.        | Struggles with varying densities and high-dimensional data.            | No explicit loss; objective is maximizing density-connectedness .                       |
+| **PCA (Principal Component Analysis)**        | Reduces dimensionality by projecting data to directions (principal components) that maximize variance. | Simplifies models, removes noise, visualizes high-D data.                        | Loses interpretability, only captures linear structure.                | Variance maximization equivalent to minimizing projection error \|x - (x^Tu)u\|^2 .     |
+| **Regularization (L2/Ridge)**                 | Penalizes large coefficients to reduce overfitting.                                                    | Prevents overfitting, keeps all features.                                        | May underfit if λ too large.                                           | J(\theta) = \frac{1}{2m}\sum (h_\theta(x^{(i)}) - y^{(i)})^2 + \lambda\sum \theta_j^2   |
+| **Cross-Validation (K-Fold)**                 | Evaluates model generalization by rotating train/test splits.                                          | Better performance estimate, uses all data.                                      | Computationally expensive.                                             | No loss function (validation strategy).                                                 |
+| **Neural Networks (Feedforward / MLP)**       | Layers of neurons apply weighted sums + nonlinear activations to approximate complex functions.        | Handles nonlinearities, learns feature hierarchies, flexible architecture.       | Requires large data, high compute cost, risk of overfitting.           | Typically Cross-Entropy or MSE depending on task  .                                     |
+
+---
+
+### **🔹 MLP (Multilayer Perceptron) — Detailed Section**
+
+| *Aspect*                               | *Description*                                                                                                                                                                                                                                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Main Idea**                          | An MLP consists of multiple fully connected layers; each neuron computes a weighted sum of inputs followed by a nonlinear activation (e.g., ReLU, sigmoid, tanh). It learns representations layer by layer to map complex input-output relations. |
+| **Needs**                              | Large labeled datasets, non-linear activation functions (ReLU, tanh, sigmoid), proper weight initialization, and sufficient computational power (GPU).                                                                                            |
+| **Advantages**                         | - Learns non-linear functions- Flexible for regression/classification- Universal function approximator- Scalable to deep architectures                                                                                                            |
+| **Disadvantages**                      | - Computationally expensive- Requires large data- Prone to overfitting- Opaque (black-box) decisions                                                                                                                                              |
+| **Loss Function (for Classification)** | **Binary Cross-Entropy:**  L = -y\log(\hat{y}) - (1-y)\log(1-\hat{y})  — used when output activation = Sigmoid.                                                                                                                                   |
+| **Loss Function (for Regression)**     | **Mean Squared Error (MSE):**  L = \frac{1}{2m}\sum (h_\theta(x^{(i)}) - y^{(i)})^2.                                                                                                                                                              |
+| **Loss Function Advantages**           | - Cross-Entropy provides stronger gradients for probabilistic classification.- MSE provides smooth optimization for continuous outputs.                                                                                                           |
+| **Loss Function Disadvantages**        | - Cross-Entropy can explode with poor initialization.- MSE less effective for imbalanced classification and non-binary tasks.                                                                                                                     |
+
+---
+
+### **🔹 Deep Learning Specifics (from Lecture 14)**
+
+- **Why Deep:** deeper networks learn hierarchical representations — edges → textures → object parts → classes .
+    
+- **Key Activation Functions:**
+    
+    - **Sigmoid:** smooth but causes vanishing gradients.
+        
+    - **Tanh:** centers data, faster convergence.
+        
+    - **ReLU:** efficient, non-linear, prevents vanishing gradient, sparse activation .
+        
+    
+
+---

@@ -62,17 +62,111 @@ const state = {
   audioCacheDir: 'audio_cache',
 };
 
+// Topic configuration
+const TOPICS = {
+  ml_midterm: {
+    name: 'Machine Learning Midterm 2',
+    cardTypes: [
+      { id: 'cards', label: 'Q&A Cards', file: 'ml_midterm_cards.md' },
+      { id: 'review', label: 'Review Cards', file: 'ml_midterm_review.md' }
+    ]
+  },
+  se_midterm: {
+    name: 'Software Engineering Midterm',
+    cardTypes: [
+      { id: 'cards', label: 'Q&A Cards', file: 'cards.md' }
+    ]
+  }
+};
+
+// Get current topic and card type from URL
+function getUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const topic = params.get('topic') || 'se_midterm';
+  const cardType = params.get('type') || 'cards';
+  return { topic, cardType };
+}
+
+// Update URL without reloading page
+function updateUrl(topic, cardType) {
+  const url = new URL(window.location);
+  url.searchParams.set('topic', topic);
+  url.searchParams.set('type', cardType);
+  window.history.pushState({}, '', url);
+}
+
+// Get card file based on topic and type
+function getCardFile(topic, cardType) {
+  const topicConfig = TOPICS[topic];
+  if (!topicConfig) {
+    return 'cards.md'; // fallback
+  }
+
+  const typeConfig = topicConfig.cardTypes.find(t => t.id === cardType);
+  return typeConfig ? typeConfig.file : topicConfig.cardTypes[0].file;
+}
+
+// Initialize card type selector
+function initCardTypeSelector() {
+  const selector = document.querySelector('#cardTypeSelector');
+  if (!selector) return;
+
+  const { topic, cardType } = getUrlParams();
+  const topicConfig = TOPICS[topic];
+
+  if (!topicConfig || topicConfig.cardTypes.length <= 1) {
+    selector.style.display = 'none';
+    return;
+  }
+
+  selector.innerHTML = '';
+  topicConfig.cardTypes.forEach(type => {
+    const btn = document.createElement('button');
+    btn.className = 'card-type-btn';
+    btn.textContent = type.label;
+    if (type.id === cardType) {
+      btn.classList.add('active');
+    }
+    btn.addEventListener('click', () => {
+      updateUrl(topic, type.id);
+      window.location.reload();
+    });
+    selector.appendChild(btn);
+  });
+}
+
+// Update subtitle based on topic
+function updateTopicSubtitle() {
+  const subtitle = document.querySelector('#topicSubtitle');
+  if (!subtitle) return;
+
+  const { topic } = getUrlParams();
+  const topicConfig = TOPICS[topic];
+
+  if (topicConfig) {
+    subtitle.textContent = topicConfig.name;
+  }
+}
+
 async function bootstrap() {
   try {
-    const response = await fetch('cards.md');
+    // Get topic and card type from URL
+    const { topic, cardType } = getUrlParams();
+    const cardFile = getCardFile(topic, cardType);
+
+    // Initialize UI elements
+    initCardTypeSelector();
+    updateTopicSubtitle();
+
+    const response = await fetch(cardFile);
     if (!response.ok) {
-      throw new Error(`Failed to load cards.md (${response.status})`);
+      throw new Error(`Failed to load ${cardFile} (${response.status})`);
     }
 
     const markdown = await response.text();
     const sections = parseDeck(markdown);
     if (!sections.length) {
-      throw new Error('No sections found in cards.md');
+      throw new Error(`No sections found in ${cardFile}`);
     }
 
     state.sections = sections;
