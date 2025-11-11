@@ -30,7 +30,7 @@ except ImportError:
 
 # Try to import the new DFA converter with improved algorithms
 try:
-    from converter import build_dfa_from_table, dfa_to_regex_string, DFA
+    from apps.dfa.converter import build_dfa_from_table, dfa_to_regex_string, DFA, regex_to_min_dfa
     CONVERTER_AVAILABLE = True
 except ImportError:
     CONVERTER_AVAILABLE = False
@@ -599,33 +599,36 @@ def regex_to_dfa_endpoint():
         if not regex:
             return jsonify({"error": "No regex provided"}), 400
 
-        # Build NFA from regex using Thompson's construction
-        nfa_result = regex_to_nfa(regex)
+        # Use the proper converter if available
+        if CONVERTER_AVAILABLE:
+            try:
+                dfa = regex_to_min_dfa(regex)
 
-        if 'error' in nfa_result:
-            return jsonify({"error": nfa_result['error']}), 400
+                # Convert the DFA object to the format expected by the frontend
+                alphabet = sorted(list(dfa.alphabet))
+                transitions = {}
 
-        # For now, return a simple DFA structure
-        # Full NFA to DFA conversion (subset construction) would go here
+                for state in range(len(dfa.transitions)):
+                    for symbol in alphabet:
+                        next_state = dfa.transitions[state].get(symbol)
+                        if next_state is not None:
+                            transitions[f"{state}_{symbol}"] = str(next_state)
 
-        # Simple example: create a 2-state DFA for demonstration
-        alphabet = sorted(list(nfa_result.get('alphabet', {'a', 'b'})))
+                result = {
+                    "alphabet": " ".join(alphabet),
+                    "states": str(len(dfa.transitions)),
+                    "initial": str(dfa.start),
+                    "final": " ".join(str(s) for s in sorted(dfa.accepts)),
+                    "transitions": transitions,
+                    "message": f"Minimized DFA for regex: {regex}"
+                }
 
-        result = {
-            "alphabet": " ".join(alphabet),
-            "states": "2",
-            "initial": "0",
-            "final": "1",
-            "transitions": {
-                "0_" + alphabet[0]: "1" if len(alphabet) > 0 else "",
-                "0_" + alphabet[1]: "0" if len(alphabet) > 1 else "",
-                "1_" + alphabet[0]: "1" if len(alphabet) > 0 else "",
-                "1_" + alphabet[1]: "1" if len(alphabet) > 1 else "",
-            },
-            "message": f"Simplified DFA for regex: {regex}\n(Full Thompson's construction + subset construction coming soon)"
-        }
+                return jsonify(result)
 
-        return jsonify(result)
+            except Exception as e:
+                return jsonify({"error": f"Regex parsing error: {str(e)}"}), 400
+        else:
+            return jsonify({"error": "Converter module not available"}), 500
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
@@ -736,6 +739,8 @@ def eliminate_state():
                 new_transitions[str(from_state)][f"_{to_state}"] = symbol_or_regex
 
         # Generate updated DOT graph with regex labels
+        print(f"DEBUG: GNFA after elimination: {dict(gnfa)}")
+        print(f"DEBUG: Eliminated states: {[rip_state]}")
         dot_graph = generate_gnfa_dot(gnfa, dfa['initial'], dfa['final'], [rip_state])
 
         # Generate SVG if graphviz available
@@ -743,7 +748,10 @@ def eliminate_state():
         if GRAPHVIZ_AVAILABLE:
             try:
                 svg = dot_graph.pipe(format='svg').decode('utf-8')
-            except:
+            except Exception as e:
+                print(f"ERROR generating SVG: {e}")
+                import traceback
+                traceback.print_exc()
                 svg = None
 
         # Generate Grail representation of GNFA

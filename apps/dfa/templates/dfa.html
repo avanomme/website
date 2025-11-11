@@ -411,6 +411,8 @@
                                 <option value="contains-01">Contains substring "01"</option>
                                 <option value="alternating">Alternating 0s and 1s</option>
                                 <option value="no-consecutive">No consecutive 1s</option>
+                                <option value="example-3a">Example 3a</option>
+                                <option value="example-3b">Example 3b</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -2459,6 +2461,37 @@
                         '1_0': '0', '1_1': '2',
                         '2_0': '2', '2_1': '2'
                     }
+                },
+                'example-3a': {
+                    name: 'Example 3a',
+                    alphabet: '0 1 2 4 8',
+                    states: 7,
+                    initial: 5,
+                    final: '2',
+                    transitions: {
+                        '5_0': '6', '5_1': '1', '5_2': '2', '5_4': '4', '5_8': '6',
+                        '0_0': '0', '0_1': '1', '0_2': '2', '0_4': '4', '0_8': '3',
+                        '1_0': '4', '1_1': '0', '1_2': '1', '1_4': '3', '1_8': '2',
+                        '2_0': '3', '2_1': '4', '2_2': '0', '2_4': '2', '2_8': '1',
+                        '3_0': '2', '3_1': '3', '3_2': '4', '3_4': '1', '3_8': '0',
+                        '4_0': '1', '4_1': '2', '4_2': '3', '4_4': '0', '4_8': '4',
+                        '6_0': '6', '6_1': '6', '6_2': '6', '6_4': '6', '6_8': '6'
+                    }
+                },
+                'example-3b': {
+                    name: 'Example 3b',
+                    alphabet: '0 1 2 4 8',
+                    states: 6,
+                    initial: 2,
+                    final: '5',
+                    transitions: {
+                        '5_0': '0', '5_1': '1', '5_2': '2', '5_4': '4', '5_8': '3',
+                        '0_0': '0', '0_1': '1', '0_2': '2', '0_4': '4', '0_8': '3',
+                        '1_0': '4', '1_1': '5', '1_2': '1', '1_4': '3', '1_8': '2',
+                        '2_0': '3', '2_1': '4', '2_2': '5', '2_4': '2', '2_8': '1',
+                        '3_0': '2', '3_1': '3', '3_2': '4', '3_4': '1', '3_8': '0',
+                        '4_0': '1', '4_1': '2', '4_2': '3', '4_4': '5', '4_8': '4'
+                    }
                 }
             };
 
@@ -2884,14 +2917,7 @@
                         // Update UI
                         updateStateList();
                         addEliminationLogEntry(response.step);
-
-                        // Display the new transitions added
-                        if (response.step && response.step.new_transitions && response.step.new_transitions.length > 0) {
-                            const transitionsHtml = response.step.new_transitions.map(t => `<div>${t}</div>`).join('');
-                            $('#current-regex').html(`<strong>New Transitions:</strong><br>${transitionsHtml}`);
-                        } else {
-                            $('#current-regex').html('No new transitions added.');
-                        }
+                        $('#current-regex').text(response.regex || 'Computing...');
 
                         // Update visual outputs in elimination section
                         if (response.svg) {
