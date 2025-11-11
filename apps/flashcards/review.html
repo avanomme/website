@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Review Cards</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    .review-card {
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .review-card-title {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--accent, #4a9eff);
+      border-bottom: 2px solid var(--accent, #4a9eff);
+      padding-bottom: 0.5rem;
+    }
+
+    .review-section {
+      margin-bottom: 1.5rem;
+    }
+
+    .review-section-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text-primary, #fff);
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .review-section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 1.2rem;
+      background: var(--accent, #4a9eff);
+      border-radius: 2px;
+    }
+
+    .review-content {
+      background: var(--background-primary, #12101a);
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      border-left: 3px solid var(--border, #333);
+      line-height: 1.7;
+    }
+
+    .review-content p {
+      margin: 0.5rem 0;
+    }
+
+    .review-content ul {
+      margin: 0.5rem 0;
+      padding-left: 1.5rem;
+    }
+
+    .review-content li {
+      margin: 0.4rem 0;
+      line-height: 1.6;
+    }
+
+    .review-content strong {
+      color: var(--accent, #4a9eff);
+      font-weight: 600;
+    }
+
+    .review-content code,
+    .review-content pre {
+      background: rgba(74, 158, 255, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9em;
+      color: var(--text-primary, #fff);
+    }
+
+    .pros-cons-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+
+    .pros-cons-grid .pro-box,
+    .pros-cons-grid .con-box {
+      background: var(--background-primary, #12101a);
+      padding: 1rem;
+      border-radius: 8px;
+    }
+
+    .pros-cons-grid .pro-box {
+      border-left: 3px solid #4ade80;
+    }
+
+    .pros-cons-grid .con-box {
+      border-left: 3px solid #f87171;
+    }
+
+    .pros-cons-grid h4 {
+      margin: 0 0 0.75rem 0;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    .pros-cons-grid .pro-box h4 {
+      color: #4ade80;
+    }
+
+    .pros-cons-grid .con-box h4 {
+      color: #f87171;
+    }
+
+    .review-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      background: var(--background-primary, #12101a);
+      z-index: 100;
+      border-bottom: 1px solid var(--border, #333);
+      margin-bottom: 1rem;
+    }
+
+    .review-counter {
+      font-size: 0.95rem;
+      color: var(--text-muted, rgba(255, 255, 255, 0.6));
+    }
+
+    @media (max-width: 768px) {
+      .pros-cons-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body class="theme-dark">
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="title-group">
+        <a href="index.html" class="back-link">← Back to Topics</a>
+        <h1>Review Cards</h1>
+        <p class="subtitle" id="topicSubtitle">Comprehensive Algorithm Overview</p>
+      </div>
+    </header>
+
+    <nav class="review-nav">
+      <button id="prevCardBtn" type="button" class="ghost">← Previous</button>
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <span class="review-counter" id="cardCounter">Card 1 of 13</span>
+        <select id="cardSelector" style="padding: 0.4rem 0.8rem; border-radius: 4px; background: var(--surface, #222); color: var(--text-primary, #fff); border: 1px solid var(--border, #333);">
+          <option>Loading...</option>
+        </select>
+      </div>
+      <button id="nextCardBtn" type="button" class="ghost">Next →</button>
+    </nav>
+
+    <main id="reviewContainer" class="card-area">
+      <!-- Review cards will be loaded here -->
+    </main>
+
+    <nav class="review-nav" style="position: relative;">
+      <button id="prevCardBtn2" type="button" class="ghost">← Previous</button>
+      <span class="review-counter" id="cardCounter2">Card 1 of 13</span>
+      <button id="nextCardBtn2" type="button" class="ghost">Next →</button>
+    </nav>
+  </div>
+
+  <script type="module" src="review.js"></script>
+</body>
+</html>

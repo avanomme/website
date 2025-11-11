@@ -1,6 +1,6 @@
 
 
-#### Master Algorithm Q&A
+#### Master Algorithm Flash
 
 #flashcards/ML/Algorithms
 **1.1** *What is the main idea behind Linear Regression?*

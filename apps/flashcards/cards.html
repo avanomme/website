@@ -6,58 +6,12 @@
   <title>Flash Cards</title>
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="app.css">
-  <style>
-    .back-link {
-      display: inline-block;
-      margin: 1rem 0;
-      padding: 0.5rem 1rem;
-      color: var(--accent, #0066cc);
-      text-decoration: none;
-      border: 1px solid var(--accent, #0066cc);
-      border-radius: 4px;
-      transition: all 0.2s ease;
-    }
-
-    .back-link:hover {
-      background: var(--accent, #0066cc);
-      color: white;
-    }
-
-    .card-type-selector {
-      display: flex;
-      gap: 0.5rem;
-      margin: 1rem 0;
-      justify-content: center;
-    }
-
-    .card-type-btn {
-      padding: 0.5rem 1.5rem;
-      border: 2px solid var(--border, #333);
-      background: var(--surface, #222);
-      color: var(--text-primary, #fff);
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 0.95rem;
-    }
-
-    .card-type-btn:hover {
-      border-color: var(--accent, #0066cc);
-      transform: translateY(-1px);
-    }
-
-    .card-type-btn.active {
-      background: var(--accent, #0066cc);
-      border-color: var(--accent, #0066cc);
-      color: white;
-    }
-  </style>
 </head>
 <body class="theme-dark">
   <div class="app-shell">
     <header class="app-header">
       <div class="title-group">
-        <a href="topics.html" class="back-link">← Back to Topics</a>
+        <a href="index.html" class="back-link">← Back to Topics</a>
         <h1>Flash Cards</h1>
         <p class="subtitle" id="topicSubtitle">Autoplay study deck with high-quality TTS</p>
         <div class="card-type-selector" id="cardTypeSelector"></div>

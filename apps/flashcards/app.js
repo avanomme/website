@@ -67,14 +67,14 @@ const TOPICS = {
   ml_midterm: {
     name: 'Machine Learning Midterm 2',
     cardTypes: [
-      { id: 'cards', label: 'Q&A Cards', file: 'ml_midterm_cards.md' },
+      { id: 'cards', label: 'Flash Cards', file: 'ml_midterm_cards.md' },
       { id: 'review', label: 'Review Cards', file: 'ml_midterm_review.md' }
     ]
   },
   se_midterm: {
     name: 'Software Engineering Midterm',
     cardTypes: [
-      { id: 'cards', label: 'Q&A Cards', file: 'cards.md' }
+      { id: 'cards', label: 'Flash Cards', file: 'cards.md' }
     ]
   }
 };
@@ -128,8 +128,14 @@ function initCardTypeSelector() {
       btn.classList.add('active');
     }
     btn.addEventListener('click', () => {
-      updateUrl(topic, type.id);
-      window.location.reload();
+      // If switching to review cards, go to review.html
+      if (type.id === 'review') {
+        window.location.href = `review.html?topic=${topic}`;
+      } else {
+        // Otherwise stay on cards.html
+        updateUrl(topic, type.id);
+        window.location.reload();
+      }
     });
     selector.appendChild(btn);
   });

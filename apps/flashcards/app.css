@@ -366,3 +366,132 @@ select {
     padding: 0.6rem 0.85rem;
   }
 }
+
+/* Navigation Components */
+.back-link {
+  display: inline-block;
+  margin: 0.5rem 0;
+  padding: 0.5rem 1rem;
+  color: var(--accent, #0066cc);
+  text-decoration: none;
+  border: 1px solid var(--accent, #0066cc);
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  background: var(--accent, #0066cc);
+  color: white;
+}
+
+.card-type-selector {
+  display: flex;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  justify-content: center;
+}
+
+.card-type-btn {
+  padding: 0.5rem 1.5rem;
+  border: 2px solid var(--border, #333);
+  background: var(--surface, #222);
+  color: var(--text-primary, #fff);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.95rem;
+}
+
+.card-type-btn:hover {
+  border-color: var(--accent, #0066cc);
+  transform: translateY(-1px);
+}
+
+.card-type-btn.active {
+  background: var(--accent, #0066cc);
+  border-color: var(--accent, #0066cc);
+  color: white;
+}
+
+/* Study Topics Page */
+.topics-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.topics-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.topics-header h1 {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.topics-header p {
+  color: var(--text-secondary, #888);
+  font-size: 1.1rem;
+}
+
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.topic-card {
+  background: var(--surface, #222);
+  border: 1px solid var(--border, #333);
+  border-radius: 8px;
+  padding: 1.5rem;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+
+.topic-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border-color: var(--accent, #0066cc);
+}
+
+.topic-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+  color: var(--text-primary, #fff);
+}
+
+.topic-card p {
+  color: var(--text-secondary, #aaa);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+  flex-grow: 1;
+}
+
+.topic-card .topic-meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.85rem;
+  color: var(--text-tertiary, #666);
+}
+
+.topic-card .topic-meta span {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.section-title {
+  font-size: 1.8rem;
+  margin: 2rem 0 1rem 0;
+  color: var(--text-primary, #fff);
+  border-bottom: 2px solid var(--border, #333);
+  padding-bottom: 0.5rem;
+}
