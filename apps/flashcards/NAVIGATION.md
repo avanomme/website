@@ -4,7 +4,7 @@
 
 ```
 domain/study                    → Main study hub (all study areas)
-domain/apps/flashcards/         → Flashcard topics selection
+domain/apps/flashcards/         → Review Topics selection
 domain/apps/flashcards/cards    → Dynamic card viewer
 ```
 
@@ -14,7 +14,7 @@ domain/apps/flashcards/cards    → Dynamic card viewer
 /website/
 ├── study.html                  # Main study hub entry point
 └── apps/flashcards/
-    ├── index.html              # Flashcard topics selection
+    ├── index.html              # Review Topics selection
     ├── cards.html              # Dynamic card viewer
     ├── se-cards.html           # SE cards (legacy/direct access)
     ├── app.js                  # App logic
@@ -31,7 +31,7 @@ domain/apps/flashcards/cards    → Dynamic card viewer
    - Shows all study areas
    - Click "Flashcards" → goes to `/apps/flashcards/`
 
-2. **domain/apps/flashcards/** - Flashcard Topics
+2. **domain/apps/flashcards/** - Review Topics
    - Shows ML and SE topics
    - Has "← Back to Study Hub" link
    - Click topic → goes to `/cards?topic=X&type=Y`
