@@ -143,7 +143,13 @@ function displayCard(index) {
 function renderCard(card) {
   const parsed = parseCardContent(card.content);
 
-  let html = `<div class="review-card">`;
+  let html = `<div class="review-card" style="position: relative;">`;
+
+  // Add edit button
+  html += `<button onclick="editCard(${state.currentIndex})" type="button" class="edit-card-btn" title="Edit this card" style="position: absolute; top: 1rem; right: 1rem; background: rgba(74, 158, 255, 0.2); border: 1px solid var(--accent, #4a9eff); color: var(--accent, #4a9eff); padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.875rem; cursor: pointer; font-weight: 600;">
+    ✏️ Edit
+  </button>`;
+
   html += `<h2 class="review-card-title">${escapeHtml(card.title)}</h2>`;
 
   // Main Idea
@@ -382,6 +388,24 @@ function updateNavigation() {
   if (selector) {
     selector.value = state.currentIndex;
   }
+}
+
+// Edit card function
+function editCard(index) {
+  const card = state.cards[index];
+  if (!card) return;
+
+  // Extract the raw content for editing
+  const params = new URLSearchParams({
+    edit: 'true',
+    type: 'review',
+    section: card.section || '',
+    title: card.title || '',
+    content: card.content || ''
+  });
+
+  // Navigate to editor with pre-filled data
+  window.location.href = `editor.html?${params.toString()}`;
 }
 
 // Initialize on load

@@ -42,9 +42,6 @@ function loadCardForEditing(params) {
   // Get card data from URL parameters
   const cardType = params.get('type') || 'flashcard';
   const section = params.get('section') || '';
-  const cardId = params.get('id') || '';
-  const question = params.get('q') || '';
-  const answer = params.get('a') || '';
 
   // Switch to the appropriate card type
   const typeButton = document.querySelector(`[data-type="${cardType}"]`);
@@ -52,17 +49,101 @@ function loadCardForEditing(params) {
     typeButton.click();
   }
 
-  // Populate fields
+  // Populate common fields
   document.getElementById('cardSection').value = decodeURIComponent(section);
-  document.getElementById('cardId').value = decodeURIComponent(cardId);
 
   if (cardType === 'flashcard') {
+    const cardId = params.get('id') || '';
+    const question = params.get('q') || '';
+    const answer = params.get('a') || '';
+
+    document.getElementById('cardId').value = decodeURIComponent(cardId);
     document.getElementById('fcQuestion').value = decodeURIComponent(question);
     document.getElementById('fcAnswer').value = decodeURIComponent(answer);
+  } else if (cardType === 'review') {
+    const title = params.get('title') || '';
+    const content = params.get('content') || '';
+
+    document.getElementById('reviewTitle').value = decodeURIComponent(title);
+
+    // Parse content to extract structured fields
+    const parsed = parseReviewContent(decodeURIComponent(content));
+    if (parsed.mainIdea) document.getElementById('reviewMainIdea').value = parsed.mainIdea;
+    if (parsed.advantages) document.getElementById('reviewAdvantages').value = parsed.advantages;
+    if (parsed.disadvantages) document.getElementById('reviewDisadvantages').value = parsed.disadvantages;
+    if (parsed.requirements) document.getElementById('reviewRequirements').value = parsed.requirements;
+    if (parsed.lossFunction) document.getElementById('reviewLossFunction').value = parsed.lossFunction;
+    if (parsed.notes) document.getElementById('reviewNotes').value = parsed.notes;
   }
 
   // Scroll to form
   document.querySelector('.editor-form').scrollIntoView({ behavior: 'smooth' });
+}
+
+function parseReviewContent(content) {
+  const result = {
+    mainIdea: '',
+    advantages: '',
+    disadvantages: '',
+    requirements: '',
+    lossFunction: '',
+    notes: ''
+  };
+
+  const lines = content.split('\n');
+  let currentSection = null;
+  let currentContent = [];
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+
+    if (trimmed.startsWith('**Main Idea:**')) {
+      if (currentSection) {
+        result[currentSection] = currentContent.join('\n').trim();
+      }
+      currentSection = 'mainIdea';
+      currentContent = [line.replace('**Main Idea:**', '').trim()];
+    } else if (trimmed.startsWith('**Advantages:**')) {
+      if (currentSection) {
+        result[currentSection] = currentContent.join('\n').trim();
+      }
+      currentSection = 'advantages';
+      currentContent = [];
+    } else if (trimmed.startsWith('**Disadvantages:**')) {
+      if (currentSection) {
+        result[currentSection] = currentContent.join('\n').trim();
+      }
+      currentSection = 'disadvantages';
+      currentContent = [];
+    } else if (trimmed.startsWith('**Requirements:**')) {
+      if (currentSection) {
+        result[currentSection] = currentContent.join('\n').trim();
+      }
+      currentSection = 'requirements';
+      currentContent = [];
+    } else if (trimmed.startsWith('**Loss Function:**') || trimmed.startsWith('**Loss / Cost Function:**')) {
+      if (currentSection) {
+        result[currentSection] = currentContent.join('\n').trim();
+      }
+      currentSection = 'lossFunction';
+      currentContent = [line.replace(/\*\*(Loss Function|Loss \/ Cost Function):\*\*/, '').trim()];
+    } else if (trimmed.startsWith('**Note:**') || trimmed.startsWith('**Notes:**') || trimmed.startsWith('**Additional Notes:**')) {
+      if (currentSection) {
+        result[currentSection] = currentContent.join('\n').trim();
+      }
+      currentSection = 'notes';
+      currentContent = [line.replace(/\*\*(Note|Notes|Additional Notes):\*\*/, '').trim()];
+    } else if (currentSection && trimmed) {
+      currentContent.push(line);
+    }
+  }
+
+  // Save the last section
+  if (currentSection) {
+    result[currentSection] = currentContent.join('\n').trim();
+  }
+
+  return result;
 }
 
 function setupCardTypeButtons() {

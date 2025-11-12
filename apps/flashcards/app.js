@@ -882,15 +882,16 @@ async function speak(text, token) {
   }
 }
 
-function getPrecompiledAudioPath(text, voiceName) {
+function getPrecompiledAudioPath(text, voiceName, format = 'wav') {
   /**
    * Generate path to precompiled audio file
-   * Format: audio_cache/{voice_name}/{md5_hash}.wav
+   * Format: audio_cache/{voice_name}/{md5_hash}.{format}
+   * Supports: wav, mp3
    */
   const combined = `${text}|${voiceName}`;
   const hash = md5(combined);
   const safeVoiceName = voiceName.replace(/ /g, '_');
-  return `${state.audioCacheDir}/${safeVoiceName}/${hash}.wav`;
+  return `${state.audioCacheDir}/${safeVoiceName}/${hash}.${format}`;
 }
 
 function md5(str) {
@@ -908,17 +909,28 @@ function md5(str) {
 async function checkPrecompiledAudio(text, voiceName) {
   /**
    * Check if precompiled audio exists and return it
+   * Tries MP3 first (smaller, better for web), then WAV
    */
   if (!state.usePrecompiled) {
     return null;
   }
 
   try {
-    const audioPath = getPrecompiledAudioPath(text, voiceName);
-    const response = await fetch(audioPath);
+    // Try MP3 first (better for web, smaller file size)
+    let audioPath = getPrecompiledAudioPath(text, voiceName, 'mp3');
+    let response = await fetch(audioPath);
 
     if (response.ok) {
-      console.log('✓ Using precompiled audio:', audioPath);
+      console.log('✓ Using precompiled audio (MP3):', audioPath);
+      return await response.blob();
+    }
+
+    // Fallback to WAV
+    audioPath = getPrecompiledAudioPath(text, voiceName, 'wav');
+    response = await fetch(audioPath);
+
+    if (response.ok) {
+      console.log('✓ Using precompiled audio (WAV):', audioPath);
       return await response.blob();
     }
   } catch (error) {
