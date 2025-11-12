@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flashcard Editor</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    .editor-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .editor-header {
+      margin-bottom: 2rem;
+    }
+
+    .card-type-selector {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .card-type-button {
+      padding: 1rem 1.5rem;
+      border: 2px solid var(--border, #333);
+      background: var(--surface, #1a1a2e);
+      color: var(--text-primary, #fff);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .card-type-button:hover {
+      border-color: var(--accent, #4a9eff);
+      background: var(--background-secondary, #222);
+    }
+
+    .card-type-button.active {
+      border-color: var(--accent, #4a9eff);
+      background: rgba(74, 158, 255, 0.1);
+    }
+
+    .card-type-button h3 {
+      margin: 0 0 0.5rem 0;
+      color: var(--accent, #4a9eff);
+    }
+
+    .card-type-button p {
+      margin: 0;
+      font-size: 0.9rem;
+      color: var(--text-muted, rgba(255, 255, 255, 0.6));
+    }
+
+    .editor-form {
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary, #fff);
+      font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--background-primary, #12101a);
+      border: 1px solid var(--border, #333);
+      border-radius: 6px;
+      color: var(--text-primary, #fff);
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .form-group textarea {
+      min-height: 150px;
+      font-family: 'Fira Code', monospace;
+      resize: vertical;
+    }
+
+    .form-group small {
+      display: block;
+      margin-top: 0.5rem;
+      color: var(--text-muted, rgba(255, 255, 255, 0.6));
+      font-size: 0.875rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent, #4a9eff);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #3a8eef;
+    }
+
+    .btn-secondary {
+      background: var(--surface, #1a1a2e);
+      color: var(--text-primary, #fff);
+      border: 1px solid var(--border, #333);
+    }
+
+    .btn-secondary:hover {
+      background: var(--background-secondary, #222);
+    }
+
+    .preview-section {
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .preview-section h3 {
+      margin-top: 0;
+      color: var(--accent, #4a9eff);
+      border-bottom: 2px solid var(--accent, #4a9eff);
+      padding-bottom: 0.5rem;
+    }
+
+    .preview-content {
+      background: var(--background-primary, #12101a);
+      padding: 1.5rem;
+      border-radius: 8px;
+      border-left: 3px solid var(--accent, #4a9eff);
+    }
+
+    .preview-markdown {
+      font-family: 'Fira Code', monospace;
+      white-space: pre-wrap;
+      color: var(--text-primary, #fff);
+      line-height: 1.6;
+    }
+
+    .template-fields {
+      display: none;
+    }
+
+    .template-fields.active {
+      display: block;
+    }
+
+    .choice-group {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: var(--background-primary, #12101a);
+      border-radius: 6px;
+      border: 1px solid var(--border, #333);
+    }
+
+    .choice-group input[type="checkbox"] {
+      width: auto;
+      margin-right: 0.5rem;
+    }
+
+    .add-choice-btn {
+      padding: 0.5rem 1rem;
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 4px;
+      color: var(--text-primary, #fff);
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+
+    .add-choice-btn:hover {
+      background: var(--background-secondary, #222);
+    }
+
+    .output-section {
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .output-section h3 {
+      margin-top: 0;
+      color: var(--accent, #4a9eff);
+    }
+
+    .copy-btn {
+      margin-top: 1rem;
+      padding: 0.5rem 1rem;
+      background: #4ade80;
+      color: #000;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .copy-btn:hover {
+      background: #22c55e;
+    }
+
+    .help-text {
+      background: rgba(74, 158, 255, 0.1);
+      border-left: 3px solid var(--accent, #4a9eff);
+      padding: 1rem;
+      margin-bottom: 2rem;
+      border-radius: 4px;
+    }
+
+    .help-text h4 {
+      margin-top: 0;
+      color: var(--accent, #4a9eff);
+    }
+  </style>
+</head>
+<body class="theme-dark">
+  <div class="editor-container">
+    <header class="editor-header">
+      <a href="index.html" class="back-link">← Back to Topics</a>
+      <h1>Flashcard Editor</h1>
+      <p class="subtitle">Create new flashcards or edit existing ones</p>
+    </header>
+
+    <div class="help-text">
+      <h4>How to Use This Editor</h4>
+      <p>1. Select a card type below (Flash Card, Quiz Question, or Review Card)</p>
+      <p>2. Fill in the required fields for your card</p>
+      <p>3. Click "Generate Markdown" to see the formatted output</p>
+      <p>4. Copy the markdown and paste it into your card file (ml_midterm_cards.md, ml_midterm_quiz.md, or ml_midterm_review.md)</p>
+    </div>
+
+    <section class="card-type-selector">
+      <button class="card-type-button active" data-type="flashcard">
+        <h3>📝 Flash Card</h3>
+        <p>Standard Q&A flashcard with question and answer</p>
+      </button>
+      <button class="card-type-button" data-type="quiz">
+        <h3>✅ Quiz Question</h3>
+        <p>Multiple choice question with all options visible</p>
+      </button>
+      <button class="card-type-button" data-type="review">
+        <h3>📋 Review Card</h3>
+        <p>Comprehensive overview with structured sections</p>
+      </button>
+    </section>
+
+    <section class="editor-form">
+      <h2>Card Details</h2>
+
+      <div class="form-group">
+        <label for="cardSection">Section/Topic</label>
+        <input type="text" id="cardSection" placeholder="e.g., ML/Algorithms/K-NN or ML/Quiz/L03">
+        <small>Use format: ML/Category/Topic or ML/Quiz/LectureNumber</small>
+      </div>
+
+      <div class="form-group">
+        <label for="cardId">Card ID</label>
+        <input type="text" id="cardId" placeholder="e.g., Q1.1 or 1.1">
+        <small>Unique identifier for this card</small>
+      </div>
+
+      <!-- Flash Card Fields -->
+      <div id="flashcardFields" class="template-fields active">
+        <div class="form-group">
+          <label for="fcQuestion">Question</label>
+          <textarea id="fcQuestion" placeholder="Enter your question here"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="fcAnswer">Answer</label>
+          <textarea id="fcAnswer" placeholder="Enter the answer here"></textarea>
+        </div>
+      </div>
+
+      <!-- Quiz Question Fields -->
+      <div id="quizFields" class="template-fields">
+        <div class="form-group">
+          <label for="quizQuestion">Question</label>
+          <textarea id="quizQuestion" placeholder="Enter the quiz question"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Answer Choices</label>
+          <div id="choicesContainer">
+            <div class="choice-group">
+              <input type="text" class="choice-text" placeholder="Choice a)" data-letter="a">
+              <label>
+                <input type="checkbox" class="choice-correct" data-letter="a">
+                Correct answer
+              </label>
+            </div>
+            <div class="choice-group">
+              <input type="text" class="choice-text" placeholder="Choice b)" data-letter="b">
+              <label>
+                <input type="checkbox" class="choice-correct" data-letter="b">
+                Correct answer
+              </label>
+            </div>
+          </div>
+          <button type="button" class="add-choice-btn" onclick="addChoice()">+ Add Another Choice</button>
+        </div>
+
+        <div class="form-group">
+          <label for="quizExplanation">Explanation (optional)</label>
+          <textarea id="quizExplanation" placeholder="Additional explanation for the answer"></textarea>
+        </div>
+      </div>
+
+      <!-- Review Card Fields -->
+      <div id="reviewFields" class="template-fields">
+        <div class="form-group">
+          <label for="reviewTitle">Card Title</label>
+          <input type="text" id="reviewTitle" placeholder="e.g., Linear Regression - Complete Overview">
+        </div>
+
+        <div class="form-group">
+          <label for="reviewMainIdea">Main Idea</label>
+          <textarea id="reviewMainIdea" placeholder="Brief description of the main concept"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reviewAdvantages">Advantages</label>
+          <textarea id="reviewAdvantages" placeholder="List advantages, one per line starting with '-'"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reviewDisadvantages">Disadvantages</label>
+          <textarea id="reviewDisadvantages" placeholder="List disadvantages, one per line starting with '-'"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reviewRequirements">Requirements (optional)</label>
+          <textarea id="reviewRequirements" placeholder="List requirements or needs"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reviewLossFunction">Loss Function (optional)</label>
+          <textarea id="reviewLossFunction" placeholder="Describe the loss/cost function with formula"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="reviewNotes">Additional Notes (optional)</label>
+          <textarea id="reviewNotes" placeholder="Any additional information"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-primary" onclick="generateMarkdown()">Generate Markdown</button>
+        <button type="button" class="btn btn-secondary" onclick="clearForm()">Clear Form</button>
+      </div>
+    </section>
+
+    <section class="output-section" id="outputSection" style="display: none;">
+      <h3>Generated Markdown</h3>
+      <div class="preview-content">
+        <pre class="preview-markdown" id="markdownOutput"></pre>
+      </div>
+      <button type="button" class="copy-btn" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+    </section>
+  </div>
+
+  <script src="editor.js"></script>
+</body>
+</html>
