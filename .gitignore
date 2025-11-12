@@ -87,8 +87,8 @@ external/emsdk/
 apps/museplay/temp/
 apps/museplay/soundfonts/
 *.sf2
-
 apps/flashcards/audio_samples/
+# Note: audio_cache_british/ is intentionally NOT ignored so it deploys to Vercel
 
 # Archived old files
 .archived/
