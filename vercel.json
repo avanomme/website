@@ -10,6 +10,10 @@
       "use": "@vercel/python"
     },
     {
+      "src": "api/cards.py",
+      "use": "@vercel/python"
+    },
+    {
       "src": "apps/player/**",
       "use": "@vercel/static"
     }
@@ -28,6 +32,21 @@
     {
       "src": "/api/logs/stats",
       "dest": "api/log.py",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/api/cards/save",
+      "dest": "api/cards.py",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/api/cards/list",
+      "dest": "api/cards.py",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/api/cards/(.*)",
+      "dest": "api/cards.py",
       "methods": ["GET"]
     },
     {

@@ -214,7 +214,7 @@ function addChoice() {
   choiceCounter++;
 }
 
-function generateMarkdown() {
+async function generateMarkdown() {
   const section = document.getElementById('cardSection').value.trim();
   const cardId = document.getElementById('cardId').value.trim();
 
@@ -223,30 +223,117 @@ function generateMarkdown() {
     return;
   }
 
+  // Prepare card data for API
+  let cardData = {
+    type: currentCardType,
+    section: section,
+    card_id: cardId
+  };
+
   let markdown = '';
 
   switch (currentCardType) {
     case 'flashcard':
+      cardData.question = document.getElementById('fcQuestion').value.trim();
+      cardData.answer = document.getElementById('fcAnswer').value.trim();
+
+      if (!cardData.question || !cardData.answer) {
+        alert('Please fill in both question and answer');
+        return;
+      }
+
       markdown = generateFlashcardMarkdown(section, cardId);
       break;
+
     case 'quiz':
+      cardData.question = document.getElementById('quizQuestion').value.trim();
+      cardData.explanation = document.getElementById('quizExplanation').value.trim();
+
+      if (!cardData.question) {
+        alert('Please fill in the question');
+        return;
+      }
+
+      // Get choices
+      const choiceTexts = document.querySelectorAll('.choice-text');
+      const choiceCorrects = document.querySelectorAll('.choice-correct');
+      cardData.choices = [];
+
+      choiceTexts.forEach((input, index) => {
+        const text = input.value.trim();
+        if (text) {
+          cardData.choices.push({
+            letter: input.dataset.letter,
+            text: text,
+            isCorrect: choiceCorrects[index].checked
+          });
+        }
+      });
+
+      if (cardData.choices.length < 2) {
+        alert('Please add at least 2 choices');
+        return;
+      }
+
+      if (!cardData.choices.some(c => c.isCorrect)) {
+        alert('Please mark at least one correct answer');
+        return;
+      }
+
       markdown = generateQuizMarkdown(section, cardId);
       break;
+
     case 'review':
+      cardData.title = document.getElementById('reviewTitle').value.trim();
+      cardData.main_idea = document.getElementById('reviewMainIdea').value.trim();
+      cardData.advantages = document.getElementById('reviewAdvantages').value.trim();
+      cardData.disadvantages = document.getElementById('reviewDisadvantages').value.trim();
+      cardData.requirements = document.getElementById('reviewRequirements').value.trim();
+      cardData.loss_function = document.getElementById('reviewLossFunction').value.trim();
+      cardData.notes = document.getElementById('reviewNotes').value.trim();
+
+      if (!cardData.title || !cardData.main_idea) {
+        alert('Please fill in at least Title and Main Idea');
+        return;
+      }
+
       markdown = generateReviewMarkdown(section, cardId);
       break;
   }
 
-  if (markdown) {
-    displayOutput(markdown);
-
-    // Log card creation
-    logEvent('card_created', {
-      card_type: currentCardType,
-      section: section,
-      card_id: cardId,
-      markdown_length: markdown.length
+  // Save card to server
+  try {
+    const response = await fetch('/api/cards/save', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(cardData)
     });
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      // Show success message
+      displayOutput(markdown, true, result);
+
+      // Log card creation
+      logEvent('card_created', {
+        card_type: currentCardType,
+        section: section,
+        card_id: cardId,
+        saved_to_file: true,
+        git_committed: result.git_committed
+      });
+    } else {
+      // Show error but still display markdown
+      displayOutput(markdown, false, result);
+      alert(`Warning: Card saved locally but server save failed: ${result.error || 'Unknown error'}`);
+    }
+  } catch (error) {
+    // Network error - still show markdown
+    displayOutput(markdown, false, {error: error.message});
+    alert(`Warning: Could not save to server: ${error.message}\nMarkdown is shown below for manual saving.`);
   }
 }
 
@@ -381,12 +468,44 @@ function generateReviewMarkdown(section, cardId) {
   return markdown;
 }
 
-function displayOutput(markdown) {
+function displayOutput(markdown, success = false, result = {}) {
   const output = document.getElementById('markdownOutput');
   const outputSection = document.getElementById('outputSection');
 
   output.textContent = markdown;
   outputSection.style.display = 'block';
+
+  // Add success/failure message
+  const messageDiv = document.getElementById('saveMessage') || (() => {
+    const div = document.createElement('div');
+    div.id = 'saveMessage';
+    div.style.cssText = 'margin-bottom: 1rem; padding: 1rem; border-radius: 8px; font-weight: 600;';
+    outputSection.insertBefore(div, output.parentElement);
+    return div;
+  })();
+
+  if (success) {
+    messageDiv.style.background = 'rgba(34, 197, 94, 0.2)';
+    messageDiv.style.border = '1px solid #22c55e';
+    messageDiv.style.color = '#22c55e';
+    messageDiv.innerHTML = `
+      ✓ Card saved successfully!<br>
+      <small style="font-weight: normal;">
+        Saved to: ${result.path || 'server'}<br>
+        ${result.git_committed ? '✓ Committed to git' : '⚠ Git commit failed (may need manual commit)'}
+      </small>
+    `;
+  } else if (result.error) {
+    messageDiv.style.background = 'rgba(239, 68, 68, 0.2)';
+    messageDiv.style.border = '1px solid #ef4444';
+    messageDiv.style.color = '#ef4444';
+    messageDiv.innerHTML = `
+      ✗ Save failed: ${result.error}<br>
+      <small style="font-weight: normal;">Markdown shown below for manual saving</small>
+    `;
+  } else {
+    messageDiv.style.display = 'none';
+  }
 
   // Scroll to output
   outputSection.scrollIntoView({ behavior: 'smooth', block: 'start' });

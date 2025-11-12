@@ -208,6 +208,14 @@ function renderCard(card) {
     html += `</div>`;
   }
 
+  // Other Content (for cards with non-standard format like Activation Functions)
+  if (parsed.otherContent && parsed.otherContent.trim()) {
+    html += `<div class="review-section">`;
+    html += `<h3 class="review-section-title">Details</h3>`;
+    html += `<div class="review-content">${renderMarkdown(parsed.otherContent)}</div>`;
+    html += `</div>`;
+  }
+
   html += `</div>`;
   return html;
 }
@@ -219,7 +227,8 @@ function parseCardContent(content) {
     disadvantages: '',
     needs: '',
     lossFunction: '',
-    notes: ''
+    notes: '',
+    otherContent: ''  // Catch-all for content that doesn't match standard sections
   };
 
   const lines = content.split('\n');
@@ -247,7 +256,7 @@ function parseCardContent(content) {
       }
       currentSection = 'disadvantages';
       currentContent = [];
-    } else if (trimmed.startsWith('**Needs:**')) {
+    } else if (trimmed.startsWith('**Needs:**') || trimmed.startsWith('**Requirements:**')) {
       if (currentSection) {
         result[currentSection] = currentContent.join('\n').trim();
       }
@@ -259,7 +268,7 @@ function parseCardContent(content) {
       }
       currentSection = 'lossFunction';
       currentContent = [];
-    } else if (trimmed.startsWith('**Note') || trimmed.startsWith('**Key') || trimmed.startsWith('**Hierarchy') || trimmed.startsWith('**Benefits')) {
+    } else if (trimmed.startsWith('**Note') || trimmed.startsWith('**Key') || trimmed.startsWith('**Hierarchy') || trimmed.startsWith('**Benefits') || trimmed.startsWith('**Bottom Line')) {
       if (currentSection) {
         result[currentSection] = currentContent.join('\n').trim();
       }
@@ -267,6 +276,9 @@ function parseCardContent(content) {
       currentContent = [line];
     } else if (currentSection) {
       currentContent.push(line);
+    } else {
+      // If we haven't matched any section yet, collect as otherContent
+      result.otherContent += line + '\n';
     }
   }
 
