@@ -595,14 +595,325 @@ The architectural styles discussed in this lecture are:
   #flashcards/SE/L10
 **10.10** *Peer-to-Peer Style*
 ?
-	- **Components**: Peers (each acts as client and server)    
-	- **Connectors**: Network protocols for discovery and communication    
-	- **Advantages**:    
-	    - Robust to single point failures        
-	    - Scales well        
-	- **Disadvantages**:    
+	- **Components**: Peers (each acts as client and server)
+	- **Connectors**: Network protocols for discovery and communication
+	- **Advantages**:
+	    - Robust to single point failures
+	    - Scales well
+	- **Disadvantages**:
 	    - Discovery and security are more complex
 	    - Synchronization issues
-	  
+
 For any of these architectural styles, you may be asked to describe the style, including identifying the components, connectors advantages and disadvantages of each. You may also be required to draw a simple diagram of the style.
+
+#### Machine Learning
+
+#flashcards/ML/Algorithms/K-NN
+**ML.A.1** *In the K-NN classification algorithm, what does the parameter k determine?*
+?
+	- The number of neighbor examples used to predict the class
+	- K-NN is a lazy learning algorithm that uses the k nearest neighbors to classify new instances
+
+#flashcards/ML/Algorithms/K-NN
+**ML.A.2** *What are the key characteristics of the K-NN algorithm?*
+?
+	- **Lazy learning**: Instance-based, no explicit training phase
+	- **k parameter**: Determines number of neighbors to consider
+	- **Simple but slow**: Easy to understand but can be slow for large datasets
+	- **Non-parametric**: Makes no assumptions about data distribution
+
+#flashcards/ML/Algorithms/Linear-Regression
+**ML.A.3** *What is the goal in Linear Regression and what does it minimize?*
+?
+	- **Goal**: Minimize the cost function
+	- **Cost function**: Mean squared error (MSE)
+	- **Formula**: MSE = (1/m) * Σ (h(x(i)) - y(i))^2
+	- Each hypothesis function has an associated cost value
+
+#flashcards/ML/Algorithms/Linear-Regression
+**ML.A.4** *How many parameters does the hypothesis function have in univariate linear regression?*
+?
+	- **2 parameters**: θ₀ (intercept) and θ₁ (slope)
+	- **Hypothesis function**: h(x) = θ₀ + θ₁x
+	- These parameters are optimized to minimize the cost function
+
+#flashcards/ML/Algorithms/Gradient-Descent
+**ML.A.5** *Explain the role of the learning rate (alpha) in gradient descent and what happens when it's too large or too small.*
+?
+	- **Alpha multiplies** the partial derivative of the cost function in the update rule
+	- **If alpha is right**: Gradient descent converges to a local optimum
+	- **If alpha is too small**: Convergence is very slow
+	- **If alpha is too large**: May not converge or even diverge
+	- **Update formula**: θ := θ - α * ∇J(θ)
+
+#flashcards/ML/Algorithms/Gradient-Descent
+**ML.A.6** *When should you use Gradient Descent vs Normal Equation Method for linear regression?*
+?
+	- **Use Gradient Descent when**:
+	    - Number of training examples is very large
+	    - Want iterative optimization
+	    - Features can be in different scales
+	- **Normal Equation Method**:
+	    - Better for small datasets
+	    - Computes solution directly (non-iterative)
+
+#flashcards/ML/Algorithms/Logistic-Regression
+**ML.A.7** *Is Logistic Regression a regression or classification algorithm? Explain.*
+?
+	- **Classification algorithm** (despite the name!)
+	- **Output**: Can be interpreted as a probability (between 0 and 1)
+	- **Uses**: Sigmoid activation function σ(z) = 1 / (1 + e^(-z))
+	- **Decision boundary**: Can learn non-linear boundaries by adding polynomial features
+	- **Benefit**: Convex cost function guarantees convergence to global minimum
+
+#flashcards/ML/Algorithms/Naive-Bayes
+**ML.A.8** *What are the key assumptions and characteristics of the Naive Bayes classifier?*
+?
+	- **Key assumption**: Attribute values are conditionally independent given the target value
+	- **MAP classification**: When conditional independence is satisfied, corresponds to Maximum A Posteriori
+	- **Classification**: Computes the class that maximizes posterior probability
+	- **Effective for**: Text classification
+	- **Bayes theorem**: P(h|D) = P(D|h) * P(h) / P(D)
+
+#flashcards/ML/Algorithms/Naive-Bayes
+**ML.A.9** *Define MAP (Maximum A Posteriori) and uniform prior in Bayesian learning.*
+?
+	- **MAP**: Maximum A **Posterior** hypothesis
+	    - Hypothesis that maximizes P(h|D)
+	- **Uniform prior**: Assuming all hypotheses are equally probable a priori
+	    - When P(h) is constant for all h
+	- **Maximum likelihood**: Under certain assumptions, minimizing squared error yields ML hypothesis
+
+#flashcards/ML/Algorithms/Decision-Trees
+**ML.A.10** *What are the key characteristics of the ID3 decision tree algorithm?*
+?
+	- **Recursive algorithm**: Builds tree top-down
+	- **Greedy algorithm**: Makes locally optimal choices at each step
+	- **Favors short hypotheses**: Prefers simpler trees
+	- **Selection criteria**: Maximizes information gain
+	- **Information gain**: IG(S, A) = H(S) - Σ |Sv|/|S| * H(Sv)
+	- **Output**: Can be represented as logic rules
+
+#flashcards/ML/Algorithms/Decision-Trees
+**ML.A.11** *What does the entropy equation calculate and how is it used in decision trees?*
+?
+	- **Entropy**: H(S) = -Σ p(i) * log₂(p(i))
+	- **Measures**: Homogeneity/impurity of a dataset
+	- **Range**: 0 (perfectly homogeneous) to 1 (maximum impurity)
+	- **Usage**: ID3 selects attributes that maximize information gain
+	- **Information gain**: Reduction in entropy after splitting on an attribute
+
+#flashcards/ML/Algorithms/K-Means
+**ML.A.12** *What are the two main operations that K-means repeatedly performs?*
+?
+	- **Assignment step**: Assign each data instance to the nearest mean (centroid)
+	- **Update step**: Assign each mean to the centroid of its assigned points
+	- **Note**: K must be specified (cannot be automatically inferred from data)
+	- **Finds**: Spherical clusters
+	- **sklearn usage**:
+	    ```python
+	    from sklearn.cluster import KMeans
+	    kmeans = KMeans(n_clusters=5)
+	    kmeans.fit(X)
+	    y_kmeans = kmeans.predict(X)
+	    ```
+
+#flashcards/ML/Algorithms/DBSCAN
+**ML.A.13** *What are the advantages of DBSCAN over K-means clustering?*
+?
+	- **Can find arbitrarily-shaped clusters** (not just spherical)
+	- **Robust to outliers** (identifies and handles them explicitly)
+	- **Does not require number of clusters to be specified**
+	- **Point types**:
+	    - Core points: ≥ minPts neighbors within eps distance
+	    - Border points: Within eps of core point but not core
+	    - Outliers: Neither core nor border
+
+#flashcards/ML/Algorithms/DBSCAN
+**ML.A.14** *What are the disadvantages of DBSCAN?*
+?
+	- **Sensitive to parameters** (minPts and eps)
+	- **Fails to find clusters with different densities**
+	- **Only applicable to spatial data**
+	- **Ineffective in large dimensions** (curse of dimensionality)
+
+#flashcards/ML/Algorithms/PCA
+**ML.A.15** *What is PCA and what is it used for?*
+?
+	- **PCA**: Principal Component Analysis
+	- **Technique**: Unsupervised dimensionality reduction
+	- **Method**: Finds directions of maximum variance
+	- **Preprocessing**: Features should be scaled/normalized first
+	- **Applications**:
+	    - Data visualization
+	    - Reducing computational cost
+	    - Removing noise
+	    - Avoiding overfitting
+
+#flashcards/ML/Algorithms/Neural-Networks
+**ML.A.16** *What is a perceptron and what are common activation functions in neural networks?*
+?
+	- **Perceptron**: Single neuron / linear classifier
+	- **Activation functions** (introduce non-linearity):
+	    - **Sigmoid**: σ(z) = 1/(1 + e^(-z)), outputs 0 to 1
+	    - **ReLU**: Rectified Linear Unit, max(0, z)
+	    - **Tanh**: Outputs -1 to 1
+	    - **Softmax**: For output layer in multi-class classification
+	- **No hidden layers**: Equivalent to logistic regression
+
+#flashcards/ML/Algorithms/Neural-Networks
+**ML.A.17** *What is backpropagation and how should neural network weights be initialized?*
+?
+	- **Backpropagation**: Algorithm for computing gradients of cost function with respect to weights
+	- **Weight initialization**: Small random values (NOT all zeros!)
+	    - Initializing to zero breaks symmetry and prevents learning
+	- **Learning rate**: Controls step size in gradient descent
+	- **Cost function**: Typically non-convex for neural networks
+
+#flashcards/ML/Algorithms/Neural-Networks
+**ML.A.18** *How can overfitting in neural networks be prevented?*
+?
+	- **Regularization**: Add penalty term to cost function (L1/L2)
+	- **Dropout**: Randomly drop neurons during training
+	- **Early stopping**: Stop training when validation error increases
+	- **More training data**: Reduce overfitting by having more examples
+	- **Simpler architecture**: Fewer layers/neurons
+
+#flashcards/ML/Algorithms/Deep-Learning
+**ML.A.19** *What characterizes deep neural networks and what are their advantages?*
+?
+	- **Characteristic**: Multiple hidden layers
+	- **Advantages**:
+	    - Automatic feature learning (hierarchical representation)
+	    - Better performance on complex tasks
+	    - Can learn abstract representations
+	- **Successful applications**:
+	    - Image recognition
+	    - Natural language processing
+	    - Speech recognition
+	    - Game playing (AlphaGo)
+
+#flashcards/ML/Algorithms/Deep-Learning
+**ML.A.20** *What are the challenges with deep neural networks?*
+?
+	- **Data requirements**: Require large amounts of training data
+	- **Computational cost**: Expensive to train
+	- **Overfitting risk**: Many parameters can overfit
+	- **Interpretability**: Difficult to understand decisions ("black box")
+	- **Vanishing gradient problem**: Gradients become very small in deep networks, making training difficult
+
+#flashcards/ML/Review/Fundamentals
+**ML.R.1** *Complete the formal definition of machine learning: "An algorithm is said to _____ from _____ E, with respect to some _____ T, and some _____ measure P, if..."*
+?
+	- An algorithm is said to **learn** from **experience** E, with respect to some **task** T, and some **performance** measure P, if its performance on T as measured by P **improves** with experience E.
+
+#flashcards/ML/Review/Fundamentals
+**ML.R.2** *Match each ML concept to its description: Regression, Classification, Supervised Learning, Unsupervised Learning*
+?
+	- **Regression**: Task of predicting a continuous value given input-output example pairs
+	- **Classification**: Task of predicting a discrete value given input-output example pairs
+	- **Supervised learning**: Task of learning a function based on example input-output pairs
+	- **Unsupervised learning**: Task of drawing inferences from datasets consisting of input data without labeled responses
+
+#flashcards/ML/Review/Notation
+**ML.R.3** *Explain the standard ML notation: x(i), n, m, x(i)j*
+?
+	- **x(i)**: Input of i-th training example from a dataset
+	- **n**: Number of features
+	- **m**: Number of training examples
+	- **x(i)j**: Value of feature j in i-th training example
+
+#flashcards/ML/Review/Fundamentals
+**ML.R.4** *True or False: Regression should be used when you have data WITHOUT labels. Also, explain labeled vs unlabeled data.*
+?
+	- **False**: Regression requires labeled data (supervised learning)
+	- **Labeled data**: Data with known outputs/targets (for supervised learning)
+	- **Unlabeled data**: Data without outputs/targets (for unsupervised learning)
+	- **Regression and Classification**: Both require labeled data
+
+#flashcards/ML/Review/Fundamentals
+**ML.R.5** *What is the mean squared error and what does it tell you?*
+?
+	- **MSE**: Tells you how close a regression line is to a set of points
+	- **Formula**: MSE = (1/m) * Σ (h(x(i)) - y(i))^2
+	- **Lower MSE**: Better fit to the data
+	- **Used as**: Cost function in linear regression
+
+#flashcards/ML/Review/Polynomial-Regression
+**ML.R.6** *What are the true statements about Polynomial Regression?*
+?
+	- **Allows the model to learn non-linear hypotheses**
+	- **Creates new features based on existing ones**
+	- **False statements**:
+	    - NOT faster than Linear Regression
+	    - New features DO need to be scaled
+	    - DOES require Gradient Descent (or Normal Equation)
+
+#flashcards/ML/Review/Data-Splits
+**ML.R.7** *Match the dataset types to their purposes: Training set, Validation set, Test set*
+?
+	- **Training set**: Used for finding the best parameter values of the model
+	- **Validation set**: Used for selecting the best model (hyperparameter tuning)
+	- **Test set**: Used for reporting the final accuracy of the model
+	- **Important**: Never use test set for model selection!
+
+#flashcards/ML/Review/Feature-Scaling
+**ML.R.8** *What is the purpose of feature scaling and when should it be applied?*
+?
+	- **Purpose**: Have all features in a similar scale
+	- **Benefits**:
+	    - Gradient descent converges faster
+	    - Prevents features with large ranges from dominating
+	- **Apply before**:
+	    - Gradient descent
+	    - K-means
+	    - PCA
+	    - Neural networks
+
+#flashcards/ML/Review/Cross-Validation
+**ML.R.9** *True or False: In K-fold cross-validation, the highest accuracy among the different folds is reported. Explain the correct approach.*
+?
+	- **False**: The **average** accuracy across all folds is reported
+	- **K-fold CV process**:
+	    1. Split data into K folds
+	    2. Train on K-1 folds, test on remaining fold
+	    3. Repeat K times (each fold used as test once)
+	    4. Report average performance
+	- **Benefits**: More robust estimate, uses all data
+
+#flashcards/ML/Review/Unsupervised-Learning
+**ML.R.10** *What is the goal of unsupervised learning and what tasks does it perform?*
+?
+	- **Goal**: Discover "interesting structures" in unlabeled data
+	- **Tasks performed**:
+	    - Finding groups/clusters in the data
+	    - Reducing dimensions of the data
+	    - Discovering correlations among variables
+	- **NOT used for**:
+	    - Regression analysis (supervised)
+	    - Predicting classes (supervised)
+
+#flashcards/ML/Review/K-NN-vs-K-Means
+**ML.R.11** *What is the key difference between K-NN and K-means?*
+?
+	- **K-NN**:
+	    - **Supervised** classification algorithm
+	    - Uses labeled data
+	    - k = number of neighbors for prediction
+	    - Lazy learning (no training phase)
+	- **K-means**:
+	    - **Unsupervised** clustering algorithm
+	    - Uses unlabeled data
+	    - k = number of clusters to find
+	    - Iterative optimization
+
+#flashcards/ML/Review/Forward-Propagation
+**ML.R.12** *What is forward propagation in neural networks?*
+?
+	- **Definition**: Computing the output of the network given an input
+	- **Process**:
+	    1. Input passes through layers
+	    2. Each layer applies weights, biases, and activation functions
+	    3. Produces final output/prediction
+	- **Contrast with backpropagation**: Forward computes output; backward computes gradients
 
