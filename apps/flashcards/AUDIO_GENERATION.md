@@ -172,6 +172,30 @@ The `audio_cache/` directory is typically git-ignored due to large file sizes. O
 
 ## Troubleshooting
 
+### Edge TTS 403 Forbidden Errors
+
+**Error**: `✗ Error 500: {"error":"403, message='Invalid response status'`
+
+**Cause**: Microsoft occasionally blocks the edge-tts library API temporarily
+
+**Solutions**:
+
+1. **Wait and Retry** (Recommended): Microsoft's blocks are usually temporary (hours to days)
+   ```bash
+   # Try again later
+   python precompile_ml_midterm.py --yes
+   ```
+
+2. **Use Coqui TTS Instead**: Higher quality, but requires more setup
+   ```bash
+   ./start_tts.sh  # Start Coqui TTS server
+   python precompile_all_cards.py  # Use original script
+   ```
+
+3. **Use Existing Cache**: The flashcard app already has audio_cache/ with cached files
+   - Just use the existing cached audio
+   - New cards will generate on-demand when played
+
 ### Server Not Available
 
 **Error**: `Error: Edge TTS server not available`
