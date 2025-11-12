@@ -184,7 +184,8 @@ Minimizes the total distance of points from their cluster centers.
 - Sensitive to feature scaling - must standardize first
 - May remove small-variance but important features
 
-**How it works:**
+**How It Works:**
+
 1. Standardize the data (mean=0, variance=1 for each feature)
 2. Compute covariance matrix
 3. Find eigenvectors (directions) and eigenvalues (variance explained)
@@ -240,6 +241,7 @@ Second term: Keep coefficients small
 - Not suitable for time series (unless you use time-series CV)
 
 **Common Choices:**
+
 - K=5 or K=10 are standard
 - K=N (Leave-One-Out): Maximum data usage but very slow
 - Stratified K-Fold: Maintains class proportions in each fold
@@ -267,6 +269,7 @@ Second term: Keep coefficients small
 - Sensitive to initialization and random seed
 
 **Requirements:**
+
 - Large labeled datasets (thousands to millions of examples)
 - Non-linear activation functions (ReLU, tanh, sigmoid)
 - Proper weight initialization (Xavier, He initialization)
