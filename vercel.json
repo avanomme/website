@@ -6,11 +6,30 @@
       "use": "@vercel/python"
     },
     {
+      "src": "api/log.py",
+      "use": "@vercel/python"
+    },
+    {
       "src": "apps/player/**",
       "use": "@vercel/static"
     }
   ],
   "routes": [
+    {
+      "src": "/api/log",
+      "dest": "api/log.py",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/api/logs",
+      "dest": "api/log.py",
+      "methods": ["GET"]
+    },
+    {
+      "src": "/api/logs/stats",
+      "dest": "api/log.py",
+      "methods": ["GET"]
+    },
     {
       "src": "/music_player/(.*)",
       "dest": "/apps/player/$1"

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flashcard Admin - Logs</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="app.css">
+  <style>
+    .admin-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .admin-header {
+      margin-bottom: 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .auth-section {
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .auth-section input {
+      width: 100%;
+      padding: 0.75rem;
+      background: var(--background-primary, #12101a);
+      border: 1px solid var(--border, #333);
+      border-radius: 6px;
+      color: var(--text-primary, #fff);
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .stat-card h3 {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-muted, rgba(255, 255, 255, 0.6));
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .stat-card .value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent, #4a9eff);
+    }
+
+    .logs-section {
+      background: var(--surface, #1a1a2e);
+      border: 1px solid var(--border, #333);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .logs-filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .logs-filters select,
+    .logs-filters input {
+      padding: 0.5rem 1rem;
+      background: var(--background-primary, #12101a);
+      border: 1px solid var(--border, #333);
+      border-radius: 6px;
+      color: var(--text-primary, #fff);
+    }
+
+    .logs-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .logs-table th {
+      background: var(--background-primary, #12101a);
+      padding: 0.75rem;
+      text-align: left;
+      font-weight: 600;
+      color: var(--accent, #4a9eff);
+      border-bottom: 2px solid var(--border, #333);
+    }
+
+    .logs-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border, #333);
+      vertical-align: top;
+    }
+
+    .logs-table tr:hover {
+      background: var(--background-secondary, #222);
+    }
+
+    .event-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .event-type.page_view {
+      background: rgba(74, 158, 255, 0.2);
+      color: #4a9eff;
+    }
+
+    .event-type.card_created {
+      background: rgba(74, 222, 128, 0.2);
+      color: #4ade80;
+    }
+
+    .event-type.card_edited {
+      background: rgba(251, 191, 36, 0.2);
+      color: #fbbf24;
+    }
+
+    .log-data {
+      font-family: 'Fira Code', monospace;
+      font-size: 0.85rem;
+      color: var(--text-muted, rgba(255, 255, 255, 0.6));
+    }
+
+    .log-data pre {
+      margin: 0;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent, #4a9eff);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #3a8eef;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .error-message {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid #ef4444;
+      color: #ef4444;
+      padding: 1rem;
+      border-radius: 6px;
+      margin-bottom: 1rem;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted, rgba(255, 255, 255, 0.6));
+    }
+  </style>
+</head>
+<body class="theme-dark">
+  <div class="admin-container">
+    <div id="authSection" class="auth-section">
+      <h2>Admin Authentication</h2>
+      <p style="color: var(--text-muted, rgba(255, 255, 255, 0.6)); margin-bottom: 1rem;">
+        Enter your admin token to view logs
+      </p>
+      <input type="password" id="authToken" placeholder="Enter admin token">
+      <button type="button" class="btn btn-primary" onclick="authenticate()" style="width: 100%;">
+        Login
+      </button>
+      <div id="authError" class="error-message hidden"></div>
+    </div>
+
+    <div id="adminContent" class="hidden">
+      <header class="admin-header">
+        <div>
+          <a href="index.html" class="back-link">← Back to Topics</a>
+          <h1>📊 Flashcard Activity Logs</h1>
+          <p class="subtitle">Monitor page views and card creation activity</p>
+        </div>
+        <button type="button" class="btn btn-primary" onclick="refreshData()">🔄 Refresh</button>
+      </header>
+
+      <section class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <h3>Total Events</h3>
+          <div class="value" id="statTotal">-</div>
+        </div>
+        <div class="stat-card">
+          <h3>Page Views</h3>
+          <div class="value" id="statPageViews">-</div>
+        </div>
+        <div class="stat-card">
+          <h3>Cards Created</h3>
+          <div class="value" id="statCardCreations">-</div>
+        </div>
+        <div class="stat-card">
+          <h3>Unique IPs</h3>
+          <div class="value" id="statUniqueIPs">-</div>
+        </div>
+      </section>
+
+      <section class="logs-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+          <h2 style="margin: 0;">Recent Activity</h2>
+          <div class="logs-filters">
+            <select id="eventTypeFilter" onchange="filterLogs()">
+              <option value="">All Events</option>
+              <option value="page_view">Page Views</option>
+              <option value="card_created">Card Created</option>
+              <option value="card_edited">Card Edited</option>
+            </select>
+            <input type="number" id="limitInput" placeholder="Limit" value="100" min="10" max="1000" onchange="filterLogs()">
+          </div>
+        </div>
+
+        <div id="logsLoading" class="loading hidden">Loading logs...</div>
+        <div id="logsError" class="error-message hidden"></div>
+
+        <div style="overflow-x: auto;">
+          <table class="logs-table">
+            <thead>
+              <tr>
+                <th>Timestamp</th>
+                <th>Event Type</th>
+                <th>IP Address</th>
+                <th>Details</th>
+                <th>User Agent</th>
+              </tr>
+            </thead>
+            <tbody id="logsTableBody">
+              <tr>
+                <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted, rgba(255, 255, 255, 0.6));">
+                  No logs yet
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    let authToken = null;
+
+    function authenticate() {
+      const token = document.getElementById('authToken').value.trim();
+      const errorDiv = document.getElementById('authError');
+
+      if (!token) {
+        errorDiv.textContent = 'Please enter a token';
+        errorDiv.classList.remove('hidden');
+        return;
+      }
+
+      authToken = token;
+
+      // Try to fetch logs to validate token
+      fetch('/api/logs?limit=1', {
+        headers: {
+          'Authorization': `Bearer ${authToken}`
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          // Token is valid
+          document.getElementById('authSection').classList.add('hidden');
+          document.getElementById('adminContent').classList.remove('hidden');
+          refreshData();
+        } else {
+          errorDiv.textContent = 'Invalid token';
+          errorDiv.classList.remove('hidden');
+        }
+      })
+      .catch(error => {
+        errorDiv.textContent = 'Error authenticating: ' + error.message;
+        errorDiv.classList.remove('hidden');
+      });
+    }
+
+    async function refreshData() {
+      await Promise.all([
+        loadStats(),
+        loadLogs()
+      ]);
+    }
+
+    async function loadStats() {
+      try {
+        const response = await fetch('/api/logs/stats', {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to load stats');
+
+        const data = await response.json();
+        const stats = data.stats;
+
+        document.getElementById('statTotal').textContent = stats.total_events || 0;
+        document.getElementById('statPageViews').textContent = stats.page_views || 0;
+        document.getElementById('statCardCreations').textContent = stats.card_creations || 0;
+        document.getElementById('statUniqueIPs').textContent = stats.unique_ips || 0;
+
+      } catch (error) {
+        console.error('Error loading stats:', error);
+      }
+    }
+
+    async function loadLogs() {
+      const logsLoading = document.getElementById('logsLoading');
+      const logsError = document.getElementById('logsError');
+      const tableBody = document.getElementById('logsTableBody');
+
+      logsLoading.classList.remove('hidden');
+      logsError.classList.add('hidden');
+
+      try {
+        const eventType = document.getElementById('eventTypeFilter').value;
+        const limit = document.getElementById('limitInput').value;
+
+        let url = `/api/logs?limit=${limit}`;
+        if (eventType) url += `&event_type=${eventType}`;
+
+        const response = await fetch(url, {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (!response.ok) throw new Error('Failed to load logs');
+
+        const data = await response.json();
+        const logs = data.logs;
+
+        if (logs.length === 0) {
+          tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted, rgba(255, 255, 255, 0.6));">No logs found</td></tr>';
+        } else {
+          tableBody.innerHTML = logs.map(log => {
+            const timestamp = new Date(log.timestamp).toLocaleString();
+            const eventType = log.event_type || 'unknown';
+            const ip = log.ip || 'unknown';
+            const userAgent = (log.user_agent || 'unknown').substring(0, 50);
+            const data = JSON.stringify(log.data || {}, null, 2);
+
+            return `
+              <tr>
+                <td>${timestamp}</td>
+                <td><span class="event-type ${eventType}">${eventType}</span></td>
+                <td>${ip}</td>
+                <td><div class="log-data"><pre>${data}</pre></div></td>
+                <td style="font-size: 0.8rem; color: var(--text-muted, rgba(255, 255, 255, 0.6));">${userAgent}...</td>
+              </tr>
+            `;
+          }).join('');
+        }
+
+        logsLoading.classList.add('hidden');
+
+      } catch (error) {
+        logsLoading.classList.add('hidden');
+        logsError.textContent = 'Error loading logs: ' + error.message;
+        logsError.classList.remove('hidden');
+      }
+    }
+
+    function filterLogs() {
+      loadLogs();
+    }
+  </script>
+</body>
+</html>

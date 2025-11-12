@@ -647,6 +647,15 @@ function displayCard() {
   els.sectionMeta.textContent = `Section ${card.sectionIndex + 1} of ${state.sections.length}`;
   els.cardMeta.textContent = `Card ${state.currentIndex + 1} of ${state.order.length}`;
 
+  // Expose current card data globally for edit button
+  window.currentCard = {
+    section: card.section || '',
+    id: card.id || '',
+    question: card.question || '',
+    answer: card.answer || '',
+    sectionTitle: card.sectionTitle || ''
+  };
+
   const currentCard = getCurrentCard();
   if (currentCard) {
     els.cardPicker.value = String(currentCard.globalIndex);

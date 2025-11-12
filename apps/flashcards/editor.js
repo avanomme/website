@@ -3,10 +3,67 @@
 let currentCardType = 'flashcard';
 let choiceCounter = 2; // Start at 'c' since we have a and b by default
 
+// Logging function
+async function logEvent(eventType, data = {}) {
+  try {
+    await fetch('/api/log', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        event_type: eventType,
+        data: data
+      })
+    });
+  } catch (error) {
+    console.error('Failed to log event:', error);
+  }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
   setupCardTypeButtons();
+
+  // Check if we're editing an existing card (passed via URL params)
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.has('edit')) {
+    loadCardForEditing(urlParams);
+  }
+
+  // Log page view
+  logEvent('page_view', {
+    page: 'editor',
+    referrer: document.referrer
+  });
 });
+
+function loadCardForEditing(params) {
+  // Get card data from URL parameters
+  const cardType = params.get('type') || 'flashcard';
+  const section = params.get('section') || '';
+  const cardId = params.get('id') || '';
+  const question = params.get('q') || '';
+  const answer = params.get('a') || '';
+
+  // Switch to the appropriate card type
+  const typeButton = document.querySelector(`[data-type="${cardType}"]`);
+  if (typeButton) {
+    typeButton.click();
+  }
+
+  // Populate fields
+  document.getElementById('cardSection').value = decodeURIComponent(section);
+  document.getElementById('cardId').value = decodeURIComponent(cardId);
+
+  if (cardType === 'flashcard') {
+    document.getElementById('fcQuestion').value = decodeURIComponent(question);
+    document.getElementById('fcAnswer').value = decodeURIComponent(answer);
+  }
+
+  // Scroll to form
+  document.querySelector('.editor-form').scrollIntoView({ behavior: 'smooth' });
+}
 
 function setupCardTypeButtons() {
   const buttons = document.querySelectorAll('.card-type-button');
@@ -94,6 +151,14 @@ function generateMarkdown() {
 
   if (markdown) {
     displayOutput(markdown);
+
+    // Log card creation
+    logEvent('card_created', {
+      card_type: currentCardType,
+      section: section,
+      card_id: cardId,
+      markdown_length: markdown.length
+    });
   }
 }
 

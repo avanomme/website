@@ -31,6 +31,9 @@
         <div class="flashcard__front" id="cardFront">
           <header class="flashcard__header">
             <span class="chip chip--question">Question</span>
+            <button id="editCardBtn" type="button" class="edit-card-btn" title="Edit this card" style="position: absolute; top: 1rem; right: 1rem; background: rgba(74, 158, 255, 0.2); border: 1px solid var(--accent, #4a9eff); color: var(--accent, #4a9eff); padding: 0.4rem 0.8rem; border-radius: 4px; font-size: 0.875rem; cursor: pointer; font-weight: 600;">
+              ✏️ Edit
+            </button>
           </header>
           <div id="cardQuestion" class="flashcard__content"></div>
           <div class="flashcard__hint">Click to reveal answer</div>
@@ -133,5 +136,33 @@
   </div>
 
   <script type="module" src="app.js"></script>
+  <script>
+    // Edit button functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const editBtn = document.getElementById('editCardBtn');
+      if (editBtn) {
+        editBtn.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent card flip
+
+          // Get current card data from the global state (if available)
+          // This will be populated by app.js
+          const currentCard = window.currentCard || {};
+
+          // Build edit URL with card data
+          const params = new URLSearchParams({
+            edit: 'true',
+            type: 'flashcard',
+            section: currentCard.section || '',
+            id: currentCard.id || '',
+            q: currentCard.question || '',
+            a: currentCard.answer || ''
+          });
+
+          // Navigate to editor with pre-filled data
+          window.location.href = `editor.html?${params.toString()}`;
+        });
+      }
+    });
+  </script>
 </body>
 </html>
