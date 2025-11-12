@@ -277,10 +277,18 @@ def main():
     print(f"\n[4/5] Generating audio files...")
     print(f"This will take approximately {to_generate * 2} seconds")
 
-    response = input("\nProceed? [y/N]: ")
-    if response.lower() != 'y':
-        print("Cancelled.")
-        return
+    # Check for --yes flag or auto-confirm
+    if len(sys.argv) > 1 and sys.argv[1] == '--yes':
+        print("\nAuto-confirmed with --yes flag")
+    else:
+        try:
+            response = input("\nProceed? [y/N]: ")
+            if response.lower() != 'y':
+                print("Cancelled.")
+                return
+        except (EOFError, KeyboardInterrupt):
+            print("\nAuto-confirming (non-interactive mode)")
+            pass
 
     # Generate
     print("\n" + "=" * 70)
