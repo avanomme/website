@@ -88,6 +88,8 @@ apps/museplay/temp/
 apps/museplay/soundfonts/
 *.sf2
 
+apps/flashcards/audio_samples/
+
 # Archived old files
 .archived/
 
