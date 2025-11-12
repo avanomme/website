@@ -306,6 +306,8 @@ Second term: Keep coefficients small
 #flashcards/ML/Review
 **Activation Functions - Complete Comparison**
 ?
+**Main Idea:** Activation functions introduce non-linearity into neural networks, allowing them to learn complex patterns. Each function has different characteristics that make it suitable for specific use cases in network architecture.
+
 **Sigmoid:** `σ(x) = 1/(1 + e^(-x))`
 - **Output Range:** (0, 1)
 - **Advantages:** Smooth and differentiable everywhere, good for output layer in binary classification (probability interpretation)
