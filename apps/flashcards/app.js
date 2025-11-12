@@ -59,7 +59,7 @@ const state = {
   useMeloTTS: false,
   useEdgeTTS: true,  // NEW: Free Edge TTS - No API keys needed!
   usePrecompiled: true,
-  audioCacheDir: 'audio_cache',
+  audioCacheDir: 'audio_cache_british',  // British voice precompiled audio
 };
 
 // Topic configuration

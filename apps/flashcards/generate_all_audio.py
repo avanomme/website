@@ -172,9 +172,17 @@ def generate_audio(text, output_path):
         return False
 
 def get_cache_path(text):
-    """Get cache file path for text"""
-    text_hash = hashlib.md5(text.encode()).hexdigest()
-    return CACHE_DIR / f"{text_hash}.wav"
+    """Get cache file path for text - matches app.js format"""
+    # Match app.js format: text|voiceName
+    combined = f"{text}|{SPEAKER_NAME}"
+    text_hash = hashlib.md5(combined.encode()).hexdigest()
+
+    # Create voice-specific subdirectory
+    safe_voice_name = SPEAKER_NAME.replace(' ', '_')
+    voice_dir = CACHE_DIR / safe_voice_name
+    voice_dir.mkdir(exist_ok=True)
+
+    return voice_dir / f"{text_hash}.wav"
 
 def main():
     """Generate all flashcard audio"""
