@@ -68,7 +68,8 @@ const TOPICS = {
     name: 'Machine Learning Midterm 2',
     cardTypes: [
       { id: 'cards', label: 'Flash Cards', file: 'ml_midterm_cards.md' },
-      { id: 'review', label: 'Review Cards', file: 'ml_midterm_review.md' }
+      { id: 'review', label: 'Review Cards', file: 'ml_midterm_review.md' },
+      { id: 'quiz', label: 'Quiz Questions', file: 'ml_midterm_quiz.md' }
     ]
   },
   se_midterm: {
