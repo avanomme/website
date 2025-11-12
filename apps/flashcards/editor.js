@@ -54,11 +54,18 @@ function loadCardForEditing(params) {
 
   if (cardType === 'flashcard') {
     const cardId = params.get('id') || '';
-    const question = params.get('q') || '';
+    let question = params.get('q') || '';
     const answer = params.get('a') || '';
 
+    // Decode the question
+    question = decodeURIComponent(question);
+
+    // Remove card ID from question if it exists at the start (e.g., "**1.1** *Question?*")
+    // Match **ID** and remove it along with any following whitespace
+    question = question.replace(/^\*\*[^\*]+\*\*\s*/, '');
+
     document.getElementById('cardId').value = decodeURIComponent(cardId);
-    document.getElementById('fcQuestion').value = decodeURIComponent(question);
+    document.getElementById('fcQuestion').value = question;
     document.getElementById('fcAnswer').value = decodeURIComponent(answer);
   } else if (cardType === 'review') {
     const title = params.get('title') || '';

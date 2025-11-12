@@ -309,6 +309,7 @@ function parseDeck(markdown) {
   let questionBuffer = [];
   let answerBuffer = [];
   let mode = 'idle'; // idle | question | answer
+  let currentSectionPath = ''; // Track section path from #flashcards/...
 
   const ensureSection = () => {
     if (!section) {
@@ -330,6 +331,13 @@ function parseDeck(markdown) {
 
     ensureSection();
 
+    // Extract card ID from question (e.g., **1.1** or **Q1.1**)
+    let cardId = '';
+    const idMatch = questionText.match(/^\*\*([^\*]+)\*\*/);
+    if (idMatch) {
+      cardId = idMatch[1].trim();
+    }
+
     section.cards.push({
       questionRaw: questionText,
       answerRaw: answerText,
@@ -337,6 +345,8 @@ function parseDeck(markdown) {
       answerHtml: renderMarkdownBlock(answerText),
       questionSpeech: toSpeechText(questionText),
       answerSpeech: toSpeechText(answerText),
+      sectionPath: currentSectionPath,
+      cardId: cardId,
     });
 
     questionBuffer = [];
@@ -368,6 +378,8 @@ function parseDeck(markdown) {
 
     if (trimmed.startsWith('#flashcards')) {
       flushCard();
+      // Extract section path (e.g., "ML/Algorithms" from "#flashcards/ML/Algorithms")
+      currentSectionPath = trimmed.replace(/^#flashcards\/?/, '').trim();
       continue;
     }
 
@@ -649,10 +661,10 @@ function displayCard() {
 
   // Expose current card data globally for edit button
   window.currentCard = {
-    section: card.section || '',
-    id: card.id || '',
-    question: card.question || '',
-    answer: card.answer || '',
+    section: card.sectionPath || '',
+    id: card.cardId || '',
+    question: card.questionRaw || '',
+    answer: card.answerRaw || '',
     sectionTitle: card.sectionTitle || ''
   };
 
