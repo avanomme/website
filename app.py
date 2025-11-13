@@ -91,6 +91,13 @@ def museplay_static(filename='index.html'):
 def museplay_scores(filename):
     return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'museplay', 'scores'), filename)
 
+# Serve SE (Software Engineering) - Use Case Mapper
+@app.route('/se')
+@app.route('/se/')
+@app.route('/se/<path:filename>')
+def se_static(filename='use-case-mapper.html'):
+    return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'se'), filename)
+
 # ============================================================================
 # DFA / GRAPH VISUALIZATION
 # ============================================================================

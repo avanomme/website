@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Use Case Mapper</title>
+    <style>
+        /* Royal Velvet CSS Theme */
+        :root {
+            --royal-purple: #4A148C;
+            --deep-purple: #6A1B9A;
+            --velvet-purple: #7B1FA2;
+            --light-purple: #9C27B0;
+            --accent-gold: #FFD700;
+            --accent-silver: #C0C0C0;
+            --background-dark: #1a0033;
+            --background-medium: #2d0052;
+            --text-light: #E1BEE7;
+            --text-white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-medium) 100%);
+            color: var(--text-light);
+            overflow: hidden;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #canvas {
+            cursor: default;
+            width: 100%;
+            height: 100%;
+        }
+
+        .controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, var(--velvet-purple), var(--light-purple));
+            border: 2px solid var(--accent-gold);
+            border-radius: 6px;
+            color: var(--text-white);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(74, 20, 140, 0.4);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, var(--light-purple), var(--deep-purple));
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 20, 140, 0.6);
+        }
+
+        .zoom-btn {
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            padding: 0;
+        }
+
+        button.secondary {
+            background: rgba(106, 27, 154, 0.3);
+            color: var(--accent-silver);
+            border: 2px solid var(--accent-silver);
+        }
+
+        button.secondary:hover {
+            background: rgba(106, 27, 154, 0.5);
+            border-color: var(--accent-gold);
+            color: var(--text-white);
+        }
+
+        #main-menu {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--background-dark), var(--background-medium));
+            border: 3px solid var(--accent-gold);
+            border-radius: 15px;
+            padding: 30px;
+            min-width: 500px;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 12px 48px rgba(74, 20, 140, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+        }
+
+        #main-menu h2 {
+            margin-bottom: 20px;
+            color: var(--accent-gold);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #main-menu.hidden {
+            display: none;
+        }
+
+        .usecase-menu-item {
+            padding: 15px;
+            background: rgba(106, 27, 154, 0.2);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--velvet-purple);
+            border-left: 4px solid var(--accent-gold);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .usecase-menu-item:hover {
+            background: rgba(106, 27, 154, 0.4);
+            border-left-width: 8px;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+
+        .usecase-menu-item .title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--text-white);
+        }
+
+        .usecase-menu-item .info {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-top: 5px;
+        }
+
+        .usecase-menu-item .feature-count {
+            background: var(--accent-gold);
+            color: var(--royal-purple);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .color-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .color-option {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .color-option:hover {
+            transform: scale(1.1);
+        }
+
+        .color-option.selected {
+            border-color: #cdd6f4;
+        }
+
+        .shape-picker {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .shape-option {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #45475a;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .shape-option:hover {
+            border-color: #89b4fa;
+        }
+
+        .shape-option.selected {
+            border-color: #cdd6f4;
+            background: #313244;
+        }
+
+        .modal-section {
+            margin: 15px 0;
+        }
+
+        .modal-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        #list-export {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--background-dark), var(--background-medium));
+            border: 3px solid var(--accent-silver);
+            border-radius: 15px;
+            padding: 30px;
+            width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 12px 48px rgba(74, 20, 140, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 200;
+            display: none;
+        }
+
+        #list-export h2 {
+            margin-bottom: 20px;
+            color: var(--accent-silver);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #list-export pre {
+            background: rgba(26, 0, 51, 0.8);
+            border: 2px solid var(--velvet-purple);
+            padding: 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: var(--text-light);
+        }
+
+        .info {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(26, 0, 51, 0.95);
+            border: 2px solid var(--velvet-purple);
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--text-light);
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(74, 20, 140, 0.5);
+        }
+
+        #modal {
+            position: absolute;
+            display: none;
+            background: linear-gradient(135deg, var(--background-dark), var(--background-medium));
+            border: 3px solid var(--accent-gold);
+            border-radius: 12px;
+            padding: 20px;
+            min-width: 300px;
+            box-shadow: 0 12px 48px rgba(74, 20, 140, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+        }
+
+        #modal h3 {
+            margin-bottom: 15px;
+            color: var(--accent-gold);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        #modal input, #modal textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: rgba(26, 0, 51, 0.6);
+            border: 2px solid var(--velvet-purple);
+            border-radius: 6px;
+            color: var(--text-white);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        #modal textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        #modal input:focus, #modal textarea:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+        }
+
+        #modal .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #modal .button-group button {
+            flex: 1;
+        }
+
+        .group-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            background: #f5c2e7;
+            color: #1e1e2e;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            margin-right: 4px;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+        <div class="controls">
+            <button onclick="app.showMainMenu()">Main Menu</button>
+            <button onclick="app.addUseCase()">+ Use Case</button>
+            <button class="zoom-btn" onclick="app.zoomIn()">+</button>
+            <button class="zoom-btn" onclick="app.zoomOut()">−</button>
+            <button class="secondary" onclick="app.resetView()">Reset</button>
+            <button class="secondary" onclick="app.showListExport()">View List</button>
+            <button class="secondary" onclick="app.exportData()">Export JSON</button>
+            <button class="secondary" onclick="app.importData()">Import</button>
+        </div>
+        <div class="info">
+            <strong>Controls:</strong><br>
+            • Click Main Menu to see all use cases<br>
+            • Click + Use Case to add a square<br>
+            • Drag squares to move them<br>
+            • Double-click square to add feature bubble<br>
+            • Click items to edit/delete<br>
+            • Drag canvas to pan, scroll to zoom
+        </div>
+    </div>
+
+    <div id="main-menu" class="hidden">
+        <h2>Use Case Overview</h2>
+        <button onclick="app.createNewUseCase()" style="width: 100%; margin-bottom: 20px;">+ Create New Use Case</button>
+        <div id="usecase-list"></div>
+        <div style="margin-top: 20px;">
+            <button class="secondary" onclick="app.hideMainMenu()" style="width: 100%;">Close</button>
+        </div>
+    </div>
+
+    <div id="list-export">
+        <h2>Feature List Export</h2>
+        <pre id="list-content"></pre>
+        <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button onclick="app.copyListToClipboard()" style="flex: 1;">Copy to Clipboard</button>
+            <button onclick="app.downloadList()" style="flex: 1;">Download as Text</button>
+            <button class="secondary" onclick="app.hideListExport()" style="flex: 1;">Close</button>
+        </div>
+    </div>
+
+    <div id="modal">
+        <h3 id="modal-title">Add Use Case</h3>
+        <input type="text" id="modal-name" placeholder="Name">
+        <textarea id="modal-info" placeholder="Description/Info"></textarea>
+        <input type="text" id="modal-group" placeholder="Group name (optional)">
+        
+        <div class="modal-section" id="color-section">
+            <label>Color</label>
+            <div class="color-picker-grid" id="color-picker"></div>
+        </div>
+
+        <div class="modal-section" id="shape-section">
+            <label>Shape</label>
+            <div class="shape-picker" id="shape-picker"></div>
+        </div>
+
+        <div class="button-group">
+            <button onclick="app.saveModal()">Save</button>
+            <button class="secondary" onclick="app.deleteFromModal()">Delete</button>
+            <button class="secondary" onclick="app.closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        class UseCaseMapper {
+            constructor() {
+                this.canvas = document.getElementById('canvas');
+                this.ctx = this.canvas.getContext('2d');
+                
+                this.useCases = [];
+                this.features = [];
+                this.connections = [];
+                
+                this.camera = { x: 0, y: 0, scale: 1 };
+                this.isDraggingCanvas = false;
+                this.isDraggingNode = false;
+                this.draggedNode = null;
+                this.dragStart = { x: 0, y: 0 };
+                this.lastClickTime = 0;
+                this.lastClickNode = null;
+                
+                this.modal = document.getElementById('modal');
+                this.modalMode = null; // 'usecase', 'feature'
+                this.editingId = null;
+                this.selectedColor = '#89b4fa';
+                this.selectedShape = 'square';
+                
+                this.colors = [
+                    '#89b4fa', '#f5c2e7', '#a6e3a1', '#fab387', 
+                    '#f38ba8', '#cba6f7', '#74c7ec', '#f9e2af',
+                    '#eba0ac', '#94e2d5', '#b4befe', '#f5e0dc'
+                ];
+                
+                this.shapes = ['square', 'circle', 'diamond', 'hexagon'];
+                
+                this.init();
+            }
+
+            init() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+                
+                this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
+                this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
+                this.canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
+                this.canvas.addEventListener('wheel', (e) => this.onWheel(e));
+                
+                this.initializeColorPicker();
+                this.initializeShapePicker();
+                
+                this.render();
+            }
+
+            initializeColorPicker() {
+                const picker = document.getElementById('color-picker');
+                picker.innerHTML = this.colors.map(color => 
+                    `<div class="color-option" style="background: ${color}" onclick="app.selectColor('${color}')"></div>`
+                ).join('');
+            }
+
+            initializeShapePicker() {
+                const picker = document.getElementById('shape-picker');
+                const shapeIcons = {
+                    square: '⬛',
+                    circle: '⚫',
+                    diamond: '🔷',
+                    hexagon: '⬢'
+                };
+                picker.innerHTML = this.shapes.map(shape => 
+                    `<div class="shape-option" onclick="app.selectShape('${shape}')">${shapeIcons[shape]}</div>`
+                ).join('');
+            }
+
+            selectColor(color) {
+                this.selectedColor = color;
+                document.querySelectorAll('.color-option').forEach(el => {
+                    el.classList.toggle('selected', el.style.background === color);
+                });
+            }
+
+            selectShape(shape) {
+                this.selectedShape = shape;
+                document.querySelectorAll('.shape-option').forEach((el, i) => {
+                    el.classList.toggle('selected', this.shapes[i] === shape);
+                });
+            }
+
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.render();
+            }
+
+            screenToWorld(x, y) {
+                return {
+                    x: (x - this.camera.x) / this.camera.scale,
+                    y: (y - this.camera.y) / this.camera.scale
+                };
+            }
+
+            worldToScreen(x, y) {
+                return {
+                    x: x * this.camera.scale + this.camera.x,
+                    y: y * this.camera.scale + this.camera.y
+                };
+            }
+
+            getNodeAt(worldX, worldY) {
+                // Check use cases
+                for (const uc of this.useCases) {
+                    if (this.hitTestShape(uc, worldX, worldY)) {
+                        return { type: 'usecase', node: uc };
+                    }
+                }
+                
+                // Check features
+                for (const feature of this.features) {
+                    if (this.hitTestShape(feature, worldX, worldY)) {
+                        return { type: 'feature', node: feature };
+                    }
+                }
+                
+                return null;
+            }
+
+            hitTestShape(node, x, y) {
+                const shape = node.shape || 'square';
+                const size = node.width || node.radius * 2;
+                
+                switch(shape) {
+                    case 'circle':
+                        const radius = node.radius || size / 2;
+                        const dx = x - node.x;
+                        const dy = y - node.y;
+                        return dx * dx + dy * dy <= radius * radius;
+                    
+                    case 'square':
+                        const halfW = (node.width || size) / 2;
+                        const halfH = (node.height || size) / 2;
+                        return Math.abs(x - node.x) <= halfW && Math.abs(y - node.y) <= halfH;
+                    
+                    case 'diamond':
+                    case 'hexagon':
+                        // Simple bounding box for now
+                        const half = size / 2;
+                        return Math.abs(x - node.x) <= half && Math.abs(y - node.y) <= half;
+                    
+                    default:
+                        return false;
+                }
+            }
+
+            onMouseDown(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const screenX = e.clientX - rect.left;
+                const screenY = e.clientY - rect.top;
+                const world = this.screenToWorld(screenX, screenY);
+                
+                const hit = this.getNodeAt(world.x, world.y);
+                
+                if (hit) {
+                    this.isDraggingNode = true;
+                    this.draggedNode = hit.node;
+                    this.dragStart = { x: world.x - hit.node.x, y: world.y - hit.node.y };
+                } else {
+                    this.isDraggingCanvas = true;
+                    this.dragStart = { x: e.clientX - this.camera.x, y: e.clientY - this.camera.y };
+                }
+            }
+
+            onMouseMove(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const screenX = e.clientX - rect.left;
+                const screenY = e.clientY - rect.top;
+                const world = this.screenToWorld(screenX, screenY);
+                
+                if (this.isDraggingNode && this.draggedNode) {
+                    this.draggedNode.x = world.x - this.dragStart.x;
+                    this.draggedNode.y = world.y - this.dragStart.y;
+                    this.render();
+                } else if (this.isDraggingCanvas) {
+                    this.camera.x = e.clientX - this.dragStart.x;
+                    this.camera.y = e.clientY - this.dragStart.y;
+                    this.render();
+                }
+                
+                const hit = this.getNodeAt(world.x, world.y);
+                this.canvas.style.cursor = hit ? 'pointer' : 'default';
+            }
+
+            onMouseUp(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const screenX = e.clientX - rect.left;
+                const screenY = e.clientY - rect.top;
+                const world = this.screenToWorld(screenX, screenY);
+                
+                const hit = this.getNodeAt(world.x, world.y);
+                
+                const now = Date.now();
+                if (hit && hit.node === this.lastClickNode && now - this.lastClickTime < 300) {
+                    if (hit.type === 'usecase') {
+                        this.addFeatureToUseCase(hit.node);
+                    } else if (hit.type === 'feature') {
+                        this.editFeature(hit.node);
+                    }
+                    this.lastClickTime = 0;
+                    this.lastClickNode = null;
+                } else {
+                    if (hit && !this.isDraggingNode) {
+                        if (hit.type === 'usecase') {
+                            this.editUseCase(hit.node);
+                        } else if (hit.type === 'feature') {
+                            this.editFeature(hit.node);
+                        }
+                    }
+                    this.lastClickTime = now;
+                    this.lastClickNode = hit ? hit.node : null;
+                }
+                
+                this.isDraggingCanvas = false;
+                this.isDraggingNode = false;
+                this.draggedNode = null;
+            }
+
+            onWheel(e) {
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+                
+                const delta = -e.deltaY * 0.001;
+                const newScale = Math.max(0.3, Math.min(3, this.camera.scale + delta));
+                
+                this.camera.x = mouseX - (mouseX - this.camera.x) * (newScale / this.camera.scale);
+                this.camera.y = mouseY - (mouseY - this.camera.y) * (newScale / this.camera.scale);
+                this.camera.scale = newScale;
+                
+                this.render();
+            }
+
+            addUseCase() {
+                const centerWorld = this.screenToWorld(this.canvas.width / 2, this.canvas.height / 2);
+                this.useCases.push({
+                    id: Date.now(),
+                    x: centerWorld.x,
+                    y: centerWorld.y,
+                    width: 140,
+                    height: 100,
+                    name: 'New Use Case',
+                    info: '',
+                    group: '',
+                    color: '#89b4fa',
+                    shape: 'square'
+                });
+                this.render();
+            }
+
+            createNewUseCase() {
+                this.addUseCase();
+                this.hideMainMenu();
+            }
+
+            addFeatureToUseCase(useCase) {
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 120;
+                
+                const feature = {
+                    id: Date.now(),
+                    x: useCase.x + Math.cos(angle) * distance,
+                    y: useCase.y + Math.sin(angle) * distance,
+                    radius: 40,
+                    name: 'New Feature',
+                    info: '',
+                    useCaseId: useCase.id,
+                    color: '#a6e3a1',
+                    shape: 'circle'
+                };
+                
+                this.features.push(feature);
+                this.connections.push({ from: useCase.id, to: feature.id });
+                this.render();
+                
+                setTimeout(() => this.editFeature(feature), 100);
+            }
+
+            editUseCase(useCase) {
+                this.modalMode = 'usecase';
+                this.editingId = useCase.id;
+                this.selectedColor = useCase.color || '#89b4fa';
+                this.selectedShape = useCase.shape || 'square';
+                
+                document.getElementById('modal-title').textContent = 'Edit Use Case';
+                document.getElementById('modal-name').value = useCase.name;
+                document.getElementById('modal-info').value = useCase.info;
+                document.getElementById('modal-group').value = useCase.group || '';
+                document.getElementById('color-section').style.display = 'block';
+                document.getElementById('shape-section').style.display = 'block';
+                document.getElementById('modal-group').style.display = 'block';
+                
+                this.selectColor(this.selectedColor);
+                this.selectShape(this.selectedShape);
+                
+                this.showModal();
+            }
+
+            editFeature(feature) {
+                this.modalMode = 'feature';
+                this.editingId = feature.id;
+                this.selectedColor = feature.color || '#a6e3a1';
+                this.selectedShape = feature.shape || 'circle';
+                
+                document.getElementById('modal-title').textContent = 'Edit Feature';
+                document.getElementById('modal-name').value = feature.name;
+                document.getElementById('modal-info').value = feature.info;
+                document.getElementById('modal-group').style.display = 'none';
+                document.getElementById('color-section').style.display = 'block';
+                document.getElementById('shape-section').style.display = 'block';
+                
+                this.selectColor(this.selectedColor);
+                this.selectShape(this.selectedShape);
+                
+                this.showModal();
+            }
+
+            showModal() {
+                this.modal.style.display = 'block';
+                this.modal.style.left = '50%';
+                this.modal.style.top = '50%';
+                this.modal.style.transform = 'translate(-50%, -50%)';
+                document.getElementById('modal-name').focus();
+            }
+
+            closeModal() {
+                this.modal.style.display = 'none';
+                this.modalMode = null;
+                this.editingId = null;
+            }
+
+            saveModal() {
+                const name = document.getElementById('modal-name').value.trim();
+                const info = document.getElementById('modal-info').value.trim();
+                const group = document.getElementById('modal-group').value.trim();
+                
+                if (!name) {
+                    alert('Name is required');
+                    return;
+                }
+                
+                if (this.modalMode === 'usecase') {
+                    const uc = this.useCases.find(u => u.id === this.editingId);
+                    if (uc) {
+                        uc.name = name;
+                        uc.info = info;
+                        uc.group = group;
+                        uc.color = this.selectedColor;
+                        uc.shape = this.selectedShape;
+                    }
+                } else if (this.modalMode === 'feature') {
+                    const feature = this.features.find(f => f.id === this.editingId);
+                    if (feature) {
+                        feature.name = name;
+                        feature.info = info;
+                        feature.color = this.selectedColor;
+                        feature.shape = this.selectedShape;
+                    }
+                }
+                
+                this.closeModal();
+                this.render();
+            }
+
+            deleteFromModal() {
+                if (!confirm('Delete this item?')) return;
+                
+                if (this.modalMode === 'usecase') {
+                    const featuresToDelete = this.features.filter(f => f.useCaseId === this.editingId);
+                    featuresToDelete.forEach(f => {
+                        this.connections = this.connections.filter(c => c.to !== f.id && c.from !== f.id);
+                    });
+                    this.features = this.features.filter(f => f.useCaseId !== this.editingId);
+                    this.useCases = this.useCases.filter(u => u.id !== this.editingId);
+                } else if (this.modalMode === 'feature') {
+                    this.connections = this.connections.filter(c => c.to !== this.editingId && c.from !== this.editingId);
+                    this.features = this.features.filter(f => f.id !== this.editingId);
+                }
+                
+                this.closeModal();
+                this.render();
+            }
+
+            showMainMenu() {
+                const menu = document.getElementById('main-menu');
+                const list = document.getElementById('usecase-list');
+                
+                list.innerHTML = this.useCases.map(uc => {
+                    const featureCount = this.features.filter(f => f.useCaseId === uc.id).length;
+                    return `
+                        <div class="usecase-menu-item" onclick="app.navigateToUseCase(${uc.id})">
+                            <div>
+                                <div class="title">${uc.name}</div>
+                                ${uc.info ? `<div class="info">${uc.info}</div>` : ''}
+                                ${uc.group ? `<div class="info">Group: ${uc.group}</div>` : ''}
+                            </div>
+                            <div class="feature-count">${featureCount} features</div>
+                        </div>
+                    `;
+                }).join('');
+                
+                if (this.useCases.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: #a6adc8;">No use cases yet. Create one to get started!</p>';
+                }
+                
+                menu.classList.remove('hidden');
+            }
+
+            hideMainMenu() {
+                document.getElementById('main-menu').classList.add('hidden');
+            }
+
+            navigateToUseCase(id) {
+                const uc = this.useCases.find(u => u.id === id);
+                if (!uc) return;
+                
+                // Center on use case
+                const screenCenter = {
+                    x: this.canvas.width / 2,
+                    y: this.canvas.height / 2
+                };
+                
+                this.camera.x = screenCenter.x - uc.x * this.camera.scale;
+                this.camera.y = screenCenter.y - uc.y * this.camera.scale;
+                
+                this.hideMainMenu();
+                this.render();
+            }
+
+            showListExport() {
+                const list = document.getElementById('list-export');
+                const content = document.getElementById('list-content');
+                
+                let text = '';
+                this.useCases.forEach(uc => {
+                    text += `${uc.name}:\n`;
+                    if (uc.info) {
+                        text += `  Description: ${uc.info}\n`;
+                    }
+                    if (uc.group) {
+                        text += `  Group: ${uc.group}\n`;
+                    }
+                    
+                    const features = this.features.filter(f => f.useCaseId === uc.id);
+                    if (features.length > 0) {
+                        text += `  Features:\n`;
+                        features.forEach(f => {
+                            text += `    ${f.name}\n`;
+                            if (f.info) {
+                                text += `      * ${f.info}\n`;
+                            }
+                        });
+                    } else {
+                        text += `  (No features yet)\n`;
+                    }
+                    text += `\n`;
+                });
+                
+                if (this.useCases.length === 0) {
+                    text = 'No use cases created yet.';
+                }
+                
+                content.textContent = text;
+                list.style.display = 'block';
+            }
+
+            hideListExport() {
+                document.getElementById('list-export').style.display = 'none';
+            }
+
+            copyListToClipboard() {
+                const content = document.getElementById('list-content').textContent;
+                navigator.clipboard.writeText(content).then(() => {
+                    alert('Copied to clipboard!');
+                }).catch(() => {
+                    alert('Failed to copy to clipboard');
+                });
+            }
+
+            downloadList() {
+                const content = document.getElementById('list-content').textContent;
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'use-case-features-list.txt';
+                a.click();
+            }
+
+            render() {
+                this.ctx.save();
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.ctx.translate(this.camera.x, this.camera.y);
+                this.ctx.scale(this.camera.scale, this.camera.scale);
+
+                // Draw connections
+                this.connections.forEach(conn => {
+                    const from = this.useCases.find(u => u.id === conn.from);
+                    const to = this.features.find(f => f.id === conn.to);
+                    
+                    if (from && to) {
+                        this.ctx.strokeStyle = '#45475a';
+                        this.ctx.lineWidth = 2;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(from.x, from.y);
+                        this.ctx.lineTo(to.x, to.y);
+                        this.ctx.stroke();
+                    }
+                });
+
+                // Draw use cases
+                this.useCases.forEach(uc => {
+                    this.drawShape(uc, uc.shape || 'square', uc.color || '#89b4fa', true);
+                });
+
+                // Draw features
+                this.features.forEach(feature => {
+                    this.drawShape(feature, feature.shape || 'circle', feature.color || '#a6e3a1', false);
+                });
+
+                this.ctx.restore();
+            }
+
+            drawShape(node, shape, color, isUseCase) {
+                this.ctx.fillStyle = color;
+                this.ctx.strokeStyle = '#45475a';
+                this.ctx.lineWidth = 2;
+                
+                const size = isUseCase ? (node.width || 140) : (node.radius * 2 || 80);
+                
+                switch(shape) {
+                    case 'circle':
+                        const radius = isUseCase ? size / 2 : node.radius;
+                        this.ctx.beginPath();
+                        this.ctx.arc(node.x, node.y, radius, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.stroke();
+                        break;
+                    
+                    case 'square':
+                        const width = node.width || size;
+                        const height = node.height || size;
+                        
+                        // Group color bar for use cases
+                        if (isUseCase && node.group) {
+                            const hash = node.group.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+                            const colors = ['#f5c2e7', '#fab387', '#a6e3a1', '#89dceb', '#cba6f7'];
+                            this.ctx.fillStyle = colors[hash % colors.length];
+                            this.ctx.fillRect(node.x - width / 2, node.y - height / 2, width, 8);
+                            this.ctx.fillStyle = color;
+                        }
+                        
+                        this.ctx.fillRect(
+                            node.x - width / 2,
+                            node.y - height / 2 + (isUseCase && node.group ? 8 : 0),
+                            width,
+                            height - (isUseCase && node.group ? 8 : 0)
+                        );
+                        this.ctx.strokeRect(node.x - width / 2, node.y - height / 2, width, height);
+                        break;
+                    
+                    case 'diamond':
+                        const half = size / 2;
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(node.x, node.y - half);
+                        this.ctx.lineTo(node.x + half, node.y);
+                        this.ctx.lineTo(node.x, node.y + half);
+                        this.ctx.lineTo(node.x - half, node.y);
+                        this.ctx.closePath();
+                        this.ctx.fill();
+                        this.ctx.stroke();
+                        break;
+                    
+                    case 'hexagon':
+                        const h = size / 2;
+                        const angle = Math.PI / 3;
+                        this.ctx.beginPath();
+                        for (let i = 0; i < 6; i++) {
+                            const x = node.x + h * Math.cos(i * angle);
+                            const y = node.y + h * Math.sin(i * angle);
+                            if (i === 0) this.ctx.moveTo(x, y);
+                            else this.ctx.lineTo(x, y);
+                        }
+                        this.ctx.closePath();
+                        this.ctx.fill();
+                        this.ctx.stroke();
+                        break;
+                }
+                
+                // Draw text
+                this.ctx.fillStyle = shape === 'square' ? '#1e1e2e' : '#1e1e2e';
+                this.ctx.font = isUseCase ? 'bold 14px sans-serif' : 'bold 12px sans-serif';
+                this.ctx.textAlign = 'center';
+                this.ctx.textBaseline = 'middle';
+                
+                const maxWidth = isUseCase ? (node.width - 20) : (node.radius * 1.6);
+                const lines = this.wrapText(node.name, maxWidth);
+                const lineHeight = isUseCase ? 16 : 14;
+                const startY = node.y - ((lines.length - 1) * lineHeight) / 2;
+                
+                lines.forEach((line, i) => {
+                    this.ctx.fillText(line, node.x, startY + i * lineHeight);
+                });
+            }
+
+            wrapText(text, maxWidth) {
+                const words = text.split(' ');
+                const lines = [];
+                let currentLine = words[0];
+
+                for (let i = 1; i < words.length; i++) {
+                    const testLine = currentLine + ' ' + words[i];
+                    const metrics = this.ctx.measureText(testLine);
+                    if (metrics.width > maxWidth) {
+                        lines.push(currentLine);
+                        currentLine = words[i];
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                lines.push(currentLine);
+                return lines;
+            }
+
+            zoomIn() {
+                this.camera.scale = Math.min(3, this.camera.scale + 0.2);
+                this.render();
+            }
+
+            zoomOut() {
+                this.camera.scale = Math.max(0.3, this.camera.scale - 0.2);
+                this.render();
+            }
+
+            resetView() {
+                this.camera = { x: 0, y: 0, scale: 1 };
+                this.render();
+            }
+
+            exportData() {
+                const data = {
+                    useCases: this.useCases,
+                    features: this.features,
+                    connections: this.connections
+                };
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'use-case-map.json';
+                a.click();
+            }
+
+            importData() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const data = JSON.parse(event.target.result);
+                            this.useCases = data.useCases || [];
+                            this.features = data.features || [];
+                            this.connections = data.connections || [];
+                            this.render();
+                        } catch (err) {
+                            alert('Invalid JSON file');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+        }
+
+        const app = new UseCaseMapper();
+    </script>
+</body>
+</html>
