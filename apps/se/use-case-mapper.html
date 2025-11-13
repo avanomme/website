@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Use Case Mapper</title>
     <style>
-        /* Royal Velvet CSS Theme */
+        /* Clean Dark Theme */
         :root {
-            --royal-purple: #4A148C;
-            --deep-purple: #6A1B9A;
-            --velvet-purple: #7B1FA2;
-            --light-purple: #9C27B0;
-            --accent-gold: #FFD700;
-            --accent-silver: #C0C0C0;
-            --background-dark: #1a0033;
-            --background-medium: #2d0052;
-            --text-light: #E1BEE7;
-            --text-white: #FFFFFF;
+            --background-primary: #12101a;
+            --background-primary-alt: rgba(22, 18, 32, 0.72);
+            --background-secondary: rgba(30, 25, 45, 0.85);
+            --purple: #9f7aea;
+            --purple-dim: hsla(270, 40%, 60%, 0.3);
+            --purple-bright: hsla(270, 40%, 60%, 0.45);
+            --text-normal: #f0eaff;
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --text-faint: rgba(255, 255, 255, 0.5);
+            --layer-4: rgba(255, 255, 255, 0.08);
+            color-scheme: dark;
         }
 
         * {
@@ -26,9 +27,9 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--background-dark) 0%, var(--background-medium) 100%);
-            color: var(--text-light);
+            font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--background-primary);
+            color: var(--text-normal);
             overflow: hidden;
         }
 
@@ -37,6 +38,91 @@
             width: 100vw;
             height: 100vh;
             overflow: hidden;
+            display: flex;
+        }
+
+        #sidebar {
+            width: 300px;
+            height: 100vh;
+            background: var(--background-primary-alt);
+            border-right: 1px solid var(--purple-dim);
+            display: flex;
+            flex-direction: column;
+            z-index: 5;
+        }
+
+        #sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--purple-dim);
+        }
+
+        #sidebar-header h3 {
+            margin: 0 0 10px 0;
+            color: var(--purple);
+            font-size: 1.2rem;
+        }
+
+        #sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+
+        .sidebar-item {
+            background: var(--background-secondary);
+            border: 1px solid var(--purple-dim);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .sidebar-item-header {
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .sidebar-item-header:hover {
+            background: var(--purple-dim);
+        }
+
+        .sidebar-item-title {
+            flex: 1;
+            font-weight: 600;
+            color: var(--text-normal);
+            font-size: 0.9rem;
+        }
+
+        .sidebar-item-count {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: var(--layer-4);
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+
+        .sidebar-item-btn {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            background: var(--purple);
+            border: 1px solid var(--purple);
+            border-radius: 4px;
+            color: var(--background-primary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .sidebar-item-btn:hover {
+            background: var(--purple-bright);
+        }
+
+        .sidebar-item-btn.secondary {
+            background: transparent;
+            color: var(--purple);
         }
 
         #canvas {
@@ -56,20 +142,17 @@
 
         button {
             padding: 8px 16px;
-            background: linear-gradient(135deg, var(--velvet-purple), var(--light-purple));
-            border: 2px solid var(--accent-gold);
+            background: #89b4fa;
+            border: none;
             border-radius: 6px;
-            color: var(--text-white);
+            color: #1e1e2e;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(74, 20, 140, 0.4);
+            transition: background 0.2s;
         }
 
         button:hover {
-            background: linear-gradient(135deg, var(--light-purple), var(--deep-purple));
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(74, 20, 140, 0.6);
+            background: #74c7ec;
         }
 
         .zoom-btn {
@@ -80,85 +163,91 @@
         }
 
         button.secondary {
-            background: rgba(106, 27, 154, 0.3);
-            color: var(--accent-silver);
-            border: 2px solid var(--accent-silver);
+            background: #313244;
+            color: #cdd6f4;
         }
 
         button.secondary:hover {
-            background: rgba(106, 27, 154, 0.5);
-            border-color: var(--accent-gold);
-            color: var(--text-white);
+            background: #45475a;
         }
 
-        #main-menu {
+        #context-menu {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, var(--background-dark), var(--background-medium));
-            border: 3px solid var(--accent-gold);
-            border-radius: 15px;
-            padding: 30px;
-            min-width: 500px;
-            max-width: 700px;
-            max-height: 80vh;
-            overflow-y: auto;
-            box-shadow: 0 12px 48px rgba(74, 20, 140, 0.6);
-            backdrop-filter: blur(10px);
-            z-index: 200;
-        }
-
-        #main-menu h2 {
-            margin-bottom: 20px;
-            color: var(--accent-gold);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        #main-menu.hidden {
             display: none;
-        }
-
-        .usecase-menu-item {
-            padding: 15px;
-            background: rgba(106, 27, 154, 0.2);
+            background: var(--background-secondary);
+            border: 1px solid var(--purple-dim);
             border-radius: 8px;
-            margin-bottom: 10px;
+            padding: 6px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            min-width: 150px;
+        }
+
+        .context-menu-item {
+            padding: 10px 14px;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid var(--velvet-purple);
-            border-left: 4px solid var(--accent-gold);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .usecase-menu-item:hover {
-            background: rgba(106, 27, 154, 0.4);
-            border-left-width: 8px;
-            transform: translateX(5px);
-            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
-        }
-
-        .usecase-menu-item .title {
-            font-weight: 600;
-            font-size: 1.1rem;
-            color: var(--text-white);
-        }
-
-        .usecase-menu-item .info {
-            font-size: 0.85rem;
-            color: var(--text-light);
-            margin-top: 5px;
-        }
-
-        .usecase-menu-item .feature-count {
-            background: var(--accent-gold);
-            color: var(--royal-purple);
-            padding: 4px 10px;
             border-radius: 4px;
-            font-size: 0.8rem;
-            font-weight: 600;
+            transition: background 0.2s;
+            color: var(--text-normal);
+            font-size: 0.9rem;
+        }
+
+        .context-menu-item:hover {
+            background: var(--purple-dim);
+        }
+
+        .context-menu-item.danger:hover {
+            background: rgba(243, 139, 168, 0.2);
+            color: #f38ba8;
+        }
+
+        #modal {
+            position: absolute;
+            display: none;
+            background: #181825;
+            border: 2px solid #89b4fa;
+            border-radius: 8px;
+            padding: 20px;
+            min-width: 300px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+        }
+
+        #modal h3 {
+            margin-bottom: 15px;
+            color: #89b4fa;
+        }
+
+        #modal input, #modal textarea {
+            width: 100%;
+            padding: 8px 12px;
+            background: #313244;
+            border: 1px solid #45475a;
+            border-radius: 6px;
+            color: #cdd6f4;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+
+        #modal textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        #modal input:focus, #modal textarea:focus {
+            outline: none;
+            border-color: #89b4fa;
+        }
+
+        #modal .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        #modal .button-group button {
+            flex: 1;
         }
 
         .color-picker-grid {
@@ -219,175 +308,110 @@
         .modal-section label {
             display: block;
             margin-bottom: 8px;
-            color: var(--accent-gold);
+            color: #f5c2e7;
             font-weight: 600;
         }
 
-        #list-export {
+        #bulk-import {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, var(--background-dark), var(--background-medium));
-            border: 3px solid var(--accent-silver);
-            border-radius: 15px;
+            background: #181825;
+            border: 2px solid #a6e3a1;
+            border-radius: 12px;
             padding: 30px;
             width: 600px;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 12px 48px rgba(74, 20, 140, 0.6);
-            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
             z-index: 200;
             display: none;
         }
 
-        #list-export h2 {
+        #bulk-import h2 {
             margin-bottom: 20px;
-            color: var(--accent-silver);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #a6e3a1;
         }
 
-        #list-export pre {
-            background: rgba(26, 0, 51, 0.8);
-            border: 2px solid var(--velvet-purple);
-            padding: 20px;
-            border-radius: 8px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        #bulk-import textarea {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            background: #313244;
+            border: 1px solid #45475a;
+            border-radius: 6px;
+            color: #cdd6f4;
             font-family: 'Monaco', 'Courier New', monospace;
             font-size: 0.9rem;
-            line-height: 1.6;
-            color: var(--text-light);
+            resize: vertical;
         }
 
         .info {
             position: absolute;
             bottom: 20px;
-            left: 20px;
-            background: rgba(26, 0, 51, 0.95);
-            border: 2px solid var(--velvet-purple);
+            left: 320px;
+            background: rgba(24, 24, 37, 0.95);
             padding: 12px 16px;
             border-radius: 6px;
             font-size: 0.85rem;
-            color: var(--text-light);
+            color: #a6adc8;
             max-width: 300px;
-            box-shadow: 0 4px 12px rgba(74, 20, 140, 0.5);
-        }
-
-        #modal {
-            position: absolute;
-            display: none;
-            background: linear-gradient(135deg, var(--background-dark), var(--background-medium));
-            border: 3px solid var(--accent-gold);
-            border-radius: 12px;
-            padding: 20px;
-            min-width: 300px;
-            box-shadow: 0 12px 48px rgba(74, 20, 140, 0.6);
-            backdrop-filter: blur(10px);
-            z-index: 100;
-        }
-
-        #modal h3 {
-            margin-bottom: 15px;
-            color: var(--accent-gold);
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-        }
-
-        #modal input, #modal textarea {
-            width: 100%;
-            padding: 8px 12px;
-            background: rgba(26, 0, 51, 0.6);
-            border: 2px solid var(--velvet-purple);
-            border-radius: 6px;
-            color: var(--text-white);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            font-family: inherit;
-        }
-
-        #modal textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-
-        #modal input:focus, #modal textarea:focus {
-            outline: none;
-            border-color: var(--accent-gold);
-            box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
-        }
-
-        #modal .button-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        #modal .button-group button {
-            flex: 1;
-        }
-
-        .group-badge {
-            display: inline-block;
-            padding: 2px 8px;
-            background: #f5c2e7;
-            color: #1e1e2e;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            margin-right: 4px;
-            margin-bottom: 4px;
         }
     </style>
 </head>
 <body>
     <div id="canvas-container">
-        <canvas id="canvas"></canvas>
-        <div class="controls">
-            <button onclick="app.showMainMenu()">Main Menu</button>
-            <button onclick="app.addUseCase()">+ Use Case</button>
-            <button class="zoom-btn" onclick="app.zoomIn()">+</button>
-            <button class="zoom-btn" onclick="app.zoomOut()">−</button>
-            <button class="secondary" onclick="app.resetView()">Reset</button>
-            <button class="secondary" onclick="app.showListExport()">View List</button>
-            <button class="secondary" onclick="app.exportData()">Export JSON</button>
-            <button class="secondary" onclick="app.importData()">Import</button>
+        <div id="sidebar">
+            <div id="sidebar-header">
+                <h3>Use Cases</h3>
+                <button onclick="app.createAllUseCases()" style="width: 100%; padding: 8px; font-size: 0.85rem; margin-bottom: 8px;">Create All</button>
+                <button onclick="app.showBulkImport()" style="width: 100%; padding: 8px; font-size: 0.85rem; margin-bottom: 8px;">+ Bulk Import</button>
+                <button onclick="app.addSingleUseCase()" style="width: 100%; padding: 8px; font-size: 0.85rem;">+ Add Use Case</button>
+            </div>
+            <div id="sidebar-content">
+                <!-- Use case list will be rendered here -->
+            </div>
         </div>
-        <div class="info">
-            <strong>Controls:</strong><br>
-            • Click Main Menu to see all use cases<br>
-            • Click + Use Case to add a square<br>
-            • Drag squares to move them<br>
-            • Double-click square to add feature bubble<br>
-            • Click items to edit/delete<br>
-            • Drag canvas to pan, scroll to zoom
-        </div>
-    </div>
-
-    <div id="main-menu" class="hidden">
-        <h2>Use Case Overview</h2>
-        <button onclick="app.createNewUseCase()" style="width: 100%; margin-bottom: 20px;">+ Create New Use Case</button>
-        <div id="usecase-list"></div>
-        <div style="margin-top: 20px;">
-            <button class="secondary" onclick="app.hideMainMenu()" style="width: 100%;">Close</button>
+        <div style="flex: 1; position: relative;">
+            <canvas id="canvas"></canvas>
+            <div class="controls">
+                <button class="zoom-btn" onclick="app.zoomIn()">+</button>
+                <button class="zoom-btn" onclick="app.zoomOut()">−</button>
+                <button class="secondary" onclick="app.resetView()">Reset</button>
+            </div>
+            <div class="info">
+                <strong>Controls:</strong><br>
+                • Drag use cases to move them<br>
+                • Double-click use case to add feature<br>
+                • Right-click for menu<br>
+                • Drag canvas to pan, scroll to zoom
+            </div>
         </div>
     </div>
 
-    <div id="list-export">
-        <h2>Feature List Export</h2>
-        <pre id="list-content"></pre>
+    <div id="context-menu">
+        <div class="context-menu-item" onclick="app.contextMenuEdit()">Edit</div>
+        <div class="context-menu-item" onclick="app.contextMenuAddFeature()" id="context-add-feature">Add Feature</div>
+        <div class="context-menu-item danger" onclick="app.contextMenuDelete()">Delete</div>
+    </div>
+
+    <div id="bulk-import">
+        <h2>Bulk Import Use Cases</h2>
+        <p style="margin-bottom: 15px; color: #a6adc8;">Enter one use case per line. They will be added to your library.</p>
+        <textarea id="bulk-import-text" placeholder="Enter use case names (one per line)..."></textarea>
         <div style="margin-top: 20px; display: flex; gap: 10px;">
-            <button onclick="app.copyListToClipboard()" style="flex: 1;">Copy to Clipboard</button>
-            <button onclick="app.downloadList()" style="flex: 1;">Download as Text</button>
-            <button class="secondary" onclick="app.hideListExport()" style="flex: 1;">Close</button>
+            <button onclick="app.doBulkImport()" style="flex: 1;">Import</button>
+            <button class="secondary" onclick="app.hideBulkImport()" style="flex: 1;">Cancel</button>
         </div>
     </div>
 
     <div id="modal">
-        <h3 id="modal-title">Add Use Case</h3>
+        <h3 id="modal-title">Edit</h3>
         <input type="text" id="modal-name" placeholder="Name">
         <textarea id="modal-info" placeholder="Description/Info"></textarea>
         <input type="text" id="modal-group" placeholder="Group name (optional)">
-        
+
         <div class="modal-section" id="color-section">
             <label>Color</label>
             <div class="color-picker-grid" id="color-picker"></div>
@@ -410,11 +434,11 @@
             constructor() {
                 this.canvas = document.getElementById('canvas');
                 this.ctx = this.canvas.getContext('2d');
-                
+
                 this.useCases = [];
                 this.features = [];
                 this.connections = [];
-                
+
                 this.camera = { x: 0, y: 0, scale: 1 };
                 this.isDraggingCanvas = false;
                 this.isDraggingNode = false;
@@ -422,42 +446,54 @@
                 this.dragStart = { x: 0, y: 0 };
                 this.lastClickTime = 0;
                 this.lastClickNode = null;
-                
+
                 this.modal = document.getElementById('modal');
                 this.modalMode = null; // 'usecase', 'feature'
                 this.editingId = null;
                 this.selectedColor = '#89b4fa';
                 this.selectedShape = 'square';
-                
+
+                this.contextMenu = document.getElementById('context-menu');
+                this.contextMenuNode = null;
+                this.contextMenuType = null;
+
                 this.colors = [
-                    '#89b4fa', '#f5c2e7', '#a6e3a1', '#fab387', 
+                    '#89b4fa', '#f5c2e7', '#a6e3a1', '#fab387',
                     '#f38ba8', '#cba6f7', '#74c7ec', '#f9e2af',
                     '#eba0ac', '#94e2d5', '#b4befe', '#f5e0dc'
                 ];
-                
+
                 this.shapes = ['square', 'circle', 'diamond', 'hexagon'];
-                
+
                 this.init();
             }
 
             init() {
                 this.resizeCanvas();
                 window.addEventListener('resize', () => this.resizeCanvas());
-                
+
                 this.canvas.addEventListener('mousedown', (e) => this.onMouseDown(e));
                 this.canvas.addEventListener('mousemove', (e) => this.onMouseMove(e));
                 this.canvas.addEventListener('mouseup', (e) => this.onMouseUp(e));
                 this.canvas.addEventListener('wheel', (e) => this.onWheel(e));
-                
+                this.canvas.addEventListener('contextmenu', (e) => this.onContextMenu(e));
+
+                // Close context menu when clicking elsewhere
+                document.addEventListener('click', () => this.hideContextMenu());
+
                 this.initializeColorPicker();
                 this.initializeShapePicker();
-                
+
+                // Load saved data
+                this.loadFromLocalStorage();
+
+                this.renderSidebar();
                 this.render();
             }
 
             initializeColorPicker() {
                 const picker = document.getElementById('color-picker');
-                picker.innerHTML = this.colors.map(color => 
+                picker.innerHTML = this.colors.map(color =>
                     `<div class="color-option" style="background: ${color}" onclick="app.selectColor('${color}')"></div>`
                 ).join('');
             }
@@ -470,8 +506,8 @@
                     diamond: '🔷',
                     hexagon: '⬢'
                 };
-                picker.innerHTML = this.shapes.map(shape => 
-                    `<div class="shape-option" onclick="app.selectShape('${shape}')">${shapeIcons[shape]}</div>`
+                picker.innerHTML = this.shapes.map(shape =>
+                    `<div class="shape-option" onclick="app.selectShape('${shape}')\">${shapeIcons[shape]}</div>`
                 ).join('');
             }
 
@@ -490,7 +526,8 @@
             }
 
             resizeCanvas() {
-                this.canvas.width = window.innerWidth;
+                const sidebar = document.getElementById('sidebar');
+                this.canvas.width = window.innerWidth - sidebar.offsetWidth;
                 this.canvas.height = window.innerHeight;
                 this.render();
             }
@@ -510,45 +547,58 @@
             }
 
             getNodeAt(worldX, worldY) {
-                // Check use cases
+                // Check use cases FIRST (matches original code behavior)
                 for (const uc of this.useCases) {
-                    if (this.hitTestShape(uc, worldX, worldY)) {
-                        return { type: 'usecase', node: uc };
+                    // Only check placed use cases
+                    if (uc.placed !== false && uc.x !== null && uc.y !== null) {
+                        if (this.hitTestShape(uc, worldX, worldY)) {
+                            return { type: 'usecase', node: uc };
+                        }
                     }
                 }
-                
-                // Check features
+
+                // Then check features
                 for (const feature of this.features) {
                     if (this.hitTestShape(feature, worldX, worldY)) {
                         return { type: 'feature', node: feature };
                     }
                 }
-                
+
                 return null;
             }
 
             hitTestShape(node, x, y) {
                 const shape = node.shape || 'square';
                 const size = node.width || node.radius * 2;
-                
+
                 switch(shape) {
                     case 'circle':
                         const radius = node.radius || size / 2;
                         const dx = x - node.x;
                         const dy = y - node.y;
                         return dx * dx + dy * dy <= radius * radius;
-                    
+
                     case 'square':
+                    case 'rounded':
                         const halfW = (node.width || size) / 2;
                         const halfH = (node.height || size) / 2;
-                        return Math.abs(x - node.x) <= halfW && Math.abs(y - node.y) <= halfH;
-                    
+                        const distX = Math.abs(x - node.x);
+                        const distY = Math.abs(y - node.y);
+                        const hit = distX <= halfW && distY <= halfH;
+
+                        // Debug logging
+                        if (node.name) {
+                            console.log(`Testing ${node.name}: click(${x.toFixed(1)}, ${y.toFixed(1)}) vs center(${node.x.toFixed(1)}, ${node.y.toFixed(1)}) size(${node.width}x${node.height}) distX=${distX.toFixed(1)} <= ${halfW.toFixed(1)}? distY=${distY.toFixed(1)} <= ${halfH.toFixed(1)}? => ${hit}`);
+                        }
+
+                        return hit;
+
                     case 'diamond':
                     case 'hexagon':
                         // Simple bounding box for now
                         const half = size / 2;
                         return Math.abs(x - node.x) <= half && Math.abs(y - node.y) <= half;
-                    
+
                     default:
                         return false;
                 }
@@ -559,9 +609,9 @@
                 const screenX = e.clientX - rect.left;
                 const screenY = e.clientY - rect.top;
                 const world = this.screenToWorld(screenX, screenY);
-                
+
                 const hit = this.getNodeAt(world.x, world.y);
-                
+
                 if (hit) {
                     this.isDraggingNode = true;
                     this.draggedNode = hit.node;
@@ -577,7 +627,7 @@
                 const screenX = e.clientX - rect.left;
                 const screenY = e.clientY - rect.top;
                 const world = this.screenToWorld(screenX, screenY);
-                
+
                 if (this.isDraggingNode && this.draggedNode) {
                     this.draggedNode.x = world.x - this.dragStart.x;
                     this.draggedNode.y = world.y - this.dragStart.y;
@@ -587,7 +637,7 @@
                     this.camera.y = e.clientY - this.dragStart.y;
                     this.render();
                 }
-                
+
                 const hit = this.getNodeAt(world.x, world.y);
                 this.canvas.style.cursor = hit ? 'pointer' : 'default';
             }
@@ -597,11 +647,13 @@
                 const screenX = e.clientX - rect.left;
                 const screenY = e.clientY - rect.top;
                 const world = this.screenToWorld(screenX, screenY);
-                
+
                 const hit = this.getNodeAt(world.x, world.y);
-                
+
+                // Simple double-click detection (EXACTLY like original code)
                 const now = Date.now();
                 if (hit && hit.node === this.lastClickNode && now - this.lastClickTime < 300) {
+                    // Double-click detected
                     if (hit.type === 'usecase') {
                         this.addFeatureToUseCase(hit.node);
                     } else if (hit.type === 'feature') {
@@ -610,6 +662,7 @@
                     this.lastClickTime = 0;
                     this.lastClickNode = null;
                 } else {
+                    // Single click - open edit modal
                     if (hit && !this.isDraggingNode) {
                         if (hit.type === 'usecase') {
                             this.editUseCase(hit.node);
@@ -620,7 +673,12 @@
                     this.lastClickTime = now;
                     this.lastClickNode = hit ? hit.node : null;
                 }
-                
+
+                // Auto-save position changes after dragging
+                if (this.isDraggingNode) {
+                    this.saveToLocalStorage();
+                }
+
                 this.isDraggingCanvas = false;
                 this.isDraggingNode = false;
                 this.draggedNode = null;
@@ -631,43 +689,113 @@
                 const rect = this.canvas.getBoundingClientRect();
                 const mouseX = e.clientX - rect.left;
                 const mouseY = e.clientY - rect.top;
-                
+
                 const delta = -e.deltaY * 0.001;
                 const newScale = Math.max(0.3, Math.min(3, this.camera.scale + delta));
-                
+
                 this.camera.x = mouseX - (mouseX - this.camera.x) * (newScale / this.camera.scale);
                 this.camera.y = mouseY - (mouseY - this.camera.y) * (newScale / this.camera.scale);
                 this.camera.scale = newScale;
-                
+
                 this.render();
             }
 
-            addUseCase() {
-                const centerWorld = this.screenToWorld(this.canvas.width / 2, this.canvas.height / 2);
-                this.useCases.push({
-                    id: Date.now(),
-                    x: centerWorld.x,
-                    y: centerWorld.y,
-                    width: 140,
-                    height: 100,
-                    name: 'New Use Case',
-                    info: '',
-                    group: '',
-                    color: '#89b4fa',
-                    shape: 'square'
-                });
-                this.render();
+            onContextMenu(e) {
+                e.preventDefault();
+                const rect = this.canvas.getBoundingClientRect();
+                const screenX = e.clientX - rect.left;
+                const screenY = e.clientY - rect.top;
+                const world = this.screenToWorld(screenX, screenY);
+
+                console.log('Right-click at world coords:', world);
+
+                const hit = this.getNodeAt(world.x, world.y);
+
+                console.log('Hit result:', hit);
+                if (hit) {
+                    console.log('Hit node:', hit.node.name, 'at', hit.node.x, hit.node.y, 'size:', hit.node.width, 'x', hit.node.height);
+                }
+
+                if (hit) {
+                    this.contextMenuNode = hit.node;
+                    this.contextMenuType = hit.type;
+                    this.contextMenu.style.display = 'block';
+                    this.contextMenu.style.left = e.clientX + 'px';
+                    this.contextMenu.style.top = e.clientY + 'px';
+
+                    // Show/hide "Add Feature" based on type
+                    const addFeatureBtn = document.getElementById('context-add-feature');
+                    if (addFeatureBtn) {
+                        addFeatureBtn.style.display = hit.type === 'usecase' ? 'block' : 'none';
+                    }
+                }
             }
 
-            createNewUseCase() {
-                this.addUseCase();
-                this.hideMainMenu();
+            hideContextMenu() {
+                this.contextMenu.style.display = 'none';
+                this.contextMenuNode = null;
+                this.contextMenuType = null;
+            }
+
+            contextMenuEdit() {
+                if (!this.contextMenuNode) return;
+
+                if (this.contextMenuType === 'usecase') {
+                    this.editUseCase(this.contextMenuNode);
+                } else if (this.contextMenuType === 'feature') {
+                    this.editFeature(this.contextMenuNode);
+                }
+
+                this.hideContextMenu();
+            }
+
+            contextMenuAddFeature() {
+                if (!this.contextMenuNode || this.contextMenuType !== 'usecase') return;
+                this.addFeatureToUseCase(this.contextMenuNode);
+                this.hideContextMenu();
+            }
+
+            contextMenuDelete() {
+                if (!this.contextMenuNode) return;
+
+                if (this.contextMenuType === 'usecase') {
+                    // For use cases: remove from canvas (mark as unplaced) instead of deleting
+                    if (!confirm('Remove this use case from the canvas? (It will remain in the sidebar)')) {
+                        this.hideContextMenu();
+                        return;
+                    }
+
+                    const useCase = this.contextMenuNode;
+                    useCase.placed = false;
+                    useCase.x = null;
+                    useCase.y = null;
+
+                    // Remove associated features from canvas
+                    const featuresToRemove = this.features.filter(f => f.useCaseId === useCase.id);
+                    featuresToRemove.forEach(f => {
+                        this.connections = this.connections.filter(c => c.to !== f.id && c.from !== f.id);
+                    });
+                    this.features = this.features.filter(f => f.useCaseId !== useCase.id);
+                } else if (this.contextMenuType === 'feature') {
+                    // For features: actually delete them
+                    if (!confirm('Delete this feature?')) {
+                        this.hideContextMenu();
+                        return;
+                    }
+                    this.connections = this.connections.filter(c => c.to !== this.contextMenuNode.id && c.from !== this.contextMenuNode.id);
+                    this.features = this.features.filter(f => f.id !== this.contextMenuNode.id);
+                }
+
+                this.hideContextMenu();
+                this.saveToLocalStorage();
+                this.renderSidebar();
+                this.render();
             }
 
             addFeatureToUseCase(useCase) {
                 const angle = Math.random() * Math.PI * 2;
                 const distance = 120;
-                
+
                 const feature = {
                     id: Date.now(),
                     x: useCase.x + Math.cos(angle) * distance,
@@ -679,11 +807,14 @@
                     color: '#a6e3a1',
                     shape: 'circle'
                 };
-                
+
                 this.features.push(feature);
                 this.connections.push({ from: useCase.id, to: feature.id });
+
+                this.saveToLocalStorage();
+                this.renderSidebar();
                 this.render();
-                
+
                 setTimeout(() => this.editFeature(feature), 100);
             }
 
@@ -692,7 +823,7 @@
                 this.editingId = useCase.id;
                 this.selectedColor = useCase.color || '#89b4fa';
                 this.selectedShape = useCase.shape || 'square';
-                
+
                 document.getElementById('modal-title').textContent = 'Edit Use Case';
                 document.getElementById('modal-name').value = useCase.name;
                 document.getElementById('modal-info').value = useCase.info;
@@ -700,10 +831,10 @@
                 document.getElementById('color-section').style.display = 'block';
                 document.getElementById('shape-section').style.display = 'block';
                 document.getElementById('modal-group').style.display = 'block';
-                
+
                 this.selectColor(this.selectedColor);
                 this.selectShape(this.selectedShape);
-                
+
                 this.showModal();
             }
 
@@ -712,17 +843,17 @@
                 this.editingId = feature.id;
                 this.selectedColor = feature.color || '#a6e3a1';
                 this.selectedShape = feature.shape || 'circle';
-                
+
                 document.getElementById('modal-title').textContent = 'Edit Feature';
                 document.getElementById('modal-name').value = feature.name;
                 document.getElementById('modal-info').value = feature.info;
                 document.getElementById('modal-group').style.display = 'none';
                 document.getElementById('color-section').style.display = 'block';
                 document.getElementById('shape-section').style.display = 'block';
-                
+
                 this.selectColor(this.selectedColor);
                 this.selectShape(this.selectedShape);
-                
+
                 this.showModal();
             }
 
@@ -744,12 +875,12 @@
                 const name = document.getElementById('modal-name').value.trim();
                 const info = document.getElementById('modal-info').value.trim();
                 const group = document.getElementById('modal-group').value.trim();
-                
+
                 if (!name) {
                     alert('Name is required');
                     return;
                 }
-                
+
                 if (this.modalMode === 'usecase') {
                     const uc = this.useCases.find(u => u.id === this.editingId);
                     if (uc) {
@@ -768,14 +899,16 @@
                         feature.shape = this.selectedShape;
                     }
                 }
-                
+
                 this.closeModal();
+                this.saveToLocalStorage();
+                this.renderSidebar();
                 this.render();
             }
 
             deleteFromModal() {
                 if (!confirm('Delete this item?')) return;
-                
+
                 if (this.modalMode === 'usecase') {
                     const featuresToDelete = this.features.filter(f => f.useCaseId === this.editingId);
                     featuresToDelete.forEach(f => {
@@ -787,121 +920,220 @@
                     this.connections = this.connections.filter(c => c.to !== this.editingId && c.from !== this.editingId);
                     this.features = this.features.filter(f => f.id !== this.editingId);
                 }
-                
+
                 this.closeModal();
+                this.saveToLocalStorage();
+                this.renderSidebar();
                 this.render();
             }
 
-            showMainMenu() {
-                const menu = document.getElementById('main-menu');
-                const list = document.getElementById('usecase-list');
-                
-                list.innerHTML = this.useCases.map(uc => {
-                    const featureCount = this.features.filter(f => f.useCaseId === uc.id).length;
-                    return `
-                        <div class="usecase-menu-item" onclick="app.navigateToUseCase(${uc.id})">
-                            <div>
-                                <div class="title">${uc.name}</div>
-                                ${uc.info ? `<div class="info">${uc.info}</div>` : ''}
-                                ${uc.group ? `<div class="info">Group: ${uc.group}</div>` : ''}
-                            </div>
-                            <div class="feature-count">${featureCount} features</div>
-                        </div>
-                    `;
-                }).join('');
-                
-                if (this.useCases.length === 0) {
-                    list.innerHTML = '<p style="text-align: center; color: #a6adc8;">No use cases yet. Create one to get started!</p>';
+            // Sidebar functions
+            createAllUseCases() {
+                const unplaced = this.useCases.filter(uc => !uc.placed || uc.x === null || uc.y === null);
+
+                if (unplaced.length === 0) {
+                    alert('All use cases are already on the canvas!');
+                    return;
                 }
-                
-                menu.classList.remove('hidden');
+
+                // Place in a grid layout
+                const cols = Math.ceil(Math.sqrt(unplaced.length));
+                const spacing = 250;
+                const centerWorld = this.screenToWorld(this.canvas.width / 2, this.canvas.height / 2);
+                const startX = centerWorld.x - ((cols - 1) * spacing) / 2;
+                const startY = centerWorld.y - ((Math.ceil(unplaced.length / cols) - 1) * spacing) / 2;
+
+                unplaced.forEach((uc, index) => {
+                    const col = index % cols;
+                    const row = Math.floor(index / cols);
+                    uc.x = startX + col * spacing;
+                    uc.y = startY + row * spacing;
+                    uc.placed = true;
+                });
+
+                this.saveToLocalStorage();
+                this.renderSidebar();
+                this.render();
+
+                alert(`Placed ${unplaced.length} use cases on canvas!`);
             }
 
-            hideMainMenu() {
-                document.getElementById('main-menu').classList.add('hidden');
+            showBulkImport() {
+                document.getElementById('bulk-import').style.display = 'block';
+                document.getElementById('bulk-import-text').focus();
             }
 
-            navigateToUseCase(id) {
-                const uc = this.useCases.find(u => u.id === id);
+            hideBulkImport() {
+                document.getElementById('bulk-import').style.display = 'none';
+                document.getElementById('bulk-import-text').value = '';
+            }
+
+            doBulkImport() {
+                const text = document.getElementById('bulk-import-text').value;
+                const lines = text.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+
+                if (lines.length === 0) {
+                    alert('Please enter at least one use case name.');
+                    return;
+                }
+
+                lines.forEach(line => {
+                    this.useCases.push({
+                        id: Date.now() + Math.random(),
+                        x: null,
+                        y: null,
+                        width: 200,
+                        height: 120,
+                        name: line,
+                        info: 'Description...',
+                        group: '',
+                        color: '#89b4fa',
+                        shape: 'square',
+                        placed: false
+                    });
+                });
+
+                this.saveToLocalStorage();
+                this.renderSidebar();
+                this.render();
+                this.hideBulkImport();
+
+                alert(`Successfully imported ${lines.length} use cases to library!`);
+            }
+
+            addSingleUseCase() {
+                const name = prompt('Enter use case name:');
+                if (!name || !name.trim()) return;
+
+                this.useCases.push({
+                    id: Date.now(),
+                    x: null,
+                    y: null,
+                    width: 140,
+                    height: 100,
+                    name: name.trim(),
+                    info: '',
+                    group: '',
+                    color: '#89b4fa',
+                    shape: 'square',
+                    placed: false
+                });
+
+                this.saveToLocalStorage();
+                this.renderSidebar();
+                this.render();
+            }
+
+            deleteUseCaseFromSidebar(useCaseId) {
+                if (!confirm('Delete this use case and all its features?')) return;
+
+                // Delete associated features
+                const featuresToDelete = this.features.filter(f => f.useCaseId === useCaseId);
+                featuresToDelete.forEach(f => {
+                    this.connections = this.connections.filter(c => c.to !== f.id && c.from !== f.id);
+                });
+                this.features = this.features.filter(f => f.useCaseId !== useCaseId);
+
+                // Delete use case
+                this.useCases = this.useCases.filter(u => u.id !== useCaseId);
+
+                this.saveToLocalStorage();
+                this.renderSidebar();
+                this.render();
+            }
+
+            placeUseCaseOnCanvas(useCaseId) {
+                const uc = this.useCases.find(u => u.id === useCaseId);
                 if (!uc) return;
-                
+
+                // Place at center of current view
+                const centerWorld = this.screenToWorld(this.canvas.width / 2, this.canvas.height / 2);
+                uc.x = centerWorld.x;
+                uc.y = centerWorld.y;
+                uc.placed = true;
+
+                this.saveToLocalStorage();
+                this.renderSidebar();
+                this.render();
+            }
+
+            jumpToUseCase(useCaseId) {
+                const uc = this.useCases.find(u => u.id === useCaseId);
+                if (!uc || !uc.placed) return;
+
                 // Center on use case
                 const screenCenter = {
                     x: this.canvas.width / 2,
                     y: this.canvas.height / 2
                 };
-                
+
                 this.camera.x = screenCenter.x - uc.x * this.camera.scale;
                 this.camera.y = screenCenter.y - uc.y * this.camera.scale;
-                
-                this.hideMainMenu();
+
                 this.render();
             }
 
-            showListExport() {
-                const list = document.getElementById('list-export');
-                const content = document.getElementById('list-content');
-                
-                let text = '';
-                this.useCases.forEach(uc => {
-                    text += `${uc.name}:\n`;
-                    if (uc.info) {
-                        text += `  Description: ${uc.info}\n`;
-                    }
-                    if (uc.group) {
-                        text += `  Group: ${uc.group}\n`;
-                    }
-                    
-                    const features = this.features.filter(f => f.useCaseId === uc.id);
-                    if (features.length > 0) {
-                        text += `  Features:\n`;
-                        features.forEach(f => {
-                            text += `    ${f.name}\n`;
-                            if (f.info) {
-                                text += `      * ${f.info}\n`;
-                            }
-                        });
-                    } else {
-                        text += `  (No features yet)\n`;
-                    }
-                    text += `\n`;
-                });
-                
+            renderSidebar() {
+                const sidebar = document.getElementById('sidebar-content');
+
                 if (this.useCases.length === 0) {
-                    text = 'No use cases created yet.';
+                    sidebar.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 20px;">No use cases yet. Use Bulk Import to add some!</p>';
+                    return;
                 }
-                
-                content.textContent = text;
-                list.style.display = 'block';
+
+                sidebar.innerHTML = this.useCases.map(uc => {
+                    const featureCount = this.features.filter(f => f.useCaseId === uc.id).length;
+                    const isPlaced = uc.placed !== false && uc.x !== null && uc.y !== null;
+
+                    return `
+                        <div class="sidebar-item" data-id="${uc.id}">
+                            <div class="sidebar-item-header">
+                                <div class="sidebar-item-title">${uc.name}</div>
+                                <span class="sidebar-item-count">${featureCount}</span>
+                            </div>
+                            <div style="padding: 8px 12px; display: flex; gap: 4px; border-top: 1px solid var(--purple-dim);">
+                                ${isPlaced ? `
+                                    <button class="sidebar-item-btn" onclick="app.jumpToUseCase(${uc.id}); event.stopPropagation();">Jump</button>
+                                    <button class="sidebar-item-btn secondary" onclick="app.editUseCase(app.useCases.find(u => u.id === ${uc.id})); event.stopPropagation();">Edit</button>
+                                    <button class="sidebar-item-btn secondary" onclick="app.deleteUseCaseFromSidebar(${uc.id}); event.stopPropagation();" style="background: rgba(243, 139, 168, 0.2); border-color: #f38ba8; color: #f38ba8;">Delete</button>
+                                ` : `
+                                    <button class="sidebar-item-btn" onclick="app.placeUseCaseOnCanvas(${uc.id}); event.stopPropagation();">Create</button>
+                                    <button class="sidebar-item-btn secondary" onclick="app.editUseCase(app.useCases.find(u => u.id === ${uc.id})); event.stopPropagation();">Edit</button>
+                                    <button class="sidebar-item-btn secondary" onclick="app.deleteUseCaseFromSidebar(${uc.id}); event.stopPropagation();" style="background: rgba(243, 139, 168, 0.2); border-color: #f38ba8; color: #f38ba8;">Delete</button>
+                                `}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
             }
 
-            hideListExport() {
-                document.getElementById('list-export').style.display = 'none';
+            // Save/Load functions
+            saveToLocalStorage() {
+                const data = {
+                    useCases: this.useCases,
+                    features: this.features,
+                    connections: this.connections,
+                    lastSaved: new Date().toISOString()
+                };
+                localStorage.setItem('usecase-mapper-data', JSON.stringify(data));
             }
 
-            copyListToClipboard() {
-                const content = document.getElementById('list-content').textContent;
-                navigator.clipboard.writeText(content).then(() => {
-                    alert('Copied to clipboard!');
-                }).catch(() => {
-                    alert('Failed to copy to clipboard');
-                });
-            }
-
-            downloadList() {
-                const content = document.getElementById('list-content').textContent;
-                const blob = new Blob([content], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'use-case-features-list.txt';
-                a.click();
+            loadFromLocalStorage() {
+                const saved = localStorage.getItem('usecase-mapper-data');
+                if (saved) {
+                    const data = JSON.parse(saved);
+                    this.useCases = data.useCases || [];
+                    this.features = data.features || [];
+                    this.connections = data.connections || [];
+                    return true;
+                }
+                return false;
             }
 
             render() {
                 this.ctx.save();
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
+
                 this.ctx.translate(this.camera.x, this.camera.y);
                 this.ctx.scale(this.camera.scale, this.camera.scale);
 
@@ -909,7 +1141,7 @@
                 this.connections.forEach(conn => {
                     const from = this.useCases.find(u => u.id === conn.from);
                     const to = this.features.find(f => f.id === conn.to);
-                    
+
                     if (from && to) {
                         this.ctx.strokeStyle = '#45475a';
                         this.ctx.lineWidth = 2;
@@ -920,9 +1152,11 @@
                     }
                 });
 
-                // Draw use cases
+                // Draw use cases (only placed ones)
                 this.useCases.forEach(uc => {
-                    this.drawShape(uc, uc.shape || 'square', uc.color || '#89b4fa', true);
+                    if (uc.placed !== false && uc.x !== null && uc.y !== null) {
+                        this.drawShape(uc, uc.shape || 'square', uc.color || '#89b4fa', true);
+                    }
                 });
 
                 // Draw features
@@ -937,9 +1171,9 @@
                 this.ctx.fillStyle = color;
                 this.ctx.strokeStyle = '#45475a';
                 this.ctx.lineWidth = 2;
-                
+
                 const size = isUseCase ? (node.width || 140) : (node.radius * 2 || 80);
-                
+
                 switch(shape) {
                     case 'circle':
                         const radius = isUseCase ? size / 2 : node.radius;
@@ -948,11 +1182,12 @@
                         this.ctx.fill();
                         this.ctx.stroke();
                         break;
-                    
+
                     case 'square':
+                    case 'rounded':
                         const width = node.width || size;
                         const height = node.height || size;
-                        
+
                         // Group color bar for use cases
                         if (isUseCase && node.group) {
                             const hash = node.group.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
@@ -961,16 +1196,30 @@
                             this.ctx.fillRect(node.x - width / 2, node.y - height / 2, width, 8);
                             this.ctx.fillStyle = color;
                         }
-                        
-                        this.ctx.fillRect(
-                            node.x - width / 2,
-                            node.y - height / 2 + (isUseCase && node.group ? 8 : 0),
-                            width,
-                            height - (isUseCase && node.group ? 8 : 0)
-                        );
-                        this.ctx.strokeRect(node.x - width / 2, node.y - height / 2, width, height);
+
+                        if (shape === 'rounded') {
+                            const cornerRadius = 10;
+                            this.ctx.beginPath();
+                            this.ctx.roundRect(
+                                node.x - width / 2,
+                                node.y - height / 2 + (isUseCase && node.group ? 8 : 0),
+                                width,
+                                height - (isUseCase && node.group ? 8 : 0),
+                                cornerRadius
+                            );
+                            this.ctx.fill();
+                            this.ctx.stroke();
+                        } else {
+                            this.ctx.fillRect(
+                                node.x - width / 2,
+                                node.y - height / 2 + (isUseCase && node.group ? 8 : 0),
+                                width,
+                                height - (isUseCase && node.group ? 8 : 0)
+                            );
+                            this.ctx.strokeRect(node.x - width / 2, node.y - height / 2, width, height);
+                        }
                         break;
-                    
+
                     case 'diamond':
                         const half = size / 2;
                         this.ctx.beginPath();
@@ -982,7 +1231,7 @@
                         this.ctx.fill();
                         this.ctx.stroke();
                         break;
-                    
+
                     case 'hexagon':
                         const h = size / 2;
                         const angle = Math.PI / 3;
@@ -998,18 +1247,18 @@
                         this.ctx.stroke();
                         break;
                 }
-                
+
                 // Draw text
-                this.ctx.fillStyle = shape === 'square' ? '#1e1e2e' : '#1e1e2e';
+                this.ctx.fillStyle = '#1e1e2e';
                 this.ctx.font = isUseCase ? 'bold 14px sans-serif' : 'bold 12px sans-serif';
                 this.ctx.textAlign = 'center';
                 this.ctx.textBaseline = 'middle';
-                
+
                 const maxWidth = isUseCase ? (node.width - 20) : (node.radius * 1.6);
                 const lines = this.wrapText(node.name, maxWidth);
                 const lineHeight = isUseCase ? 16 : 14;
                 const startY = node.y - ((lines.length - 1) * lineHeight) / 2;
-                
+
                 lines.forEach((line, i) => {
                     this.ctx.fillText(line, node.x, startY + i * lineHeight);
                 });
@@ -1047,44 +1296,6 @@
             resetView() {
                 this.camera = { x: 0, y: 0, scale: 1 };
                 this.render();
-            }
-
-            exportData() {
-                const data = {
-                    useCases: this.useCases,
-                    features: this.features,
-                    connections: this.connections
-                };
-                const json = JSON.stringify(data, null, 2);
-                const blob = new Blob([json], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'use-case-map.json';
-                a.click();
-            }
-
-            importData() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = 'application/json';
-                input.onchange = (e) => {
-                    const file = e.target.files[0];
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        try {
-                            const data = JSON.parse(event.target.result);
-                            this.useCases = data.useCases || [];
-                            this.features = data.features || [];
-                            this.connections = data.connections || [];
-                            this.render();
-                        } catch (err) {
-                            alert('Invalid JSON file');
-                        }
-                    };
-                    reader.readAsText(file);
-                };
-                input.click();
             }
         }
 
