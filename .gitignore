@@ -96,3 +96,8 @@ apps/flashcards/audio_samples/
 # Python
 *.pyc
 __pycache__
+
+# Google Drive API credentials
+credentials.json
+token.json
+service-account.json

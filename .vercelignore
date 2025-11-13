@@ -6,13 +6,23 @@ node_modules
 venv
 .venv
 apps/flashcards/.venv-tts
+apps/flashcards/.venv-edge-tts
 build
 dist
 
-# Large assets and source trees not required for frontend deployment
+# Large assets and source trees not required for deployment
 lib/graphviz
-sounds
+sounds/
 external/
+
+# Large WAV files in root
+*.wav
+
+# Flashcards - exclude large audio caches and samples
+apps/flashcards/voice_previews/
+apps/flashcards/audio_samples/
+apps/flashcards/audio_cache/
+# Keep audio_cache_british for deployment
 
 # Editor / OS files
 .DS_Store
@@ -30,15 +40,20 @@ lib/**/tests
 .claude
 
 # Large project directories not needed for deployment
-emsdk
-MuseScore
-MusePlay
+emsdk/
+MuseScore/
 
-# apps/player - exclude large dependencies but keep core files, soundfonts, and scores
-apps/player/node_modules
-apps/player/musescore-player
-apps/player/verovio-reference-book.pdf
+# apps/player - exclude large dependencies but keep core files
+apps/player/node_modules/
 
-# apps/museplay - exclude large dependencies
-apps/museplay/node_modules
+# apps/museplay - exclude large dependencies and temp files
+apps/museplay/node_modules/
 apps/museplay/temp/
+apps/museplay/soundfonts/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Archived files
+.archived/

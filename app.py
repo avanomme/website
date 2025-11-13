@@ -9,9 +9,19 @@ import io
 import subprocess
 import tempfile
 import uuid
+import json
+import datetime
 from pathlib import Path
 from werkzeug.utils import secure_filename
 from jinja2 import ChoiceLoader, FileSystemLoader
+
+# Try to import redis
+try:
+    import redis
+    REDIS_AVAILABLE = True
+except ImportError:
+    REDIS_AVAILABLE = False
+    print("Warning: redis not available. Using filesystem fallback.")
 
 # Try to import graphviz and dot2tex, but make them optional for Vercel deployment
 try:
@@ -97,6 +107,245 @@ def museplay_scores(filename):
 @app.route('/se/<path:filename>')
 def se_static(filename='use-case-mapper.html'):
     return send_from_directory(os.path.join(PROJECT_DIR, 'apps', 'se'), filename)
+
+# ============================================================================
+# REDIS STORAGE HELPER
+# ============================================================================
+
+# Redis configuration from environment
+REDIS_URL = os.environ.get('REDIS_URL', '')
+USE_REDIS = REDIS_AVAILABLE and bool(REDIS_URL)
+
+# Initialize Redis client
+redis_client = None
+if USE_REDIS:
+    try:
+        redis_client = redis.from_url(
+            REDIS_URL,
+            decode_responses=True,
+            socket_connect_timeout=5,
+            socket_timeout=5
+        )
+        # Test connection
+        redis_client.ping()
+        print(f"✓ Connected to Redis successfully")
+    except Exception as e:
+        print(f"✗ Redis connection failed: {e}")
+        USE_REDIS = False
+        redis_client = None
+
+# Filesystem fallback for local development
+SE_PROJECTS_DIR = os.path.join(PROJECT_DIR, 'apps', 'se', 'projects')
+FILESYSTEM_AVAILABLE = False
+if not USE_REDIS:
+    try:
+        os.makedirs(SE_PROJECTS_DIR, exist_ok=True)
+        # Test if we can write
+        test_file = os.path.join(SE_PROJECTS_DIR, '.test')
+        with open(test_file, 'w') as f:
+            f.write('test')
+        os.remove(test_file)
+        FILESYSTEM_AVAILABLE = True
+        print(f"Using filesystem storage: {SE_PROJECTS_DIR}")
+    except (OSError, PermissionError) as e:
+        print(f"✗ Filesystem is read-only: {e}")
+        print("⚠️  WARNING: No storage backend available! Redis required for production.")
+
+def kv_get(key):
+    """Get value from Redis or filesystem fallback"""
+    if USE_REDIS and redis_client:
+        try:
+            result = redis_client.get(key)
+            return json.loads(result) if result else None
+        except Exception as e:
+            print(f"Redis get error: {e}")
+            return None
+    else:
+        # Filesystem fallback
+        filepath = os.path.join(SE_PROJECTS_DIR, f"{key.replace('se:project:', '')}.json")
+        if os.path.exists(filepath):
+            with open(filepath, 'r') as f:
+                return json.load(f)
+        return None
+
+def kv_set(key, value):
+    """Set value in Redis or filesystem fallback"""
+    if USE_REDIS and redis_client:
+        try:
+            redis_client.set(key, json.dumps(value))
+            return True
+        except Exception as e:
+            print(f"Redis set error: {e}")
+            return False
+    elif FILESYSTEM_AVAILABLE:
+        # Filesystem fallback
+        try:
+            filepath = os.path.join(SE_PROJECTS_DIR, f"{key.replace('se:project:', '')}.json")
+            with open(filepath, 'w') as f:
+                json.dump(value, f, indent=2)
+            return True
+        except Exception as e:
+            print(f"Filesystem write error: {e}")
+            return False
+    else:
+        print("No storage backend available")
+        return False
+
+def kv_delete(key):
+    """Delete value from Redis or filesystem fallback"""
+    if USE_REDIS and redis_client:
+        try:
+            redis_client.delete(key)
+            return True
+        except Exception as e:
+            print(f"Redis delete error: {e}")
+            return False
+    else:
+        # Filesystem fallback
+        filepath = os.path.join(SE_PROJECTS_DIR, f"{key.replace('se:project:', '')}.json")
+        if os.path.exists(filepath):
+            os.remove(filepath)
+            return True
+        return False
+
+def kv_keys(pattern):
+    """Get keys matching pattern from Redis or filesystem fallback"""
+    if USE_REDIS and redis_client:
+        try:
+            # Redis KEYS command supports patterns like "se:project:*"
+            keys = redis_client.keys(pattern)
+            return [k for k in keys]
+        except Exception as e:
+            print(f"Redis keys error: {e}")
+            return []
+    else:
+        # Filesystem fallback
+        keys = []
+        for filename in os.listdir(SE_PROJECTS_DIR):
+            if filename.endswith('.json'):
+                keys.append(f"se:project:{filename[:-5]}")
+        return keys
+
+# ============================================================================
+# SE PROJECT MANAGEMENT API
+# ============================================================================
+
+@app.route('/api/se/health', methods=['GET'])
+def se_health_check():
+    """Check SE storage backend status"""
+    status = {
+        'redis': USE_REDIS,
+        'filesystem': FILESYSTEM_AVAILABLE,
+        'storage_available': USE_REDIS or FILESYSTEM_AVAILABLE
+    }
+    return jsonify(status)
+
+@app.route('/api/se/projects', methods=['GET'])
+def list_se_projects():
+    """List all available SE projects"""
+    try:
+        projects = []
+        keys = kv_keys('se:project:*')
+
+        for key in keys:
+            project_name = key.replace('se:project:', '')
+            data = kv_get(key)
+
+            if data:
+                projects.append({
+                    'name': project_name,
+                    'useCaseCount': len(data.get('useCases', [])),
+                    'featureCount': len(data.get('features', [])),
+                    'lastModified': data.get('lastModified', '')
+                })
+
+        return jsonify({'success': True, 'projects': projects})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/se/projects/<project_name>', methods=['GET'])
+def load_se_project(project_name):
+    """Load a specific SE project"""
+    try:
+        key = f"se:project:{project_name}"
+        data = kv_get(key)
+
+        if not data:
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+
+        return jsonify({'success': True, 'data': data})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/se/projects/<project_name>', methods=['POST'])
+def save_se_project(project_name):
+    """Save a SE project"""
+    try:
+        # Check if storage is available
+        if not USE_REDIS and not FILESYSTEM_AVAILABLE:
+            return jsonify({
+                'success': False,
+                'error': 'No storage backend available. Redis configuration required for production deployment.'
+            }), 503
+
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        # Add metadata
+        data['projectName'] = project_name
+        data['lastModified'] = datetime.datetime.now().isoformat()
+
+        # Save to KV storage (with filesystem fallback)
+        key = f"se:project:{project_name}"
+        success = kv_set(key, data)
+
+        # Try to backup to Google Drive (async, don't block on failure)
+        drive_backup_result = None
+        try:
+            from google_drive_backup import GoogleDriveBackup
+            backup = GoogleDriveBackup()
+            drive_backup_result = backup.backup_to_drive(data, project_name)
+            if drive_backup_result['success']:
+                print(f"✓ Google Drive backup successful: {drive_backup_result['file_name']}")
+        except Exception as e:
+            print(f"Google Drive backup failed (non-critical): {e}")
+            # Don't fail the save if Drive backup fails
+
+        if success:
+            response = {'success': True, 'message': 'Project saved successfully'}
+            if drive_backup_result and drive_backup_result.get('success'):
+                response['drive_backup'] = {
+                    'success': True,
+                    'file_name': drive_backup_result.get('file_name'),
+                    'timestamp': drive_backup_result.get('timestamp')
+                }
+            return jsonify(response)
+        else:
+            error_msg = 'Storage backend not available' if not (USE_REDIS or FILESYSTEM_AVAILABLE) else 'Failed to save project'
+            return jsonify({'success': False, 'error': error_msg}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/se/projects/<project_name>', methods=['DELETE'])
+def delete_se_project(project_name):
+    """Delete a SE project"""
+    try:
+        key = f"se:project:{project_name}"
+
+        # Check if project exists
+        if not kv_get(key):
+            return jsonify({'success': False, 'error': 'Project not found'}), 404
+
+        # Delete from KV storage
+        success = kv_delete(key)
+
+        if success:
+            return jsonify({'success': True, 'message': 'Project deleted successfully'})
+        else:
+            return jsonify({'success': False, 'error': 'Failed to delete project'}), 500
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # ============================================================================
 # DFA / GRAPH VISUALIZATION

@@ -1,0 +1,38 @@
+{
+  "useCases": [
+    {
+      "color": "#89b4fa",
+      "group": "",
+      "height": 78,
+      "id": 1763038129535,
+      "info": "Description goes here...",
+      "name": "New Use Case",
+      "placed": true,
+      "shape": "rounded",
+      "width": 180,
+      "x": 2152,
+      "y": 562
+    }
+  ],
+  "features": [
+    {
+      "color": "#a6e3a1",
+      "id": 1763038145708,
+      "info": "",
+      "name": "New Feature",
+      "radius": 50.677734375,
+      "shape": "rounded",
+      "useCaseId": 1763038129535,
+      "x": 1895.7019598953625,
+      "y": 240.12194905903448
+    }
+  ],
+  "connections": [
+    {
+      "from": 1763038129535,
+      "to": 1763038145708
+    }
+  ],
+  "projectName": "software",
+  "lastModified": "2025-11-13T09:12:45.624060"
+}
