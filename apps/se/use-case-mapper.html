@@ -1205,6 +1205,14 @@
                     lastSaved: new Date().toISOString()
                 };
 
+                // Always save to localStorage as backup
+                try {
+                    localStorage.setItem('usecase-mapper-data', JSON.stringify(data));
+                } catch (e) {
+                    console.error('Failed to save to localStorage:', e);
+                }
+
+                // Try to save to server
                 try {
                     const response = await fetch('/api/se/projects/shared-project', {
                         method: 'POST',
@@ -1218,12 +1226,12 @@
                         return true;
                     } else {
                         console.error('Save failed:', await response.text());
-                        this.updateSaveStatus('Save failed', true);
+                        this.updateSaveStatus('Saved locally only', true);
                         return false;
                     }
                 } catch (error) {
                     console.error('Save error:', error);
-                    this.updateSaveStatus('Save error', true);
+                    this.updateSaveStatus('Saved locally only', true);
                     return false;
                 }
             }
@@ -1243,25 +1251,59 @@
 
                             this.renderSidebar();
                             this.render();
-                            this.updateSaveStatus('Loaded');
+                            this.updateSaveStatus('Loaded from server');
+                            return true;
                         } else {
-                            // No project exists yet, start fresh
+                            // No project exists yet, try localStorage as backup
+                            const hasLocalData = this.loadFromLocalStorage();
                             this.renderSidebar();
                             this.render();
-                            this.updateSaveStatus('Ready');
+                            if (hasLocalData) {
+                                this.updateSaveStatus('Loaded from backup');
+                                // Save to server now
+                                this.saveToServer();
+                            } else {
+                                this.updateSaveStatus('Ready (new project)');
+                            }
+                            return hasLocalData;
                         }
                     } else {
                         console.error('Load failed:', await response.text());
+                        // Try localStorage as fallback
+                        const hasLocalData = this.loadFromLocalStorage();
                         this.renderSidebar();
                         this.render();
-                        this.updateSaveStatus('Load failed', true);
+                        this.updateSaveStatus(hasLocalData ? 'Loaded from backup' : 'Load failed', !hasLocalData);
+                        return hasLocalData;
                     }
                 } catch (error) {
                     console.error('Load error:', error);
+                    // Try localStorage as fallback
+                    const hasLocalData = this.loadFromLocalStorage();
                     this.renderSidebar();
                     this.render();
-                    this.updateSaveStatus('Load error', true);
+                    this.updateSaveStatus(hasLocalData ? 'Loaded from backup' : 'Load error', !hasLocalData);
+                    return hasLocalData;
                 }
+            }
+
+            loadFromLocalStorage() {
+                const saved = localStorage.getItem('usecase-mapper-data');
+                if (saved) {
+                    try {
+                        const data = JSON.parse(saved);
+                        if (data.useCases && data.useCases.length > 0) {
+                            this.useCases = data.useCases || [];
+                            this.features = data.features || [];
+                            this.connections = data.connections || [];
+                            this.lastSaveTime = data.lastSaved ? new Date(data.lastSaved) : null;
+                            return true;
+                        }
+                    } catch (e) {
+                        console.error('Failed to parse localStorage:', e);
+                    }
+                }
+                return false;
             }
 
             async manualSave() {
