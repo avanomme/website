@@ -529,19 +529,13 @@
                 this.initializeColorPicker();
                 this.initializeShapePicker();
 
-                // Load saved data
-                this.loadFromLocalStorage();
-
-                this.renderSidebar();
-                this.render();
+                // Load saved data from server
+                this.loadFromServer();
 
                 // Setup auto-save every 10 seconds
                 this.autoSaveInterval = setInterval(() => {
-                    this.saveToLocalStorage();
-                    this.updateSaveStatus('Auto-saved');
+                    this.saveToServer();
                 }, 10000);
-
-                this.updateSaveStatus('Loaded');
             }
 
             initializeColorPicker() {
@@ -729,7 +723,7 @@
 
                 // Auto-save position changes after dragging
                 if (this.isDraggingNode) {
-                    this.saveToLocalStorage();
+                    this.saveToServer();
                 }
 
                 this.isDraggingCanvas = false;
@@ -840,7 +834,7 @@
                 }
 
                 this.hideContextMenu();
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
             }
@@ -864,7 +858,7 @@
                 this.features.push(feature);
                 this.connections.push({ from: useCase.id, to: feature.id });
 
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
 
@@ -954,7 +948,7 @@
                 }
 
                 this.closeModal();
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
             }
@@ -975,7 +969,7 @@
                 }
 
                 this.closeModal();
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
             }
@@ -1004,7 +998,7 @@
                     uc.placed = true;
                 });
 
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
 
@@ -1046,7 +1040,7 @@
                     });
                 });
 
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
                 this.hideBulkImport();
@@ -1072,7 +1066,7 @@
                     placed: false
                 });
 
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
             }
@@ -1090,7 +1084,7 @@
                 // Delete use case
                 this.useCases = this.useCases.filter(u => u.id !== useCaseId);
 
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
             }
@@ -1105,7 +1099,7 @@
                 uc.y = centerWorld.y;
                 uc.placed = true;
 
-                this.saveToLocalStorage();
+                this.saveToServer();
                 this.renderSidebar();
                 this.render();
             }
@@ -1202,37 +1196,82 @@
                 this.render();
             }
 
-            // Save/Load functions
-            saveToLocalStorage() {
+            // Save/Load functions - Server-based for shared editing
+            async saveToServer() {
                 const data = {
                     useCases: this.useCases,
                     features: this.features,
                     connections: this.connections,
                     lastSaved: new Date().toISOString()
                 };
-                localStorage.setItem('usecase-mapper-data', JSON.stringify(data));
-                this.lastSaveTime = new Date();
-            }
 
-            loadFromLocalStorage() {
-                const saved = localStorage.getItem('usecase-mapper-data');
-                if (saved) {
-                    const data = JSON.parse(saved);
-                    this.useCases = data.useCases || [];
-                    this.features = data.features || [];
-                    this.connections = data.connections || [];
-                    this.lastSaveTime = data.lastSaved ? new Date(data.lastSaved) : null;
-                    return true;
+                try {
+                    const response = await fetch('/api/se/projects/shared-project', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+
+                    if (response.ok) {
+                        this.lastSaveTime = new Date();
+                        this.updateSaveStatus('Auto-saved');
+                        return true;
+                    } else {
+                        console.error('Save failed:', await response.text());
+                        this.updateSaveStatus('Save failed', true);
+                        return false;
+                    }
+                } catch (error) {
+                    console.error('Save error:', error);
+                    this.updateSaveStatus('Save error', true);
+                    return false;
                 }
-                return false;
             }
 
-            manualSave() {
-                this.saveToLocalStorage();
-                this.updateSaveStatus('Saved!');
+            async loadFromServer() {
+                try {
+                    const response = await fetch('/api/se/projects/shared-project');
+
+                    if (response.ok) {
+                        const result = await response.json();
+
+                        if (result.success && result.data) {
+                            this.useCases = result.data.useCases || [];
+                            this.features = result.data.features || [];
+                            this.connections = result.data.connections || [];
+                            this.lastSaveTime = result.data.lastSaved ? new Date(result.data.lastSaved) : null;
+
+                            this.renderSidebar();
+                            this.render();
+                            this.updateSaveStatus('Loaded');
+                        } else {
+                            // No project exists yet, start fresh
+                            this.renderSidebar();
+                            this.render();
+                            this.updateSaveStatus('Ready');
+                        }
+                    } else {
+                        console.error('Load failed:', await response.text());
+                        this.renderSidebar();
+                        this.render();
+                        this.updateSaveStatus('Load failed', true);
+                    }
+                } catch (error) {
+                    console.error('Load error:', error);
+                    this.renderSidebar();
+                    this.render();
+                    this.updateSaveStatus('Load error', true);
+                }
             }
 
-            updateSaveStatus(message) {
+            async manualSave() {
+                const success = await this.saveToServer();
+                if (success) {
+                    this.updateSaveStatus('Saved!');
+                }
+            }
+
+            updateSaveStatus(message, isError = false) {
                 const statusEl = document.getElementById('save-status');
                 if (!statusEl) return;
 
@@ -1244,7 +1283,7 @@
                 });
 
                 statusEl.textContent = `${message} at ${timeStr}`;
-                statusEl.style.color = '#a6e3a1';
+                statusEl.style.color = isError ? '#f38ba8' : '#a6e3a1';
 
                 // Fade back to normal color after 2 seconds
                 setTimeout(() => {
