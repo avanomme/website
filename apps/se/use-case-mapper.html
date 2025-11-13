@@ -125,6 +125,46 @@
             color: var(--purple);
         }
 
+        .expand-icon {
+            font-size: 0.7rem;
+            transition: transform 0.2s;
+            display: inline-block;
+        }
+
+        .expand-icon.expanded {
+            transform: rotate(90deg);
+        }
+
+        .sidebar-features {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background: var(--background-primary);
+        }
+
+        .sidebar-features.expanded {
+            max-height: 500px;
+        }
+
+        .sidebar-feature-item {
+            padding: 8px 12px;
+            border-top: 1px solid var(--purple-dim);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .sidebar-feature-item:hover {
+            background: var(--purple-dim);
+        }
+
+        .sidebar-feature-info {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 4px;
+        }
+
         #canvas {
             cursor: default;
             width: 100%;
@@ -376,6 +416,8 @@
         <div style="flex: 1; position: relative;">
             <canvas id="canvas"></canvas>
             <div class="controls">
+                <button onclick="app.manualSave()" id="save-btn">💾 Save</button>
+                <span id="save-status" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border-radius: 6px; font-size: 0.85rem; color: #a6adc8;"></span>
                 <button class="zoom-btn" onclick="app.zoomIn()">+</button>
                 <button class="zoom-btn" onclick="app.zoomOut()">−</button>
                 <button class="secondary" onclick="app.resetView()">Reset</button>
@@ -465,6 +507,9 @@
 
                 this.shapes = ['square', 'circle', 'diamond', 'hexagon'];
 
+                this.lastSaveTime = null;
+                this.autoSaveInterval = null;
+
                 this.init();
             }
 
@@ -489,6 +534,14 @@
 
                 this.renderSidebar();
                 this.render();
+
+                // Setup auto-save every 10 seconds
+                this.autoSaveInterval = setInterval(() => {
+                    this.saveToLocalStorage();
+                    this.updateSaveStatus('Auto-saved');
+                }, 10000);
+
+                this.updateSaveStatus('Loaded');
             }
 
             initializeColorPicker() {
@@ -1082,12 +1135,14 @@
                 }
 
                 sidebar.innerHTML = this.useCases.map(uc => {
-                    const featureCount = this.features.filter(f => f.useCaseId === uc.id).length;
+                    const features = this.features.filter(f => f.useCaseId === uc.id);
+                    const featureCount = features.length;
                     const isPlaced = uc.placed !== false && uc.x !== null && uc.y !== null;
 
                     return `
                         <div class="sidebar-item" data-id="${uc.id}">
-                            <div class="sidebar-item-header">
+                            <div class="sidebar-item-header" onclick="app.toggleFeatures(${uc.id})">
+                                <span class="expand-icon">▶</span>
                                 <div class="sidebar-item-title">${uc.name}</div>
                                 <span class="sidebar-item-count">${featureCount}</span>
                             </div>
@@ -1102,9 +1157,49 @@
                                     <button class="sidebar-item-btn secondary" onclick="app.deleteUseCaseFromSidebar(${uc.id}); event.stopPropagation();" style="background: rgba(243, 139, 168, 0.2); border-color: #f38ba8; color: #f38ba8;">Delete</button>
                                 `}
                             </div>
+                            <div class="sidebar-features" data-usecase="${uc.id}">
+                                ${features.map(f => `
+                                    <div class="sidebar-feature-item" onclick="app.jumpToFeature(${f.id}); event.stopPropagation();">
+                                        <div style="flex: 1;">
+                                            <div><strong>${f.name}</strong></div>
+                                            ${f.info ? `<div class="sidebar-feature-info">${f.info}</div>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                                ${features.length === 0 ? '<div style="padding: 12px; text-align: center; color: var(--text-muted); font-size: 0.8rem;">No features yet</div>' : ''}
+                            </div>
                         </div>
                     `;
                 }).join('');
+            }
+
+            toggleFeatures(useCaseId) {
+                const item = document.querySelector(`.sidebar-features[data-usecase="${useCaseId}"]`);
+                const icon = item.previousElementSibling.previousElementSibling.querySelector('.expand-icon');
+
+                if (item.classList.contains('expanded')) {
+                    item.classList.remove('expanded');
+                    icon.classList.remove('expanded');
+                } else {
+                    item.classList.add('expanded');
+                    icon.classList.add('expanded');
+                }
+            }
+
+            jumpToFeature(featureId) {
+                const feature = this.features.find(f => f.id === featureId);
+                if (!feature) return;
+
+                // Center on feature
+                const screenCenter = {
+                    x: this.canvas.width / 2,
+                    y: this.canvas.height / 2
+                };
+
+                this.camera.x = screenCenter.x - feature.x * this.camera.scale;
+                this.camera.y = screenCenter.y - feature.y * this.camera.scale;
+
+                this.render();
             }
 
             // Save/Load functions
@@ -1116,6 +1211,7 @@
                     lastSaved: new Date().toISOString()
                 };
                 localStorage.setItem('usecase-mapper-data', JSON.stringify(data));
+                this.lastSaveTime = new Date();
             }
 
             loadFromLocalStorage() {
@@ -1125,9 +1221,35 @@
                     this.useCases = data.useCases || [];
                     this.features = data.features || [];
                     this.connections = data.connections || [];
+                    this.lastSaveTime = data.lastSaved ? new Date(data.lastSaved) : null;
                     return true;
                 }
                 return false;
+            }
+
+            manualSave() {
+                this.saveToLocalStorage();
+                this.updateSaveStatus('Saved!');
+            }
+
+            updateSaveStatus(message) {
+                const statusEl = document.getElementById('save-status');
+                if (!statusEl) return;
+
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+
+                statusEl.textContent = `${message} at ${timeStr}`;
+                statusEl.style.color = '#a6e3a1';
+
+                // Fade back to normal color after 2 seconds
+                setTimeout(() => {
+                    statusEl.style.color = '#a6adc8';
+                }, 2000);
             }
 
             render() {
