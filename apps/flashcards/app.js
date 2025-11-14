@@ -1137,6 +1137,9 @@ async function speakWithCoqui(text, token, cardNumber = null, isAnswer = false) 
     const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio(audioUrl);
 
+    // Apply speech rate to cached audio playback
+    audio.playbackRate = state.speechRate || 1.0;
+
     state.currentAudio = audio;
 
     return new Promise((resolve) => {
