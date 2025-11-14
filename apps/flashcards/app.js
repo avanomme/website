@@ -1326,18 +1326,38 @@ async function initServerTTS() {
       console.log('Edge TTS server not available');
     }
 
-    // Add Gracie Wise as a cached voice option (uses precompiled audio + Coqui fallback)
-    const gracieWise = {
-      name: 'Gracie Wise',
-      language: 'en',
-      gender: 'female',
-      accent: 'British',
-      provider: 'cached',
-      isCached: true
-    };
+    // Bad voices to filter out
+    const badVoiceNames = ['Flo', 'Rocky', 'Grandma', 'Grandpa'];
 
-    // Combine all voices (Gracie first for cached audio, then Edge TTS since it's free!)
-    const allVoices = [gracieWise, ...edgeVoices, ...coquiVoices, ...meloVoices];
+    // Filter out bad voices from all sources
+    const filteredCoqui = coquiVoices.filter(v => !badVoiceNames.includes(v.name));
+    const filteredMelo = meloVoices.filter(v => !badVoiceNames.includes(v.name));
+    const filteredEdge = edgeVoices.filter(v => !badVoiceNames.includes(v.name));
+
+    // Combine all voices (Edge TTS first since it's free!)
+    let allVoices = [...filteredEdge, ...filteredCoqui, ...filteredMelo];
+
+    // Remove duplicates by name
+    const uniqueVoices = [];
+    const seenNames = new Set();
+    for (const voice of allVoices) {
+      if (!seenNames.has(voice.name)) {
+        seenNames.add(voice.name);
+        uniqueVoices.push(voice);
+      }
+    }
+    allVoices = uniqueVoices;
+
+    // Mark Gracie Wise as cached if she exists in the voice list
+    const gracieIndex = allVoices.findIndex(v => v.name === 'Gracie Wise');
+    if (gracieIndex !== -1) {
+      allVoices[gracieIndex].isCached = true;
+      allVoices[gracieIndex].provider = 'cached';
+
+      // Move Gracie to the front
+      const gracie = allVoices.splice(gracieIndex, 1)[0];
+      allVoices.unshift(gracie);
+    }
 
     if (allVoices.length === 0) {
       console.warn('No TTS servers available, falling back to browser speech');
