@@ -14,9 +14,13 @@ from TTS.api import TTS
 app = Flask(__name__)
 CORS(app)
 
-# Create cache directory
-CACHE_DIR = Path("/tmp/tts_cache")
+# Create cache directories
+CACHE_DIR = Path("/tmp/tts_cache")  # Temporary hash-based cache
 CACHE_DIR.mkdir(exist_ok=True)
+
+# Organized cache directory (matches browser structure)
+ORGANIZED_CACHE_DIR = Path(__file__).parent / "audio_cache"
+ORGANIZED_CACHE_DIR.mkdir(exist_ok=True)
 
 # Initialize TTS with XTTS-v2
 print("Loading XTTS-v2 model... This may take a moment.")
@@ -64,6 +68,24 @@ def save_to_cache(text, speaker, audio_path):
     import shutil
     shutil.copy(audio_path, cache_file)
     print(f"✓ Cached: {text[:30]}...")
+
+def save_to_organized_cache(speaker, card_number, is_answer, audio_path):
+    """Save generated audio to organized cache directory"""
+    import shutil
+
+    # Create voice directory
+    safe_voice_name = speaker.lower().replace(' ', '_')
+    voice_dir = ORGANIZED_CACHE_DIR / safe_voice_name
+    voice_dir.mkdir(exist_ok=True)
+
+    # Create filename: cardNumber_q.wav or cardNumber_a.wav
+    qa_type = 'a' if is_answer else 'q'
+    filename = f"{card_number}_{qa_type}.wav"
+    cache_file = voice_dir / filename
+
+    shutil.copy(audio_path, cache_file)
+    print(f"✓ Saved to organized cache: {cache_file}")
+    return str(cache_file)
 
 @app.route('/api/voices', methods=['GET'])
 def get_voices():

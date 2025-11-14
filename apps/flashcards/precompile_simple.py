@@ -112,7 +112,7 @@ def generate_audio(text, voice_name):
     try:
         response = requests.post(
             COQUI_SERVER_URL,
-            json={"text": text, "voice": voice_name},
+            json={"text": text, "speaker": voice_name},
             timeout=30
         )
 

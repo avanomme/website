@@ -1100,6 +1100,7 @@ async function checkPrecompiledAudio(text, voiceName, cardNumber, isAnswer) {
 async function speakWithCoqui(text, token, cardNumber = null, isAnswer = false) {
   try {
     const voiceName = state.voiceName || state.voices[0]?.name || 'Claribel Dervla';
+    console.log(`🎤 Speaking with voice: "${voiceName}" (card: ${cardNumber}, isAnswer: ${isAnswer})`);
 
     // Check for precompiled audio first
     let audioBlob = await checkPrecompiledAudio(text, voiceName, cardNumber, isAnswer);
@@ -1137,9 +1138,6 @@ async function speakWithCoqui(text, token, cardNumber = null, isAnswer = false) 
     const audioUrl = URL.createObjectURL(audioBlob);
     const audio = new Audio(audioUrl);
 
-    // Apply speech rate to cached audio playback
-    audio.playbackRate = state.speechRate || 1.0;
-
     state.currentAudio = audio;
 
     return new Promise((resolve) => {
@@ -1158,6 +1156,13 @@ async function speakWithCoqui(text, token, cardNumber = null, isAnswer = false) 
         }
         console.error('Audio playback error');
         resolve();
+      };
+
+      // Apply playback rate when audio is ready
+      audio.onloadedmetadata = () => {
+        const rate = state.speechRate || 1.0;
+        audio.playbackRate = rate;
+        console.log(`🎵 Playback rate set to ${rate}x`);
       };
 
       if (isAutoplayTokenActive(token) && state.isPlaying) {
@@ -1362,16 +1367,21 @@ async function initServerTTS() {
     }
     allVoices = uniqueVoices;
 
-    // Mark Gracie Wise as cached if she exists in the voice list
-    const gracieIndex = allVoices.findIndex(v => v.name === 'Gracie Wise');
-    if (gracieIndex !== -1) {
-      allVoices[gracieIndex].isCached = true;
-      allVoices[gracieIndex].provider = 'cached';
+    // Mark cached voices (Gracie, Claribel, Andrew)
+    const voicesToCache = ['Gracie Wise', 'Claribel Dervla', 'Andrew Chipper'];
+    const cachedVoices = [];
 
-      // Move Gracie to the front
-      const gracie = allVoices.splice(gracieIndex, 1)[0];
-      allVoices.unshift(gracie);
+    for (const voiceName of voicesToCache) {
+      const voiceIndex = allVoices.findIndex(v => v.name === voiceName);
+      if (voiceIndex !== -1) {
+        allVoices[voiceIndex].isCached = true;
+        allVoices[voiceIndex].provider = 'cached';
+        cachedVoices.push(allVoices.splice(voiceIndex, 1)[0]);
+      }
     }
+
+    // Add cached voices to the front
+    allVoices.unshift(...cachedVoices);
 
     if (allVoices.length === 0) {
       console.warn('No TTS servers available, falling back to browser speech');
