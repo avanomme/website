@@ -17,6 +17,8 @@ external/
 
 # Large WAV files in root
 *.wav
+cox7_clips/
+cox8_clips/
 
 # Flashcards - exclude large audio caches and samples
 apps/flashcards/voice_previews/
