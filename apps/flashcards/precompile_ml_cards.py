@@ -134,13 +134,19 @@ def main():
 
     # Parse cards
     print("Step 1: Parsing card file...")
+    print(f"  Looking for: {CARDS_FILE}")
     texts = parse_cards_md()
 
     if not texts:
         print("✗ No text found to process")
         return 1
 
-    print(f"✓ Found {len(texts)} text segments to precompile\n")
+    print(f"✓ Found {len(texts)} text segments to precompile")
+    print(f"\nFirst 3 examples:")
+    for i, text in enumerate(texts[:3], 1):
+        preview = text[:60] + "..." if len(text) > 60 else text
+        print(f"  {i}. {preview}")
+    print()
 
     # Create cache directory
     CACHE_DIR.mkdir(exist_ok=True)
