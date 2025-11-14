@@ -1326,8 +1326,18 @@ async function initServerTTS() {
       console.log('Edge TTS server not available');
     }
 
-    // Combine all voices (prioritize Edge TTS since it's free!)
-    const allVoices = [...edgeVoices, ...coquiVoices, ...meloVoices];
+    // Add Gracie Wise as a cached voice option (uses precompiled audio + Coqui fallback)
+    const gracieWise = {
+      name: 'Gracie Wise',
+      language: 'en',
+      gender: 'female',
+      accent: 'British',
+      provider: 'cached',
+      isCached: true
+    };
+
+    // Combine all voices (Gracie first for cached audio, then Edge TTS since it's free!)
+    const allVoices = [gracieWise, ...edgeVoices, ...coquiVoices, ...meloVoices];
 
     if (allVoices.length === 0) {
       console.warn('No TTS servers available, falling back to browser speech');
@@ -1340,11 +1350,11 @@ async function initServerTTS() {
 
     state.voices = allVoices;
 
-    // Default to first British/Irish/Australian voice if available
+    // Default to Gracie Wise (cached) if available, otherwise British/Irish/Australian
     const preferredAccents = ['British', 'Irish', 'Australian'];
-    const preferredVoice = allVoices.find(v =>
-      v.accent && preferredAccents.includes(v.accent)
-    ) || allVoices[0];
+    const preferredVoice = allVoices.find(v => v.isCached) ||
+                          allVoices.find(v => v.accent && preferredAccents.includes(v.accent)) ||
+                          allVoices[0];
 
     state.voiceName = preferredVoice.name;
     state.voiceURI = preferredVoice.name;
@@ -1432,9 +1442,10 @@ function populateVoicePicker() {
     const accent = voice.accent ? ` [${voice.accent}]` : '';
     const gender = voice.gender ? ` (${voice.gender})` : '';
     const star = preferredAccents.includes(voice.accent) ? '⭐ ' : '';
+    const cached = voice.isCached ? '💾 ' : '';
 
-    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
-      option.textContent = `${star}${voice.name}${accent}${gender}`;
+    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS || voice.isCached) {
+      option.textContent = `${cached}${star}${voice.name}${accent}${gender}`;
     } else {
       option.textContent = `${voice.name}${accent}${gender}`;
     }
