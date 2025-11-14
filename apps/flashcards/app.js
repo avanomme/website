@@ -902,6 +902,7 @@ function getPrecompiledAudioPath(text, voiceName, cardNumber, isAnswer, format =
    */
   if (!cardNumber) {
     // Fallback to old hash-based system if no card number
+    console.log('⚠️ No card number provided, using hash fallback');
     const combined = `${text}|${voiceName}`;
     const hash = md5(combined);
     return `${state.audioCacheDir}/${hash}.${format}`;
@@ -909,7 +910,9 @@ function getPrecompiledAudioPath(text, voiceName, cardNumber, isAnswer, format =
 
   const safeVoiceName = voiceName.toLowerCase().replace(/ /g, '_');
   const qaType = isAnswer ? 'a' : 'q';
-  return `audio_cache/${safeVoiceName}/${cardNumber}_${qaType}.${format}`;
+  const path = `audio_cache/${safeVoiceName}/${cardNumber}_${qaType}.${format}`;
+  console.log(`📁 Cache path: ${path} (card: ${cardNumber}, isAnswer: ${isAnswer})`);
+  return path;
 }
 
 // Simple working MD5 implementation (matches Python's hashlib.md5)
