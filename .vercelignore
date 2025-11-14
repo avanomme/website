@@ -21,8 +21,8 @@ external/
 # Flashcards - exclude large audio caches and samples
 apps/flashcards/voice_previews/
 apps/flashcards/audio_samples/
-apps/flashcards/audio_cache/
-# Keep audio_cache_british for deployment
+# DO NOT exclude audio_cache - we need it for deployment
+# apps/flashcards/audio_cache/
 
 # Editor / OS files
 .DS_Store

@@ -16,6 +16,10 @@
     {
       "src": "apps/player/**",
       "use": "@vercel/static"
+    },
+    {
+      "src": "apps/flashcards/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [

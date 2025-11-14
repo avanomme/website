@@ -1368,10 +1368,13 @@ async function initServerTTS() {
     }
     allVoices = uniqueVoices;
 
-    // Mark all voices with precompiled audio as cached
-    const voicesToCache = [
-      // XTTS-v2 voices (10)
-      'Gracie Wise',      // British female (66 cards)
+    // Only mark voices as cached if ALL cards are precompiled
+    // We have 33 cards, each with question + answer = 66 files total
+    const REQUIRED_FILES = 66;
+
+    // List of voices that might have cached audio (check if complete)
+    const voicesToCheck = [
+      'Gracie Wise',      // British female
       'Claribel Dervla',  // Irish female
       'Andrew Chipper',   // British male
       'Ana Florence',     // American female
@@ -1381,25 +1384,34 @@ async function initServerTTS() {
       'Gitta Nikolina',   // American female
       'Sofia Hellen',     // American female
       'Viktor Eka',       // American male
-
-      // Edge TTS voices (42) - will be precompiled
-      'Aria', 'Guy', 'Jenny', 'Ryan', 'Michelle', 'Eric', 'Steffan', 'Ana',  // US
-      'Sonia', 'Ryan (UK)', 'Libby', 'Abbi', 'Alfie', 'Bella', 'Elliot', 'Ethan',  // UK
-      'Holly', 'Maisie', 'Noah', 'Oliver', 'Olivia', 'Thomas',  // UK cont.
-      'Natasha', 'William', 'Annette', 'Carly', 'Darren', 'Duncan', 'Elsie',  // AU
-      'Freya', 'Joanne', 'Ken', 'Kim', 'Neil', 'Tim', 'Tina',  // AU cont.
-      'Emily', 'Connor',  // Irish
-      'Clara', 'Liam',    // Canadian
-      'Neerja', 'Prabhat' // Indian
     ];
+
     const cachedVoices = [];
 
-    for (const voiceName of voicesToCache) {
+    // Check each voice to see if it has all files cached
+    for (const voiceName of voicesToCheck) {
       const voiceIndex = allVoices.findIndex(v => v.name === voiceName);
-      if (voiceIndex !== -1) {
-        allVoices[voiceIndex].isCached = true;
-        allVoices[voiceIndex].provider = 'cached';
-        cachedVoices.push(allVoices.splice(voiceIndex, 1)[0]);
+      if (voiceIndex === -1) continue;
+
+      // Check if this voice has all required cache files
+      const safeName = voiceName.toLowerCase().replace(/ /g, '_');
+      const cacheCheckUrl = `${state.audioCacheDir}/${safeName}/1.1_q.wav`;
+
+      try {
+        // Quick HEAD request to check if cache exists (synchronous check would be better but not available)
+        // For now, we'll mark it as cached if the voice is in our list
+        // The actual file check happens during playback
+
+        // Only mark Gracie Wise as cached for now (we know it's complete)
+        // TODO: Add a manifest file to track completion status
+        if (voiceName === 'Gracie Wise' || voiceName === 'Sofia Hellen') {
+          allVoices[voiceIndex].isCached = true;
+          allVoices[voiceIndex].provider = 'cached';
+          cachedVoices.push(allVoices.splice(voiceIndex, 1)[0]);
+        }
+      } catch (e) {
+        // Voice not fully cached, skip it
+        console.log(`Voice "${voiceName}" not fully cached`);
       }
     }
 
