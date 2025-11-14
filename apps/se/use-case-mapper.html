@@ -398,9 +398,160 @@
             color: #a6adc8;
             max-width: 300px;
         }
+
+        #login-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        #login-modal.hidden {
+            display: none;
+        }
+
+        #login-form {
+            background: var(--background-secondary);
+            border: 2px solid var(--purple);
+            border-radius: 12px;
+            padding: 40px;
+            width: 400px;
+            text-align: center;
+        }
+
+        #login-form h2 {
+            margin-bottom: 10px;
+            color: var(--purple);
+        }
+
+        #login-form p {
+            margin-bottom: 25px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        #login-form input {
+            width: 100%;
+            padding: 12px;
+            background: var(--background-primary);
+            border: 1px solid var(--purple-dim);
+            border-radius: 6px;
+            color: var(--text-normal);
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        #login-form input:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+
+        #login-form button {
+            width: 100%;
+            padding: 12px;
+            background: var(--purple);
+            border: none;
+            border-radius: 6px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        #login-form button:hover {
+            background: var(--purple-bright);
+            transform: translateY(-1px);
+        }
+
+        #active-users-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--background-secondary);
+            border-bottom: 1px solid var(--purple-dim);
+            padding: 8px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 10;
+            font-size: 0.85rem;
+        }
+
+        #active-users-bar .label {
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        #active-users-list {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .user-badge {
+            background: var(--purple-dim);
+            padding: 4px 12px;
+            border-radius: 12px;
+            color: var(--text-normal);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user-badge.me {
+            background: var(--purple);
+            font-weight: 600;
+        }
+
+        .user-badge .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #a6e3a1;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Adjust canvas container to account for active users bar */
+        body.logged-in #canvas-container {
+            margin-top: 40px;
+            height: calc(100vh - 40px);
+        }
+
+        body.logged-in #sidebar {
+            height: calc(100vh - 40px);
+        }
     </style>
 </head>
 <body>
+    <!-- Login Modal -->
+    <div id="login-modal">
+        <div id="login-form">
+            <h2>Welcome to Use Case Mapper</h2>
+            <p>Enter your name to join the collaboration</p>
+            <input type="text" id="username-input" placeholder="Your name" maxlength="30" autofocus>
+            <button onclick="app.handleLogin()">Join Session</button>
+        </div>
+    </div>
+
+    <!-- Active Users Bar -->
+    <div id="active-users-bar" style="display: none;">
+        <span class="label">Active Users:</span>
+        <div id="active-users-list"></div>
+    </div>
+
     <div id="canvas-container">
         <div id="sidebar">
             <div id="sidebar-header">
@@ -417,6 +568,10 @@
             <canvas id="canvas"></canvas>
             <div class="controls">
                 <button onclick="app.manualSave()" id="save-btn">💾 Save</button>
+                <button onclick="app.exportJSON()" style="margin-left: 4px;">📥 Export JSON</button>
+                <button onclick="app.exportList()" style="margin-left: 4px;">📋 Export List</button>
+                <button onclick="app.importJSON()" style="margin-left: 4px;">📤 Import JSON</button>
+                <button onclick="app.autoSpace()" style="margin-left: 4px;">🔄 Auto-Space</button>
                 <span id="save-status" style="padding: 8px 12px; background: rgba(0,0,0,0.3); border-radius: 6px; font-size: 0.85rem; color: #a6adc8;"></span>
                 <button class="zoom-btn" onclick="app.zoomIn()">+</button>
                 <button class="zoom-btn" onclick="app.zoomOut()">−</button>
@@ -427,7 +582,9 @@
                 • Drag use cases to move them<br>
                 • Double-click use case to add feature<br>
                 • Right-click for menu<br>
-                • Drag canvas to pan, scroll to zoom
+                • Scroll: pan up/down<br>
+                • Shift+Scroll: pan left/right<br>
+                • Cmd/Ctrl+Scroll: zoom in/out
             </div>
         </div>
     </div>
@@ -510,10 +667,28 @@
                 this.lastSaveTime = null;
                 this.autoSaveInterval = null;
 
+                // User tracking
+                this.username = localStorage.getItem('se-username') || null;
+                this.sessionId = this.generateSessionId();
+                this.activeUsers = [];
+                this.userUpdateInterval = null;
+
                 this.init();
             }
 
+            generateSessionId() {
+                return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
             init() {
+                // Check if user is logged in
+                if (!this.username) {
+                    this.showLoginModal();
+                } else {
+                    this.hideLoginModal();
+                    this.startUserTracking();
+                }
+
                 this.resizeCanvas();
                 window.addEventListener('resize', () => this.resizeCanvas());
 
@@ -733,16 +908,32 @@
 
             onWheel(e) {
                 e.preventDefault();
-                const rect = this.canvas.getBoundingClientRect();
-                const mouseX = e.clientX - rect.left;
-                const mouseY = e.clientY - rect.top;
 
-                const delta = -e.deltaY * 0.001;
-                const newScale = Math.max(0.3, Math.min(3, this.camera.scale + delta));
+                const PAN_SPEED = 30; // Pixels to pan per scroll notch
+                const ZOOM_SPEED = 0.1; // Zoom amount per scroll notch
 
-                this.camera.x = mouseX - (mouseX - this.camera.x) * (newScale / this.camera.scale);
-                this.camera.y = mouseY - (mouseY - this.camera.y) * (newScale / this.camera.scale);
-                this.camera.scale = newScale;
+                // Cmd/Ctrl + Scroll = Zoom in/out
+                if (e.metaKey || e.ctrlKey) {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const mouseX = e.clientX - rect.left;
+                    const mouseY = e.clientY - rect.top;
+
+                    const delta = -e.deltaY * 0.001;
+                    const newScale = Math.max(0.3, Math.min(3, this.camera.scale + delta));
+
+                    // Zoom towards mouse position
+                    this.camera.x = mouseX - (mouseX - this.camera.x) * (newScale / this.camera.scale);
+                    this.camera.y = mouseY - (mouseY - this.camera.y) * (newScale / this.camera.scale);
+                    this.camera.scale = newScale;
+                }
+                // Shift + Scroll = Pan left/right
+                else if (e.shiftKey) {
+                    this.camera.x += e.deltaY > 0 ? PAN_SPEED : -PAN_SPEED;
+                }
+                // Normal Scroll = Pan up/down
+                else {
+                    this.camera.y += e.deltaY > 0 ? PAN_SPEED : -PAN_SPEED;
+                }
 
                 this.render();
             }
@@ -1313,6 +1504,154 @@
                 }
             }
 
+            exportJSON() {
+                const data = {
+                    useCases: this.useCases,
+                    features: this.features,
+                    connections: this.connections,
+                    lastSaved: new Date().toISOString(),
+                    exportedAt: new Date().toISOString()
+                };
+
+                const jsonStr = JSON.stringify(data, null, 2);
+                const blob = new Blob([jsonStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                a.download = `use-case-mapper-${timestamp}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                this.updateSaveStatus('Exported to JSON file');
+            }
+
+            exportList() {
+                let text = '# Use Case Mapper Export\n\n';
+                text += `Generated: ${new Date().toLocaleString()}\n`;
+                text += `Total Use Cases: ${this.useCases.length}\n`;
+                text += `Total Features: ${this.features.length}\n\n`;
+                text += '---\n\n';
+
+                // Sort use cases by name
+                const sortedUseCases = [...this.useCases].sort((a, b) =>
+                    a.name.localeCompare(b.name)
+                );
+
+                sortedUseCases.forEach((useCase, index) => {
+                    // Use case header
+                    text += `## ${index + 1}. ${useCase.name}\n\n`;
+
+                    // Use case description
+                    if (useCase.description && useCase.description.trim()) {
+                        text += `**Description:** ${useCase.description}\n\n`;
+                    }
+
+                    // Find all features connected to this use case
+                    const connectedFeatureIds = this.connections
+                        .filter(c => c.useCaseId === useCase.id)
+                        .map(c => c.featureId);
+
+                    const connectedFeatures = this.features
+                        .filter(f => connectedFeatureIds.includes(f.id))
+                        .sort((a, b) => a.name.localeCompare(b.name));
+
+                    if (connectedFeatures.length > 0) {
+                        text += `**Features (${connectedFeatures.length}):**\n\n`;
+
+                        connectedFeatures.forEach((feature, fIndex) => {
+                            text += `${index + 1}.${fIndex + 1}. **${feature.name}**\n`;
+                            if (feature.description && feature.description.trim()) {
+                                // Indent description
+                                const descLines = feature.description.split('\n');
+                                descLines.forEach(line => {
+                                    text += `   ${line}\n`;
+                                });
+                            }
+                            text += '\n';
+                        });
+                    } else {
+                        text += '*No features connected*\n\n';
+                    }
+
+                    text += '---\n\n';
+                });
+
+                // Create and download the file
+                const blob = new Blob([text], { type: 'text/markdown' });
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                a.download = `use-case-list-${timestamp}.md`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                this.updateSaveStatus('Exported list to Markdown file');
+            }
+
+            importJSON() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json,.json';
+
+                input.onchange = async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+
+                    try {
+                        const text = await file.text();
+                        const data = JSON.parse(text);
+
+                        // Validate the data structure
+                        if (!data.useCases || !Array.isArray(data.useCases)) {
+                            throw new Error('Invalid file format: missing useCases array');
+                        }
+
+                        // Confirm before overwriting
+                        const hasData = this.useCases.length > 0 || this.features.length > 0;
+                        if (hasData) {
+                            const confirmed = confirm(
+                                `This will replace your current project with the imported data.\n\n` +
+                                `Current: ${this.useCases.length} use cases, ${this.features.length} features\n` +
+                                `Import: ${data.useCases.length} use cases, ${data.features?.length || 0} features\n\n` +
+                                `Continue?`
+                            );
+                            if (!confirmed) return;
+                        }
+
+                        // Import the data
+                        this.useCases = data.useCases || [];
+                        this.features = data.features || [];
+                        this.connections = data.connections || [];
+                        this.lastSaveTime = data.lastSaved ? new Date(data.lastSaved) : null;
+
+                        // Re-render everything
+                        this.renderSidebar();
+                        this.render();
+
+                        // Save to server and localStorage
+                        await this.saveToServer();
+
+                        this.updateSaveStatus(`Imported from ${file.name}`);
+                        alert(`Successfully imported:\n• ${this.useCases.length} use cases\n• ${this.features.length} features\n• ${this.connections.length} connections`);
+
+                    } catch (error) {
+                        console.error('Import error:', error);
+                        alert(`Failed to import file:\n${error.message}`);
+                        this.updateSaveStatus('Import failed', true);
+                    }
+                };
+
+                input.click();
+            }
+
             updateSaveStatus(message, isError = false) {
                 const statusEl = document.getElementById('save-status');
                 if (!statusEl) return;
@@ -1486,6 +1825,75 @@
                 return lines;
             }
 
+            autoSpace() {
+                // Force-directed layout algorithm to space out overlapping nodes
+                const MIN_DISTANCE = 200; // Minimum distance between use cases
+                const FEATURE_DISTANCE = 120; // Distance for features from use case
+                const ITERATIONS = 50; // Number of iterations to run
+                const DAMPING = 0.8; // Damping factor to slow down movement
+
+                this.updateSaveStatus('Auto-spacing nodes...');
+
+                for (let iter = 0; iter < ITERATIONS; iter++) {
+                    // Calculate repulsion forces between use cases
+                    for (let i = 0; i < this.useCases.length; i++) {
+                        let forceX = 0;
+                        let forceY = 0;
+
+                        for (let j = 0; j < this.useCases.length; j++) {
+                            if (i === j) continue;
+
+                            const dx = this.useCases[i].x - this.useCases[j].x;
+                            const dy = this.useCases[i].y - this.useCases[j].y;
+                            const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+                            if (dist < MIN_DISTANCE) {
+                                const force = (MIN_DISTANCE - dist) / dist;
+                                forceX += (dx / dist) * force;
+                                forceY += (dy / dist) * force;
+                            }
+                        }
+
+                        // Apply forces with damping
+                        this.useCases[i].x += forceX * DAMPING;
+                        this.useCases[i].y += forceY * DAMPING;
+                    }
+
+                    // Position features around their use cases
+                    this.features.forEach(feature => {
+                        // Find which use case this feature is connected to
+                        const connection = this.connections.find(c => c.featureId === feature.id);
+                        if (connection) {
+                            const useCase = this.useCases.find(uc => uc.id === connection.useCaseId);
+                            if (useCase) {
+                                // Get all features for this use case
+                                const useCaseFeatures = this.connections
+                                    .filter(c => c.useCaseId === useCase.id)
+                                    .map(c => this.features.find(f => f.id === c.featureId))
+                                    .filter(f => f);
+
+                                const featureIndex = useCaseFeatures.findIndex(f => f.id === feature.id);
+                                const angleStep = (2 * Math.PI) / Math.max(useCaseFeatures.length, 1);
+                                const angle = angleStep * featureIndex;
+
+                                // Target position around the use case
+                                const targetX = useCase.x + Math.cos(angle) * FEATURE_DISTANCE;
+                                const targetY = useCase.y + Math.sin(angle) * FEATURE_DISTANCE;
+
+                                // Move feature towards target position
+                                feature.x += (targetX - feature.x) * 0.3;
+                                feature.y += (targetY - feature.y) * 0.3;
+                            }
+                        }
+                    });
+                }
+
+                // Re-render with new positions
+                this.render();
+                this.saveToServer();
+                this.updateSaveStatus('Auto-spacing complete!');
+            }
+
             zoomIn() {
                 this.camera.scale = Math.min(3, this.camera.scale + 0.2);
                 this.render();
@@ -1499,6 +1907,120 @@
             resetView() {
                 this.camera = { x: 0, y: 0, scale: 1 };
                 this.render();
+            }
+
+            // Login and User Tracking Methods
+            showLoginModal() {
+                document.getElementById('login-modal').classList.remove('hidden');
+                document.getElementById('username-input').focus();
+
+                // Allow Enter key to submit
+                document.getElementById('username-input').addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        this.handleLogin();
+                    }
+                });
+            }
+
+            hideLoginModal() {
+                document.getElementById('login-modal').classList.add('hidden');
+                document.body.classList.add('logged-in');
+                document.getElementById('active-users-bar').style.display = 'flex';
+            }
+
+            handleLogin() {
+                const input = document.getElementById('username-input');
+                const username = input.value.trim();
+
+                if (!username) {
+                    alert('Please enter your name');
+                    input.focus();
+                    return;
+                }
+
+                this.username = username;
+                localStorage.setItem('se-username', username);
+
+                this.hideLoginModal();
+                this.startUserTracking();
+                this.loadFromServer();
+            }
+
+            startUserTracking() {
+                // Report presence immediately
+                this.reportPresence();
+
+                // Update presence every 10 seconds
+                this.userUpdateInterval = setInterval(() => {
+                    this.reportPresence();
+                }, 10000);
+
+                // Fetch active users every 5 seconds
+                setInterval(() => {
+                    this.fetchActiveUsers();
+                }, 5000);
+
+                // Initial fetch
+                this.fetchActiveUsers();
+            }
+
+            async reportPresence() {
+                try {
+                    await fetch('/api/se/presence', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: this.username,
+                            sessionId: this.sessionId,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                } catch (error) {
+                    console.error('Failed to report presence:', error);
+                }
+            }
+
+            async fetchActiveUsers() {
+                try {
+                    const response = await fetch('/api/se/active-users');
+                    if (response.ok) {
+                        const data = await response.json();
+                        this.activeUsers = data.users || [];
+                        this.updateActiveUsersDisplay();
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch active users:', error);
+                }
+            }
+
+            updateActiveUsersDisplay() {
+                const container = document.getElementById('active-users-list');
+                if (!container) return;
+
+                container.innerHTML = '';
+
+                if (this.activeUsers.length === 0) {
+                    container.innerHTML = '<span style="color: var(--text-muted);">No active users</span>';
+                    return;
+                }
+
+                this.activeUsers.forEach(user => {
+                    const badge = document.createElement('div');
+                    badge.className = 'user-badge';
+                    if (user.username === this.username) {
+                        badge.classList.add('me');
+                    }
+
+                    const dot = document.createElement('div');
+                    dot.className = 'status-dot';
+
+                    const name = document.createElement('span');
+                    name.textContent = user.username + (user.username === this.username ? ' (You)' : '');
+
+                    badge.appendChild(dot);
+                    badge.appendChild(name);
+                    container.appendChild(badge);
+                });
             }
         }
 

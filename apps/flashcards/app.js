@@ -907,42 +907,166 @@ function getPrecompiledAudioPath(text, voiceName, format = 'wav') {
 }
 
 function md5(str) {
-  // Simple MD5 implementation for cache keys
-  // For production, use a proper crypto library
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
+  // Use Web Crypto API for real MD5 hash
+  // Fallback to simple hash if crypto not available
+  try {
+    // Synchronous MD5 using a simple implementation
+    // This matches Python's hashlib.md5()
+    function rotateLeft(value, shift) {
+      return (value << shift) | (value >>> (32 - shift));
+    }
+
+    function addUnsigned(x, y) {
+      return (x + y) >>> 0;
+    }
+
+    function f(x, y, z) { return (x & y) | (~x & z); }
+    function g(x, y, z) { return (x & z) | (y & ~z); }
+    function h(x, y, z) { return x ^ y ^ z; }
+    function i(x, y, z) { return y ^ (x | ~z); }
+
+    // Convert string to UTF-8 bytes
+    const bytes = new TextEncoder().encode(str);
+
+    // Pad message
+    const msgLen = bytes.length;
+    const numBlocks = ((msgLen + 8) >>> 6) + 1;
+    const totalLen = numBlocks << 6;
+    const msg = new Uint8Array(totalLen);
+    msg.set(bytes);
+    msg[msgLen] = 0x80;
+
+    // Append length in bits
+    const view = new DataView(msg.buffer);
+    view.setUint32(totalLen - 8, msgLen << 3, true);
+    view.setUint32(totalLen - 4, msgLen >>> 29, true);
+
+    // MD5 constants
+    const T = new Uint32Array(64);
+    for (let j = 0; j < 64; j++) {
+      T[j] = Math.floor(Math.abs(Math.sin(j + 1)) * 0x100000000);
+    }
+
+    let a = 0x67452301, b = 0xEFCDAB89, c = 0x98BADCFE, d = 0x10325476;
+
+    for (let offset = 0; offset < totalLen; offset += 64) {
+      const X = new Uint32Array(16);
+      for (let j = 0; j < 16; j++) {
+        X[j] = view.getUint32(offset + (j << 2), true);
+      }
+
+      let AA = a, BB = b, CC = c, DD = d;
+
+      // Round 1
+      const S1 = [7, 12, 17, 22];
+      for (let j = 0; j < 16; j++) {
+        const k = j;
+        const temp = addUnsigned(addUnsigned(a, f(b, c, d)), addUnsigned(X[k], T[j]));
+        a = d; d = c; c = b;
+        b = addUnsigned(b, rotateLeft(temp, S1[j % 4]));
+      }
+
+      // Round 2
+      const S2 = [5, 9, 14, 20];
+      for (let j = 0; j < 16; j++) {
+        const k = (1 + 5 * j) % 16;
+        const temp = addUnsigned(addUnsigned(a, g(b, c, d)), addUnsigned(X[k], T[16 + j]));
+        a = d; d = c; c = b;
+        b = addUnsigned(b, rotateLeft(temp, S2[j % 4]));
+      }
+
+      // Round 3
+      const S3 = [4, 11, 16, 23];
+      for (let j = 0; j < 16; j++) {
+        const k = (5 + 3 * j) % 16;
+        const temp = addUnsigned(addUnsigned(a, h(b, c, d)), addUnsigned(X[k], T[32 + j]));
+        a = d; d = c; c = b;
+        b = addUnsigned(b, rotateLeft(temp, S3[j % 4]));
+      }
+
+      // Round 4
+      const S4 = [6, 10, 15, 21];
+      for (let j = 0; j < 16; j++) {
+        const k = (7 * j) % 16;
+        const temp = addUnsigned(addUnsigned(a, i(b, c, d)), addUnsigned(X[k], T[48 + j]));
+        a = d; d = c; c = b;
+        b = addUnsigned(b, rotateLeft(temp, S4[j % 4]));
+      }
+
+      a = addUnsigned(a, AA);
+      b = addUnsigned(b, BB);
+      c = addUnsigned(c, CC);
+      d = addUnsigned(d, DD);
+    }
+
+    // Convert to hex string
+    const toHex = (n) => {
+      let s = '';
+      for (let i = 0; i < 4; i++) {
+        s += ((n >>> (i * 8)) & 0xFF).toString(16).padStart(2, '0');
+      }
+      return s;
+    };
+
+    return toHex(a) + toHex(b) + toHex(c) + toHex(d);
+  } catch (error) {
+    console.error('MD5 error:', error);
+    // Fallback to simple hash
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16).padStart(32, '0');
   }
-  return Math.abs(hash).toString(16).padStart(32, '0');
 }
 
 async function checkPrecompiledAudio(text, voiceName) {
   /**
    * Check if precompiled audio exists and return it
    * Tries MP3 first (smaller, better for web), then WAV
+   * Supports both new (subdirectory) and old (flat) cache structures
    */
   if (!state.usePrecompiled) {
     return null;
   }
 
   try {
-    // Try MP3 first (better for web, smaller file size)
-    let audioPath = getPrecompiledAudioPath(text, voiceName, 'mp3');
-    let response = await fetch(audioPath);
+    const combined = `${text}|${voiceName}`;
+    const hash = md5(combined);
 
+    // Try new structure first: audio_cache_british/Gracie_Wise/hash.ext
+    const safeVoiceName = voiceName.replace(/ /g, '_');
+
+    // Try MP3 with subdirectory
+    let audioPath = `${state.audioCacheDir}/${safeVoiceName}/${hash}.mp3`;
+    let response = await fetch(audioPath);
     if (response.ok) {
       console.log('✓ Using precompiled audio (MP3):', audioPath);
       return await response.blob();
     }
 
-    // Fallback to WAV
-    audioPath = getPrecompiledAudioPath(text, voiceName, 'wav');
+    // Try WAV with subdirectory
+    audioPath = `${state.audioCacheDir}/${safeVoiceName}/${hash}.wav`;
     response = await fetch(audioPath);
-
     if (response.ok) {
       console.log('✓ Using precompiled audio (WAV):', audioPath);
+      return await response.blob();
+    }
+
+    // Try old flat structure: audio_cache_british/hash.ext
+    audioPath = `${state.audioCacheDir}/${hash}.mp3`;
+    response = await fetch(audioPath);
+    if (response.ok) {
+      console.log('✓ Using precompiled audio (MP3, flat):', audioPath);
+      return await response.blob();
+    }
+
+    audioPath = `${state.audioCacheDir}/${hash}.wav`;
+    response = await fetch(audioPath);
+    if (response.ok) {
+      console.log('✓ Using precompiled audio (WAV, flat):', audioPath);
       return await response.blob();
     }
   } catch (error) {
@@ -1192,8 +1316,18 @@ async function initServerTTS() {
       console.log('Edge TTS server not available');
     }
 
-    // Combine all voices (prioritize Edge TTS since it's free!)
-    const allVoices = [...edgeVoices, ...coquiVoices, ...meloVoices];
+    // Add precompiled British voice option at the top
+    const precompiledVoice = {
+      name: 'Gracie Wise',
+      language: 'en',
+      gender: 'female',
+      accent: 'British',
+      provider: 'precompiled',
+      isPrecompiled: true
+    };
+
+    // Combine all voices (prioritize precompiled, then Edge TTS since it's free!)
+    const allVoices = [precompiledVoice, ...edgeVoices, ...coquiVoices, ...meloVoices];
 
     if (allVoices.length === 0) {
       console.warn('No TTS servers available, falling back to browser speech');
@@ -1206,11 +1340,11 @@ async function initServerTTS() {
 
     state.voices = allVoices;
 
-    // Default to first British/Irish/Australian voice if available
+    // Default to precompiled British voice if available
     const preferredAccents = ['British', 'Irish', 'Australian'];
-    const preferredVoice = allVoices.find(v =>
-      v.accent && preferredAccents.includes(v.accent)
-    ) || allVoices[0];
+    const preferredVoice = allVoices.find(v => v.isPrecompiled) ||
+                          allVoices.find(v => v.accent && preferredAccents.includes(v.accent)) ||
+                          allVoices[0];
 
     state.voiceName = preferredVoice.name;
     state.voiceURI = preferredVoice.name;
@@ -1298,9 +1432,10 @@ function populateVoicePicker() {
     const accent = voice.accent ? ` [${voice.accent}]` : '';
     const gender = voice.gender ? ` (${voice.gender})` : '';
     const star = preferredAccents.includes(voice.accent) ? '⭐ ' : '';
+    const cached = voice.isPrecompiled ? '💾 ' : '';
 
-    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
-      option.textContent = `${star}${voice.name}${accent}${gender}`;
+    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS || voice.isPrecompiled) {
+      option.textContent = `${cached}${star}${voice.name}${accent}${gender}`;
     } else {
       option.textContent = `${voice.name}${accent}${gender}`;
     }

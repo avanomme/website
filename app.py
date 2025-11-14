@@ -168,18 +168,31 @@ def kv_get(key):
                 return json.load(f)
         return None
 
-def kv_set(key, value):
-    """Set value in Redis or filesystem fallback"""
+def kv_set(key, value, ttl=None):
+    """Set value in Redis or filesystem fallback
+
+    Args:
+        key: Storage key
+        value: Value to store (will be JSON serialized)
+        ttl: Time-to-live in seconds (only works with Redis)
+    """
     if USE_REDIS and redis_client:
         try:
-            redis_client.set(key, json.dumps(value))
+            if ttl:
+                redis_client.setex(key, ttl, json.dumps(value))
+            else:
+                redis_client.set(key, json.dumps(value))
             return True
         except Exception as e:
             print(f"Redis set error: {e}")
             return False
     elif FILESYSTEM_AVAILABLE:
-        # Filesystem fallback
+        # Filesystem fallback (TTL not supported)
         try:
+            # Handle different key types
+            if key.startswith('se:presence:'):
+                # Don't save presence data to filesystem
+                return True
             filepath = os.path.join(SE_PROJECTS_DIR, f"{key.replace('se:project:', '')}.json")
             with open(filepath, 'w') as f:
                 json.dump(value, f, indent=2)
@@ -303,10 +316,10 @@ def save_se_project(project_name):
         # Try to backup to Google Drive (async, don't block on failure)
         drive_backup_result = None
         try:
-            from google_drive_backup import GoogleDriveBackup
-            backup = GoogleDriveBackup()
+            from google_drive_oauth import GoogleDriveOAuthBackup
+            backup = GoogleDriveOAuthBackup()
             drive_backup_result = backup.backup_to_drive(data, project_name)
-            if drive_backup_result['success']:
+            if drive_backup_result and drive_backup_result.get('success'):
                 print(f"✓ Google Drive backup successful: {drive_backup_result['file_name']}")
         except Exception as e:
             print(f"Google Drive backup failed (non-critical): {e}")
@@ -346,6 +359,60 @@ def delete_se_project(project_name):
             return jsonify({'success': False, 'error': 'Failed to delete project'}), 500
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# ============================================================================
+# USER PRESENCE TRACKING
+# ============================================================================
+
+@app.route('/api/se/presence', methods=['POST'])
+def report_presence():
+    """Report user presence for active user tracking"""
+    try:
+        data = request.get_json()
+        if not data or 'username' not in data or 'sessionId' not in data:
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+        username = data['username']
+        session_id = data['sessionId']
+        timestamp = data.get('timestamp', datetime.datetime.now().isoformat())
+
+        # Store presence with 30-second TTL
+        key = f"se:presence:{session_id}"
+        presence_data = {
+            'username': username,
+            'sessionId': session_id,
+            'timestamp': timestamp,
+            'lastSeen': datetime.datetime.now().isoformat()
+        }
+
+        kv_set(key, presence_data, ttl=30)
+
+        return jsonify({'success': True})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/se/active-users', methods=['GET'])
+def get_active_users():
+    """Get list of currently active users"""
+    try:
+        # Get all presence keys
+        keys = kv_keys('se:presence:*')
+
+        users_dict = {}
+        for key in keys:
+            presence = kv_get(key)
+            if presence and 'username' in presence:
+                username = presence['username']
+                # Only keep the most recent session for each username
+                if username not in users_dict or presence['lastSeen'] > users_dict[username]['lastSeen']:
+                    users_dict[username] = presence
+
+        # Convert to list and sort by username
+        users = sorted(users_dict.values(), key=lambda x: x['username'])
+
+        return jsonify({'success': True, 'users': users})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e), 'users': []}), 500
 
 # ============================================================================
 # DFA / GRAPH VISUALIZATION

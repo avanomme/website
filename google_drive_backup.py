@@ -79,11 +79,13 @@ class GoogleDriveBackup:
             json_data = json.dumps(data, indent=2)
 
             # Create file metadata
+            # Note: Must upload to a folder that's been shared with the service account
             file_metadata = {
                 'name': filename,
                 'parents': [DRIVE_FOLDER_ID],
                 'mimeType': 'application/json',
-                'description': f'Automatic backup of {project_name} at {datetime.now().isoformat()}'
+                'description': f'Automatic backup of {project_name} at {datetime.now().isoformat()}',
+                'writersCanShare': False  # Prevent service account from sharing files
             }
 
             # Upload file
@@ -96,7 +98,8 @@ class GoogleDriveBackup:
             file = self.service.files().create(
                 body=file_metadata,
                 media_body=media,
-                fields='id, name, createdTime, webViewLink'
+                fields='id, name, createdTime, webViewLink',
+                supportsAllDrives=True  # Support shared drives
             ).execute()
 
             return {
@@ -133,7 +136,9 @@ class GoogleDriveBackup:
                 q=query,
                 pageSize=max_results,
                 orderBy='createdTime desc',
-                fields='files(id, name, createdTime, webViewLink, size)'
+                fields='files(id, name, createdTime, webViewLink, size)',
+                supportsAllDrives=True,
+                includeItemsFromAllDrives=True
             ).execute()
 
             files = results.get('files', [])
