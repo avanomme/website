@@ -1276,8 +1276,9 @@ function updateSpeechControlsState() {
   }
 
   if (els.speechRate) {
-    // Speech rate doesn't apply to Coqui TTS (it has its own fixed rate)
-    els.speechRate.disabled = disableSpeechControls || state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS;
+    // Speech rate works with cached audio (HTML5 playback rate) and browser TTS
+    // It doesn't work with live TTS servers, but we always enable it for cached audio
+    els.speechRate.disabled = disableSpeechControls;
   }
 }
 

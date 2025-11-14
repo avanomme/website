@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Precompile Sofia Hellen (American Female) from XTTS-v2
+Precompile Natasha (Australian Female) from Edge TTS
+With aggressive rate limiting to avoid 403 errors
 """
 import requests
 import time
@@ -9,13 +10,16 @@ import sys
 import re
 
 # Configuration
-COQUI_SERVER_URL = "http://localhost:5050/api/speak"
+EDGE_SERVER_URL = "http://localhost:5052/api/speak"
 CARDS_FILE = "ml_midterm_cards.md"
 CACHE_DIR = Path("audio_cache")
 
-# Sofia Hellen voice
-VOICE_NAME = "Sofia Hellen"
-DESCRIPTION = "American female"
+# Natasha voice
+VOICE_NAME = "Natasha"
+VOICE_ID = "en-AU-NatashaNeural"
+
+# Aggressive rate limiting
+DELAY_BETWEEN_REQUESTS = 2.0  # 2 seconds between each request
 
 def parse_cards_md():
     """Parse ml_midterm_cards.md to extract all text with card numbers"""
@@ -96,28 +100,46 @@ def safe_filename(name):
     """Convert voice name to safe directory name"""
     return name.lower().replace(' ', '_')
 
-def generate_audio(text, voice_name):
-    """Generate audio via Coqui TTS"""
-    try:
-        response = requests.post(
-            COQUI_SERVER_URL,
-            json={"text": text, "speaker": voice_name},
-            timeout=30
-        )
+def generate_edge_audio(text, voice_id):
+    """Generate audio via Edge TTS with retry logic"""
+    max_retries = 3
+    retry_delay = 5  # seconds
 
-        if response.status_code == 200:
-            return response.content
-        else:
-            print(f"    ✗ Server error {response.status_code}")
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(
+                EDGE_SERVER_URL,
+                json={"text": text, "voice": voice_id},
+                timeout=60  # Longer timeout
+            )
+
+            if response.status_code == 200:
+                return response.content
+            elif response.status_code == 403:
+                print(f"    ⚠️ Rate limited (attempt {attempt + 1}/{max_retries})")
+                if attempt < max_retries - 1:
+                    time.sleep(retry_delay * (attempt + 1))  # Exponential backoff
+                    continue
+                return None
+            else:
+                print(f"    ✗ Server error {response.status_code}")
+                return None
+        except Exception as e:
+            print(f"    ✗ Error: {e}")
+            if attempt < max_retries - 1:
+                time.sleep(retry_delay)
+                continue
             return None
-    except Exception as e:
-        print(f"    ✗ Error: {e}")
-        return None
+
+    return None
 
 def main():
     print("\n" + "="*60)
-    print(f"  Precompile {VOICE_NAME} ({DESCRIPTION})")
+    print(f"  Precompile {VOICE_NAME} (Edge TTS)")
+    print(f"  Voice ID: {VOICE_ID}")
     print("="*60 + "\n")
+    print(f"⚠️  Using {DELAY_BETWEEN_REQUESTS}s delay between requests")
+    print("   to avoid rate limiting\n")
 
     # Parse cards
     print("Parsing cards...")
@@ -133,28 +155,29 @@ def main():
     voice_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"{'='*60}")
-    print(f"  {VOICE_NAME} ({DESCRIPTION})")
+    print(f"  {VOICE_NAME} (Australian Female)")
     print('='*60)
 
     success = 0
     skip = 0
     errors = 0
 
-    for card_num, qa_type, text in cards:
+    for idx, (card_num, qa_type, text) in enumerate(cards, 1):
         filename = f"{card_num}_{qa_type}.wav"
         filepath = voice_dir / filename
 
         # Skip if exists
         if filepath.exists():
             skip += 1
+            print(f"[{idx}/{len(cards)}] {card_num}_{qa_type} - cached")
             continue
 
         # Show progress
         preview = text[:50] + "..." if len(text) > 50 else text
-        print(f"[{card_num}_{qa_type}] {preview}")
+        print(f"[{idx}/{len(cards)}] {card_num}_{qa_type}: {preview}")
 
         # Generate
-        audio_data = generate_audio(text, VOICE_NAME)
+        audio_data = generate_edge_audio(text, VOICE_ID)
 
         if audio_data:
             filepath.write_bytes(audio_data)
@@ -162,16 +185,25 @@ def main():
             print(f"  ✓ Saved ({len(audio_data):,} bytes)")
         else:
             errors += 1
+            print(f"  ✗ Failed")
 
-        time.sleep(0.3)  # Rate limit
+        # Rate limiting - wait between ALL requests
+        if idx < len(cards):  # Don't wait after last item
+            print(f"  ⏱️  Waiting {DELAY_BETWEEN_REQUESTS}s...")
+            time.sleep(DELAY_BETWEEN_REQUESTS)
 
-    print(f"\n✓ Complete: {success} new, {skip} cached, {errors} errors")
+    print(f"\n{'='*60}")
+    print(f"✓ Complete: {success} new, {skip} cached, {errors} errors")
+    print(f"{'='*60}")
 
-    # Summary
     voice_dir = CACHE_DIR / safe_filename(VOICE_NAME)
     count = len(list(voice_dir.glob('*.wav')))
     print(f"\n{VOICE_NAME}: {count} files")
     print(f"Cache directory: {CACHE_DIR}")
+
+    if errors > 0:
+        print(f"\n⚠️  {errors} files failed - you can re-run this script")
+        print("   to retry only the failed files")
 
     return 0
 

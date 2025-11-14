@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
-Precompile Sofia Hellen (American Female) from XTTS-v2
+Precompile Australian Female voices from Edge TTS
+Quick test to verify Edge TTS precompilation works
 """
 import requests
 import time
@@ -9,13 +10,21 @@ import sys
 import re
 
 # Configuration
-COQUI_SERVER_URL = "http://localhost:5050/api/speak"
+EDGE_SERVER_URL = "http://localhost:5052/api/speak"
 CARDS_FILE = "ml_midterm_cards.md"
 CACHE_DIR = Path("audio_cache")
 
-# Sofia Hellen voice
-VOICE_NAME = "Sofia Hellen"
-DESCRIPTION = "American female"
+# Australian Female voices from Edge TTS
+AU_FEMALE_VOICES = [
+    ("Natasha", "en-AU-NatashaNeural"),
+    ("Annette", "en-AU-AnnetteNeural"),
+    ("Carly", "en-AU-CarlyNeural"),
+    ("Elsie", "en-AU-ElsieNeural"),
+    ("Freya", "en-AU-FreyaNeural"),
+    ("Joanne", "en-AU-JoanneNeural"),
+    ("Kim", "en-AU-KimNeural"),
+    ("Tina", "en-AU-TinaNeural"),
+]
 
 def parse_cards_md():
     """Parse ml_midterm_cards.md to extract all text with card numbers"""
@@ -96,12 +105,12 @@ def safe_filename(name):
     """Convert voice name to safe directory name"""
     return name.lower().replace(' ', '_')
 
-def generate_audio(text, voice_name):
-    """Generate audio via Coqui TTS"""
+def generate_edge_audio(text, voice_id):
+    """Generate audio via Edge TTS"""
     try:
         response = requests.post(
-            COQUI_SERVER_URL,
-            json={"text": text, "speaker": voice_name},
+            EDGE_SERVER_URL,
+            json={"text": text, "voice": voice_id},
             timeout=30
         )
 
@@ -116,7 +125,7 @@ def generate_audio(text, voice_name):
 
 def main():
     print("\n" + "="*60)
-    print(f"  Precompile {VOICE_NAME} ({DESCRIPTION})")
+    print("  Precompile Australian Female Voices (Edge TTS)")
     print("="*60 + "\n")
 
     # Parse cards
@@ -129,49 +138,58 @@ def main():
 
     print(f"✓ Found {len(cards)} items ({len(cards)//2} cards)\n")
 
-    voice_dir = CACHE_DIR / safe_filename(VOICE_NAME)
-    voice_dir.mkdir(parents=True, exist_ok=True)
+    # Precompile each voice
+    for voice_name, voice_id in AU_FEMALE_VOICES:
+        voice_dir = CACHE_DIR / safe_filename(voice_name)
+        voice_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"{'='*60}")
-    print(f"  {VOICE_NAME} ({DESCRIPTION})")
-    print('='*60)
+        print(f"\n{'='*60}")
+        print(f"  {voice_name} (Australian Female)")
+        print(f"  Voice ID: {voice_id}")
+        print('='*60)
 
-    success = 0
-    skip = 0
-    errors = 0
+        success = 0
+        skip = 0
+        errors = 0
 
-    for card_num, qa_type, text in cards:
-        filename = f"{card_num}_{qa_type}.wav"
-        filepath = voice_dir / filename
+        for card_num, qa_type, text in cards:
+            filename = f"{card_num}_{qa_type}.wav"
+            filepath = voice_dir / filename
 
-        # Skip if exists
-        if filepath.exists():
-            skip += 1
-            continue
+            # Skip if exists
+            if filepath.exists():
+                skip += 1
+                continue
 
-        # Show progress
-        preview = text[:50] + "..." if len(text) > 50 else text
-        print(f"[{card_num}_{qa_type}] {preview}")
+            # Show progress
+            preview = text[:50] + "..." if len(text) > 50 else text
+            print(f"[{card_num}_{qa_type}] {preview}")
 
-        # Generate
-        audio_data = generate_audio(text, VOICE_NAME)
+            # Generate
+            audio_data = generate_edge_audio(text, voice_id)
 
-        if audio_data:
-            filepath.write_bytes(audio_data)
-            success += 1
-            print(f"  ✓ Saved ({len(audio_data):,} bytes)")
-        else:
-            errors += 1
+            if audio_data:
+                filepath.write_bytes(audio_data)
+                success += 1
+                print(f"  ✓ Saved ({len(audio_data):,} bytes)")
+            else:
+                errors += 1
 
-        time.sleep(0.3)  # Rate limit
+            time.sleep(0.3)  # Rate limit
 
-    print(f"\n✓ Complete: {success} new, {skip} cached, {errors} errors")
+        print(f"\n✓ Complete: {success} new, {skip} cached, {errors} errors")
 
     # Summary
-    voice_dir = CACHE_DIR / safe_filename(VOICE_NAME)
-    count = len(list(voice_dir.glob('*.wav')))
-    print(f"\n{VOICE_NAME}: {count} files")
-    print(f"Cache directory: {CACHE_DIR}")
+    print("\n" + "="*60)
+    print("  Summary")
+    print("="*60 + "\n")
+
+    for voice_name, voice_id in AU_FEMALE_VOICES:
+        voice_dir = CACHE_DIR / safe_filename(voice_name)
+        count = len(list(voice_dir.glob('*.wav')))
+        print(f"  {voice_name:15s} - {count:3d} files")
+
+    print(f"\nCache directory: {CACHE_DIR}")
 
     return 0
 
