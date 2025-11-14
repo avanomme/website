@@ -101,3 +101,6 @@ __pycache__
 credentials.json
 token.json
 service-account.json
+software-engineering-478113-178d5e07d998.json
+*.json
+service-account*.json

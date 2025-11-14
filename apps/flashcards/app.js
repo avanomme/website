@@ -906,167 +906,177 @@ function getPrecompiledAudioPath(text, voiceName, format = 'wav') {
   return `${state.audioCacheDir}/${safeVoiceName}/${hash}.${format}`;
 }
 
-function md5(str) {
-  // Use Web Crypto API for real MD5 hash
-  // Fallback to simple hash if crypto not available
-  try {
-    // Synchronous MD5 using a simple implementation
-    // This matches Python's hashlib.md5()
-    function rotateLeft(value, shift) {
-      return (value << shift) | (value >>> (32 - shift));
-    }
-
-    function addUnsigned(x, y) {
-      return (x + y) >>> 0;
-    }
-
-    function f(x, y, z) { return (x & y) | (~x & z); }
-    function g(x, y, z) { return (x & z) | (y & ~z); }
-    function h(x, y, z) { return x ^ y ^ z; }
-    function i(x, y, z) { return y ^ (x | ~z); }
-
-    // Convert string to UTF-8 bytes
-    const bytes = new TextEncoder().encode(str);
-
-    // Pad message
-    const msgLen = bytes.length;
-    const numBlocks = ((msgLen + 8) >>> 6) + 1;
-    const totalLen = numBlocks << 6;
-    const msg = new Uint8Array(totalLen);
-    msg.set(bytes);
-    msg[msgLen] = 0x80;
-
-    // Append length in bits
-    const view = new DataView(msg.buffer);
-    view.setUint32(totalLen - 8, msgLen << 3, true);
-    view.setUint32(totalLen - 4, msgLen >>> 29, true);
-
-    // MD5 constants
-    const T = new Uint32Array(64);
-    for (let j = 0; j < 64; j++) {
-      T[j] = Math.floor(Math.abs(Math.sin(j + 1)) * 0x100000000);
-    }
-
-    let a = 0x67452301, b = 0xEFCDAB89, c = 0x98BADCFE, d = 0x10325476;
-
-    for (let offset = 0; offset < totalLen; offset += 64) {
-      const X = new Uint32Array(16);
-      for (let j = 0; j < 16; j++) {
-        X[j] = view.getUint32(offset + (j << 2), true);
-      }
-
-      let AA = a, BB = b, CC = c, DD = d;
-
-      // Round 1
-      const S1 = [7, 12, 17, 22];
-      for (let j = 0; j < 16; j++) {
-        const k = j;
-        const temp = addUnsigned(addUnsigned(a, f(b, c, d)), addUnsigned(X[k], T[j]));
-        a = d; d = c; c = b;
-        b = addUnsigned(b, rotateLeft(temp, S1[j % 4]));
-      }
-
-      // Round 2
-      const S2 = [5, 9, 14, 20];
-      for (let j = 0; j < 16; j++) {
-        const k = (1 + 5 * j) % 16;
-        const temp = addUnsigned(addUnsigned(a, g(b, c, d)), addUnsigned(X[k], T[16 + j]));
-        a = d; d = c; c = b;
-        b = addUnsigned(b, rotateLeft(temp, S2[j % 4]));
-      }
-
-      // Round 3
-      const S3 = [4, 11, 16, 23];
-      for (let j = 0; j < 16; j++) {
-        const k = (5 + 3 * j) % 16;
-        const temp = addUnsigned(addUnsigned(a, h(b, c, d)), addUnsigned(X[k], T[32 + j]));
-        a = d; d = c; c = b;
-        b = addUnsigned(b, rotateLeft(temp, S3[j % 4]));
-      }
-
-      // Round 4
-      const S4 = [6, 10, 15, 21];
-      for (let j = 0; j < 16; j++) {
-        const k = (7 * j) % 16;
-        const temp = addUnsigned(addUnsigned(a, i(b, c, d)), addUnsigned(X[k], T[48 + j]));
-        a = d; d = c; c = b;
-        b = addUnsigned(b, rotateLeft(temp, S4[j % 4]));
-      }
-
-      a = addUnsigned(a, AA);
-      b = addUnsigned(b, BB);
-      c = addUnsigned(c, CC);
-      d = addUnsigned(d, DD);
-    }
-
-    // Convert to hex string
-    const toHex = (n) => {
-      let s = '';
-      for (let i = 0; i < 4; i++) {
-        s += ((n >>> (i * 8)) & 0xFF).toString(16).padStart(2, '0');
-      }
-      return s;
-    };
-
-    return toHex(a) + toHex(b) + toHex(c) + toHex(d);
-  } catch (error) {
-    console.error('MD5 error:', error);
-    // Fallback to simple hash
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash;
-    }
-    return Math.abs(hash).toString(16).padStart(32, '0');
+// Simple working MD5 implementation (matches Python's hashlib.md5)
+function md5(string) {
+  function rotateLeft(value, amount) {
+    return (value << amount) | (value >>> (32 - amount));
   }
+
+  function addUnsigned(x, y) {
+    const lsw = (x & 0xFFFF) + (y & 0xFFFF);
+    const msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+    return (msw << 16) | (lsw & 0xFFFF);
+  }
+
+  function md5cmn(q, a, b, x, s, t) {
+    return addUnsigned(rotateLeft(addUnsigned(addUnsigned(a, q), addUnsigned(x, t)), s), b);
+  }
+
+  function md5ff(a, b, c, d, x, s, t) {
+    return md5cmn((b & c) | ((~b) & d), a, b, x, s, t);
+  }
+
+  function md5gg(a, b, c, d, x, s, t) {
+    return md5cmn((b & d) | (c & (~d)), a, b, x, s, t);
+  }
+
+  function md5hh(a, b, c, d, x, s, t) {
+    return md5cmn(b ^ c ^ d, a, b, x, s, t);
+  }
+
+  function md5ii(a, b, c, d, x, s, t) {
+    return md5cmn(c ^ (b | (~d)), a, b, x, s, t);
+  }
+
+  function coreMd5(x, len) {
+    x[len >> 5] |= 0x80 << ((len) % 32);
+    x[(((len + 64) >>> 9) << 4) + 14] = len;
+
+    let a = 1732584193;
+    let b = -271733879;
+    let c = -1732584194;
+    let d = 271733878;
+
+    for (let i = 0; i < x.length; i += 16) {
+      const olda = a;
+      const oldb = b;
+      const oldc = c;
+      const oldd = d;
+
+      a = md5ff(a, b, c, d, x[i], 7, -680876936);
+      d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
+      c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
+      b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
+      a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
+      d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
+      c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
+      b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
+      a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
+      d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
+      c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
+      b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
+      a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
+      d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
+      c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
+      b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
+
+      a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
+      d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
+      c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
+      b = md5gg(b, c, d, a, x[i], 20, -373897302);
+      a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
+      d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
+      c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
+      b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
+      a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
+      d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
+      c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
+      b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
+      a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
+      d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
+      c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
+      b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
+
+      a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
+      d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
+      c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
+      b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
+      a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
+      d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
+      c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
+      b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
+      a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
+      d = md5hh(d, a, b, c, x[i], 11, -358537222);
+      c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
+      b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
+      a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
+      d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
+      c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
+      b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
+
+      a = md5ii(a, b, c, d, x[i], 6, -198630844);
+      d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
+      c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
+      b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
+      a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
+      d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
+      c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
+      b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
+      a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
+      d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
+      c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
+      b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
+      a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
+      d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
+      c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
+      b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
+
+      a = addUnsigned(a, olda);
+      b = addUnsigned(b, oldb);
+      c = addUnsigned(c, oldc);
+      d = addUnsigned(d, oldd);
+    }
+    return [a, b, c, d];
+  }
+
+  function stringToWordArray(string) {
+    const wordArray = [];
+    for (let i = 0; i < string.length; i++) {
+      wordArray[i >> 2] |= (string.charCodeAt(i) & 0xFF) << ((i % 4) * 8);
+    }
+    return wordArray;
+  }
+
+  function wordToHex(word) {
+    let hex = '';
+    for (let i = 0; i < 4; i++) {
+      const byte = (word >>> (i * 8)) & 0xFF;
+      hex += byte.toString(16).padStart(2, '0');
+    }
+    return hex;
+  }
+
+  const wordArray = stringToWordArray(string);
+  const hash = coreMd5(wordArray, string.length * 8);
+
+  return wordToHex(hash[0]) + wordToHex(hash[1]) + wordToHex(hash[2]) + wordToHex(hash[3]);
 }
 
 async function checkPrecompiledAudio(text, voiceName) {
   /**
    * Check if precompiled audio exists and return it
    * Tries MP3 first (smaller, better for web), then WAV
-   * Supports both new (subdirectory) and old (flat) cache structures
    */
   if (!state.usePrecompiled) {
     return null;
   }
 
   try {
-    const combined = `${text}|${voiceName}`;
-    const hash = md5(combined);
-
-    // Try new structure first: audio_cache_british/Gracie_Wise/hash.ext
-    const safeVoiceName = voiceName.replace(/ /g, '_');
-
-    // Try MP3 with subdirectory
-    let audioPath = `${state.audioCacheDir}/${safeVoiceName}/${hash}.mp3`;
+    // Try MP3 first (better for web, smaller file size)
+    let audioPath = getPrecompiledAudioPath(text, voiceName, 'mp3');
     let response = await fetch(audioPath);
+
     if (response.ok) {
       console.log('✓ Using precompiled audio (MP3):', audioPath);
       return await response.blob();
     }
 
-    // Try WAV with subdirectory
-    audioPath = `${state.audioCacheDir}/${safeVoiceName}/${hash}.wav`;
+    // Fallback to WAV
+    audioPath = getPrecompiledAudioPath(text, voiceName, 'wav');
     response = await fetch(audioPath);
+
     if (response.ok) {
       console.log('✓ Using precompiled audio (WAV):', audioPath);
-      return await response.blob();
-    }
-
-    // Try old flat structure: audio_cache_british/hash.ext
-    audioPath = `${state.audioCacheDir}/${hash}.mp3`;
-    response = await fetch(audioPath);
-    if (response.ok) {
-      console.log('✓ Using precompiled audio (MP3, flat):', audioPath);
-      return await response.blob();
-    }
-
-    audioPath = `${state.audioCacheDir}/${hash}.wav`;
-    response = await fetch(audioPath);
-    if (response.ok) {
-      console.log('✓ Using precompiled audio (WAV, flat):', audioPath);
       return await response.blob();
     }
   } catch (error) {
@@ -1316,18 +1326,8 @@ async function initServerTTS() {
       console.log('Edge TTS server not available');
     }
 
-    // Add precompiled British voice option at the top
-    const precompiledVoice = {
-      name: 'Gracie Wise',
-      language: 'en',
-      gender: 'female',
-      accent: 'British',
-      provider: 'precompiled',
-      isPrecompiled: true
-    };
-
-    // Combine all voices (prioritize precompiled, then Edge TTS since it's free!)
-    const allVoices = [precompiledVoice, ...edgeVoices, ...coquiVoices, ...meloVoices];
+    // Combine all voices (prioritize Edge TTS since it's free!)
+    const allVoices = [...edgeVoices, ...coquiVoices, ...meloVoices];
 
     if (allVoices.length === 0) {
       console.warn('No TTS servers available, falling back to browser speech');
@@ -1340,11 +1340,11 @@ async function initServerTTS() {
 
     state.voices = allVoices;
 
-    // Default to precompiled British voice if available
+    // Default to first British/Irish/Australian voice if available
     const preferredAccents = ['British', 'Irish', 'Australian'];
-    const preferredVoice = allVoices.find(v => v.isPrecompiled) ||
-                          allVoices.find(v => v.accent && preferredAccents.includes(v.accent)) ||
-                          allVoices[0];
+    const preferredVoice = allVoices.find(v =>
+      v.accent && preferredAccents.includes(v.accent)
+    ) || allVoices[0];
 
     state.voiceName = preferredVoice.name;
     state.voiceURI = preferredVoice.name;
@@ -1432,10 +1432,9 @@ function populateVoicePicker() {
     const accent = voice.accent ? ` [${voice.accent}]` : '';
     const gender = voice.gender ? ` (${voice.gender})` : '';
     const star = preferredAccents.includes(voice.accent) ? '⭐ ' : '';
-    const cached = voice.isPrecompiled ? '💾 ' : '';
 
-    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS || voice.isPrecompiled) {
-      option.textContent = `${cached}${star}${voice.name}${accent}${gender}`;
+    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
+      option.textContent = `${star}${voice.name}${accent}${gender}`;
     } else {
       option.textContent = `${voice.name}${accent}${gender}`;
     }
