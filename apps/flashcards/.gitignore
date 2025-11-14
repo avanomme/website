@@ -1,7 +1,12 @@
 .vercel
 
+# Virtual environments (now symlinks to ~/uv-envs/tts)
+.venv-tts
+.venv-edge-tts
+.venv-tts.backup/
+.venv-edge-tts.backup/
+
 # Custom voice models (large files, not for git/vercel)
-apps/flashcards/custom_models/
-apps/flashcards/tts_server_custom.py
-apps/flashcards/precompile_cox_custom.py
-/cox_model/
+custom_models/
+tts_server_custom.py
+precompile_cox_custom.py

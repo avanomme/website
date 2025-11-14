@@ -104,3 +104,9 @@ service-account.json
 software-engineering-478113-178d5e07d998.json
 *.json
 service-account*.json
+
+# Custom voice model files
+cox_model/
+cox7_clips/
+cox8_clips/
+cloned_voice_samples_elevenlabs/
