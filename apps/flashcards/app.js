@@ -1367,8 +1367,9 @@ async function initServerTTS() {
     }
     allVoices = uniqueVoices;
 
-    // Mark all 10 Coqui voices as cached (all have card 1.1 at minimum)
+    // Mark all voices with precompiled audio as cached
     const voicesToCache = [
+      // XTTS-v2 voices (10)
       'Gracie Wise',      // British female (66 cards)
       'Claribel Dervla',  // Irish female
       'Andrew Chipper',   // British male
@@ -1378,7 +1379,17 @@ async function initServerTTS() {
       'Daisy Studious',   // British female
       'Gitta Nikolina',   // American female
       'Sofia Hellen',     // American female
-      'Viktor Eka'        // American male
+      'Viktor Eka',       // American male
+
+      // Edge TTS voices (42) - will be precompiled
+      'Aria', 'Guy', 'Jenny', 'Ryan', 'Michelle', 'Eric', 'Steffan', 'Ana',  // US
+      'Sonia', 'Ryan (UK)', 'Libby', 'Abbi', 'Alfie', 'Bella', 'Elliot', 'Ethan',  // UK
+      'Holly', 'Maisie', 'Noah', 'Oliver', 'Olivia', 'Thomas',  // UK cont.
+      'Natasha', 'William', 'Annette', 'Carly', 'Darren', 'Duncan', 'Elsie',  // AU
+      'Freya', 'Joanne', 'Ken', 'Kim', 'Neil', 'Tim', 'Tina',  // AU cont.
+      'Emily', 'Connor',  // Irish
+      'Clara', 'Liam',    // Canadian
+      'Neerja', 'Prabhat' // Indian
     ];
     const cachedVoices = [];
 
