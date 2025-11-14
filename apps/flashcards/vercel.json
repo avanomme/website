@@ -1,15 +1,7 @@
 {
-  "version": 2,
-  "public": true,
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ],
   "headers": [
     {
-      "source": "/(.*)",
+      "source": "/(.*).js",
       "headers": [
         {
           "key": "Cache-Control",
@@ -18,7 +10,16 @@
       ]
     },
     {
-      "source": "/audio_cache_british/(.*)",
+      "source": "/(.*).html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=0, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/audio_cache/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
