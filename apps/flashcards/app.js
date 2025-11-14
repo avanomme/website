@@ -1367,8 +1367,19 @@ async function initServerTTS() {
     }
     allVoices = uniqueVoices;
 
-    // Mark cached voices (Gracie, Claribel, Andrew)
-    const voicesToCache = ['Gracie Wise', 'Claribel Dervla', 'Andrew Chipper'];
+    // Mark all 10 Coqui voices as cached (all have card 1.1 at minimum)
+    const voicesToCache = [
+      'Gracie Wise',      // British female (66 cards)
+      'Claribel Dervla',  // Irish female
+      'Andrew Chipper',   // British male
+      'Ana Florence',     // American female
+      'Brenda Stern',     // American female
+      'Craig Gutsy',      // Australian male
+      'Daisy Studious',   // British female
+      'Gitta Nikolina',   // American female
+      'Sofia Hellen',     // American female
+      'Viktor Eka'        // American male
+    ];
     const cachedVoices = [];
 
     for (const voiceName of voicesToCache) {
