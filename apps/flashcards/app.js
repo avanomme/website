@@ -347,6 +347,7 @@ function parseDeck(markdown) {
       answerSpeech: toSpeechText(answerText),
       sectionPath: currentSectionPath,
       cardId: cardId,
+      cardNumber: cardId,  // Use cardId as cardNumber for cache paths
     });
 
     questionBuffer = [];
