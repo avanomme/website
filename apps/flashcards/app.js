@@ -897,13 +897,12 @@ async function speak(text, token) {
 function getPrecompiledAudioPath(text, voiceName, format = 'wav') {
   /**
    * Generate path to precompiled audio file
-   * Format: audio_cache/{voice_name}/{md5_hash}.{format}
+   * Format: audio_cache/{md5_hash}.{format}
    * Supports: wav, mp3
    */
   const combined = `${text}|${voiceName}`;
   const hash = md5(combined);
-  const safeVoiceName = voiceName.replace(/ /g, '_');
-  return `${state.audioCacheDir}/${safeVoiceName}/${hash}.${format}`;
+  return `${state.audioCacheDir}/${hash}.${format}`;
 }
 
 // Simple working MD5 implementation (matches Python's hashlib.md5)

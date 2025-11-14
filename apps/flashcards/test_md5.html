@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MD5 Test</title>
+    <script src="app.js"></script>
+</head>
+<body>
+    <h2>MD5 Hash Test</h2>
+    <pre id="output">Loading...</pre>
+    <script>
+        setTimeout(() => {
+            const tests = [
+                'What is machine learning?|Gracie Wise',
+                'Machine learning is a subset of artificial intelligence.|Gracie Wise'
+            ];
+
+            let output = '';
+            tests.forEach(test => {
+                const hash = md5(test);
+                output += `Input: ${test}\n`;
+                output += `MD5:   ${hash}\n\n`;
+            });
+
+            document.getElementById('output').textContent = output;
+        }, 500);
+    </script>
+</body>
+</html>
