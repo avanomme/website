@@ -45,8 +45,8 @@ def parse_cards_md():
     for line in lines:
         stripped = line.strip()
 
-        # Skip empty lines and comments
-        if not stripped or stripped.startswith('<!--'):
+        # Skip empty lines, comments, and headers
+        if not stripped or stripped.startswith('<!--') or stripped.startswith('####'):
             continue
 
         # New card marker
