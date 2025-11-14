@@ -24,6 +24,12 @@ export function parseFlashcardsFile(filePath) {
       // question line usually like: **1.1**  *Question text*
       const qLine = i < lines.length ? lines[i].trim() : "";
       let question = qLine;
+      let cardNumber = null;
+
+      // Extract card number (e.g., "1.1" from "**1.1** *text*")
+      const numMatch = qLine.match(/\*\*([\d.]+)\*\*/);
+      if (numMatch) cardNumber = numMatch[1];
+
       const qm = qLine.match(/\*\*[^*]+\*\*\s*(.*)/);
       if (qm) question = qm[1].trim();
 
@@ -44,7 +50,7 @@ export function parseFlashcardsFile(filePath) {
         .join("\n")
         .trim();
 
-      cards.push({ tag, question: question || "", answer });
+      cards.push({ tag, question: question || "", answer, cardNumber });
       continue;
     }
     i++;

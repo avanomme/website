@@ -753,7 +753,7 @@ function runSpeechSequence(card, token) {
     }
 
     if (card.questionSpeech) {
-      await speak(card.questionSpeech, token);
+      await speak(card.questionSpeech, token, card.cardNumber, false);
       if (!isAutoplayTokenActive(token) || !state.isPlaying) {
         return;
       }
@@ -771,7 +771,7 @@ function runSpeechSequence(card, token) {
 
     const shouldReadAnswer = Boolean(card.answerSpeech) && (state.autoReveal || state.showingAnswer);
     if (shouldReadAnswer) {
-      await speak(card.answerSpeech, token);
+      await speak(card.answerSpeech, token, card.cardNumber, true);
       if (!isAutoplayTokenActive(token) || !state.isPlaying) {
         return;
       }
@@ -882,27 +882,34 @@ function cancelSpeech() {
   state.activeUtterance = null;
 }
 
-async function speak(text, token) {
+async function speak(text, token, cardNumber = null, isAnswer = false) {
   if (!text || !isAutoplayTokenActive(token) || !state.isPlaying) {
     return;
   }
 
   if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
-    return speakWithCoqui(text, token);
+    return speakWithCoqui(text, token, cardNumber, isAnswer);
   } else if (supportsSpeech()) {
     return speakWithBrowser(text, token);
   }
 }
 
-function getPrecompiledAudioPath(text, voiceName, format = 'wav') {
+function getPrecompiledAudioPath(text, voiceName, cardNumber, isAnswer, format = 'wav') {
   /**
    * Generate path to precompiled audio file
-   * Format: audio_cache/{md5_hash}.{format}
-   * Supports: wav, mp3
+   * Format: audio_cache/{voice_name}/{cardNumber}_{q_or_a}.{format}
+   * Example: audio_cache/gracie_wise/1.1_q.wav
    */
-  const combined = `${text}|${voiceName}`;
-  const hash = md5(combined);
-  return `${state.audioCacheDir}/${hash}.${format}`;
+  if (!cardNumber) {
+    // Fallback to old hash-based system if no card number
+    const combined = `${text}|${voiceName}`;
+    const hash = md5(combined);
+    return `${state.audioCacheDir}/${hash}.${format}`;
+  }
+
+  const safeVoiceName = voiceName.toLowerCase().replace(/ /g, '_');
+  const qaType = isAnswer ? 'a' : 'q';
+  return `audio_cache/${safeVoiceName}/${cardNumber}_${qaType}.${format}`;
 }
 
 // Simple working MD5 implementation (matches Python's hashlib.md5)
@@ -1051,7 +1058,7 @@ function md5(string) {
   return wordToHex(hash[0]) + wordToHex(hash[1]) + wordToHex(hash[2]) + wordToHex(hash[3]);
 }
 
-async function checkPrecompiledAudio(text, voiceName) {
+async function checkPrecompiledAudio(text, voiceName, cardNumber, isAnswer) {
   /**
    * Check if precompiled audio exists and return it
    * Tries MP3 first (smaller, better for web), then WAV
@@ -1062,7 +1069,7 @@ async function checkPrecompiledAudio(text, voiceName) {
 
   try {
     // Try MP3 first (better for web, smaller file size)
-    let audioPath = getPrecompiledAudioPath(text, voiceName, 'mp3');
+    let audioPath = getPrecompiledAudioPath(text, voiceName, cardNumber, isAnswer, 'mp3');
     let response = await fetch(audioPath);
 
     if (response.ok) {
@@ -1071,7 +1078,7 @@ async function checkPrecompiledAudio(text, voiceName) {
     }
 
     // Fallback to WAV
-    audioPath = getPrecompiledAudioPath(text, voiceName, 'wav');
+    audioPath = getPrecompiledAudioPath(text, voiceName, cardNumber, isAnswer, 'wav');
     response = await fetch(audioPath);
 
     if (response.ok) {
@@ -1080,17 +1087,18 @@ async function checkPrecompiledAudio(text, voiceName) {
     }
   } catch (error) {
     // File doesn't exist, will generate on-demand
+    console.log('No precompiled audio found, will generate on-demand');
   }
 
   return null;
 }
 
-async function speakWithCoqui(text, token) {
+async function speakWithCoqui(text, token, cardNumber = null, isAnswer = false) {
   try {
     const voiceName = state.voiceName || state.voices[0]?.name || 'Claribel Dervla';
 
     // Check for precompiled audio first
-    let audioBlob = await checkPrecompiledAudio(text, voiceName);
+    let audioBlob = await checkPrecompiledAudio(text, voiceName, cardNumber, isAnswer);
 
     if (!audioBlob) {
       // Determine which TTS server to use
