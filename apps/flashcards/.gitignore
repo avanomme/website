@@ -1,1 +1,7 @@
 .vercel
+
+# Custom voice models (large files, not for git/vercel)
+apps/flashcards/custom_models/
+apps/flashcards/tts_server_custom.py
+apps/flashcards/precompile_cox_custom.py
+/cox_model/
