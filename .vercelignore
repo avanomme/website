@@ -15,8 +15,8 @@ lib/graphviz
 sounds/
 external/
 
-# Large WAV files in root
-*.wav
+# Large WAV files in root (but NOT audio_cache!)
+/*.wav
 cox7_clips/
 cox8_clips/
 
