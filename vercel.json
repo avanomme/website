@@ -42,44 +42,38 @@
       ]
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/log",
-      "dest": "api/log.py",
-      "methods": ["POST"]
+      "source": "/api/log",
+      "destination": "/api/log.py"
     },
     {
-      "src": "/api/logs",
-      "dest": "api/log.py",
-      "methods": ["GET"]
+      "source": "/api/logs",
+      "destination": "/api/log.py"
     },
     {
-      "src": "/api/logs/stats",
-      "dest": "api/log.py",
-      "methods": ["GET"]
+      "source": "/api/logs/stats",
+      "destination": "/api/log.py"
     },
     {
-      "src": "/api/cards/save",
-      "dest": "api/cards.py",
-      "methods": ["POST"]
+      "source": "/api/cards/save",
+      "destination": "/api/cards.py"
     },
     {
-      "src": "/api/cards/list",
-      "dest": "api/cards.py",
-      "methods": ["GET"]
+      "source": "/api/cards/list",
+      "destination": "/api/cards.py"
     },
     {
-      "src": "/api/cards/(.*)",
-      "dest": "api/cards.py",
-      "methods": ["GET"]
+      "source": "/api/cards/(.*)",
+      "destination": "/api/cards.py"
     },
     {
-      "src": "/music_player/(.*)",
-      "dest": "/apps/player/$1"
+      "source": "/music_player/(.*)",
+      "destination": "/apps/player/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "app.py"
+      "source": "/(.*)",
+      "destination": "/app.py"
     }
   ]
 }

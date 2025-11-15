@@ -7,6 +7,8 @@ venv
 .venv
 apps/flashcards/.venv-tts
 apps/flashcards/.venv-edge-tts
+apps/flashcards/.venv-tts.backup
+apps/flashcards/.venv-edge-tts.backup
 build
 dist
 
@@ -19,6 +21,8 @@ external/
 /*.wav
 cox7_clips/
 cox8_clips/
+cox_model/
+apps/flashcards/custom_models/
 
 # Flashcards - exclude large audio caches and samples
 apps/flashcards/voice_previews/
