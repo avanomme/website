@@ -133,6 +133,24 @@ body.theme-dark {
   font-size: 0.9rem;
 }
 
+.flashcard__content img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.flashcard__question-repeat img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.5rem auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
 .flashcard__question-repeat {
   font-size: 0.95rem;
   line-height: 1.5;

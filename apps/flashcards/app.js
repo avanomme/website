@@ -487,8 +487,22 @@ function renderMarkdownBlock(text) {
 }
 
 function renderInlineMarkdown(text) {
-  const escaped = escapeHtml(text);
-  return escaped
+  // Handle images BEFORE escaping HTML (so the markdown syntax is preserved)
+  let result = text;
+
+  // Extract and replace images with placeholders
+  const images = [];
+  result = result.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+    const placeholder = `__IMAGE_${images.length}__`;
+    images.push({ alt, src });
+    return placeholder;
+  });
+
+  // Now escape HTML for the rest of the text
+  const escaped = escapeHtml(result);
+
+  // Apply inline formatting
+  let formatted = escaped
     .replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>')
     .replace(/___(.+?)___/g, '<strong><em>$1</em></strong>')
     .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -497,6 +511,15 @@ function renderInlineMarkdown(text) {
     .replace(/_(.+?)_/g, '<em>$1</em>')
     .replace(/`(.+?)`/g, '<code>$1</code>')
     .replace(/~~(.+?)~~/g, '<del>$1</del>');
+
+  // Restore images as HTML img tags
+  images.forEach((img, index) => {
+    const placeholder = `__IMAGE_${index}__`;
+    const imgTag = `<img src="${escapeHtml(img.src)}" alt="${escapeHtml(img.alt || 'Image')}" style="max-width: 100%; height: auto; display: block; margin: 0.5rem 0;" />`;
+    formatted = formatted.replace(placeholder, imgTag);
+  });
+
+  return formatted;
 }
 
 function escapeHtml(text) {
