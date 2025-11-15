@@ -14,6 +14,8 @@ e) The neighbor examples used to predict the class
 
 #flashcards/ML/Quiz/L01
 **Q1.2** *Complete: An algorithm is said to (blank) from (blank) E, with respect to some (blank) T, and some (blank) measure P, if its performance on T as measured by P (blank) with experience E.*
+
+Choices: *task, performance, learn, improves, experience*
 ?
 An algorithm is said to **learn** from **experience** E, with respect to some **task** T, and some **performance** measure P, if its performance on T as measured by P **improves** with experience E.
 
@@ -37,7 +39,7 @@ Choices:
 - **Supervised learning** → Task of learning a function based on example input-output pairs
 
 #flashcards/ML/Quiz/L01
-**Q1.4** *The notation x(i) refers to:*
+**Q1.4** *The notation$x^{(i)}$ refers to:*
 
 a) The prediction of regression for input x
 b) The i-th component of a vector
@@ -54,7 +56,7 @@ e) The prediction of classification for input x
 
 #flashcards/ML/Quiz/L02
 **Q2.2** *In Linear Regression, associated to each hypothesis function there is a:*
-
+Select One:
 a) Optimization algorithm
 b) Dataset
 c) Cost value
@@ -83,7 +85,7 @@ b) False
 
 #flashcards/ML/Quiz/L02
 **Q2.5** *How many parameters has the hypothesis function in an univariate linear regression problem?*
-
+Select One:
 a) 0
 b) 2
 c) 1
@@ -95,10 +97,10 @@ e) 3
 #flashcards/ML/Quiz/L03
 **Q3.1** *Match each notation element to its description:*
 
-- x(i)
+- $x^{(i)}$
 - n
 - m
-- x(i)j
+- $x_{j}^{(i)}$
 
 Choices:
 - input of i-th training example
@@ -106,14 +108,14 @@ Choices:
 - Number of training examples
 - value of feature j in i-th training example
 ?
-- **x(i)** → input of i-th training example
+- **$x^{(i)}$** → input of i-th training example
 - **n** → Number of features
 - **m** → Number of training examples
-- **x(i)j** → value of feature j in i-th training example
+- **$x_{j}^{(i)}$** → value of feature j in i-th training example
 
 #flashcards/ML/Quiz/L03
 **Q3.2** *In a univariate linear regression problem, how many variables has the optimization problem solved by gradient descent?*
-
+Select One:
 a) 2 Variables
 b) 0 Variables
 c) 1 Variable
@@ -269,22 +271,50 @@ b) False
 **a) True** ✓
 
 #flashcards/ML/Quiz/L06
-**Q6.3** *The entropy equation calculates:*
+**Q6.3** *What is calculated using this:*
+![alt text](image.png)
+
+a) The probability of a class
+b) The information gain
+c) The most likely feature in the dataset
+d) The entropy
+e) The homogeneity 
 ?
-**The entropy** (measure of homogeneity/impurity of a dataset)
+**d) The entropy** (measure of homogeneity/impurity of a dataset)
 
 Formula: H(S) = -Σ p(i) * log₂(p(i))
 
 #flashcards/ML/Quiz/L06
-**Q6.4** *Which is the criteria in ID3 for selecting an attribute when constructing the tree?*
+**Q6.4** *Given this decision tree how will this new input be classified?
+Outlook=Rain; Humidity=High; Temperature=Low; Wind=Strong*
+![alt text](image-1.png)
+Select one:
+a) Uncertain
+b) No
+c) Yes
+d) Error
 ?
-**The selected attribute maximizes the information gain**
+**b) no**
+
+#flashcards/ML/Quiz/L06
+**Q6.5** *Which is the criteria in ID3 for selecting an attribute when constructing the tree?*
+
+a) The selected attribute maximizes the information gain.
+b) The selected attribute has the least available features.
+c) The selected attribute minimizes the information gain.
+d) The selected attribute maximizes the entropy.
+e) The selected attributes is the most frequent one.
+?
+**a) The selected attribute maximizes the information gain**
 
 #flashcards/ML/Quiz/L07
 **Q7.1** *Is it possible to learn a non-linear decision boundary with Logistic Regression?*
 
-a) No
-b) Yes, but it is necessary to add new polynomial features
+a) Depends on the problem at hand.
+b) Yes, but it is necessary to add new polynomial features.
+c) No, because Logistic Regression only allows learning linear hypotheses.
+d) Depends on the cost function used.
+e) Yes, but a very large dataset is required.
 ?
 **b) Yes, but it is necessary to add new polynomial features** ✓
 
@@ -307,9 +337,24 @@ b) False
 Explanation: It's a **classification** algorithm (despite the name!)
 
 #flashcards/ML/Quiz/L07
-**Q7.4** *What is the benefit of using the logistic regression cost function?*
+**Q7.4** *What is the benefit of using this cost function?*
+![alt text](image-2.png)
+
+a) It avoids overfitting 
+b) It is easy to compute
+c) It allows learning non-linear decision boundaries
+d) It is not biased
+e) It is convex
 ?
-**It is convex, which guarantees convergence to the global minimum**
+**e) It is convex**
+
+Which of these expressions correspond to the logistic function?
+
+a) $𝑔(𝑧)=\frac{𝑧}{1+𝑒−𝑧}$
+b) $𝑔(𝑧)=\frac{1}{1+𝑒^{−𝑧}}$
+c) $𝑔(𝑧)=\frac{z}{1−𝑒^{𝑧}}$
+d) $𝑔(𝑧)=\frac{1−𝑒^{−𝑧}}{𝑒−𝑧}$
+e) $𝑔(𝑧)=\frac{𝑒^{−𝑧}}{1+𝑒^{−𝑧}}$
 
 #flashcards/ML/Quiz/L07
 **Q7.5** *The sigmoid function in logistic regression outputs values between:*
