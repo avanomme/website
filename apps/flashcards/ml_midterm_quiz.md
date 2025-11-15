@@ -13,7 +13,7 @@ e) The neighbor examples used to predict the class
 **e) The neighbor examples used to predict the class** ✓
 
 #flashcards/ML/Quiz/L01
-**Q1.2** *Complete: An algorithm is said to _____ from _____ E, with respect to some _____ T, and some _____ measure P, if its performance on T as measured by P _____ with experience E.*
+**Q1.2** *Complete: An algorithm is said to (blank) from (blank) E, with respect to some (blank) T, and some (blank) measure P, if its performance on T as measured by P (blank) with experience E.*
 ?
 An algorithm is said to **learn** from **experience** E, with respect to some **task** T, and some **performance** measure P, if its performance on T as measured by P **improves** with experience E.
 
@@ -48,7 +48,7 @@ e) The prediction of classification for input x
 **d) The i-th example from a dataset** ✓
 
 #flashcards/ML/Quiz/L02
-**Q2.1** *The goal in Linear Regression is to _____ the cost function.*
+**Q2.1** *The goal in Linear Regression is to (blank) the cost function.*
 ?
 **minimize**
 
@@ -220,7 +220,7 @@ d) An unseen instance is classified by computing the class that maximizes the po
 - **d) An unseen instance is classified by computing the class that maximizes the posterior probability** ✓
 
 #flashcards/ML/Quiz/L05
-**Q5.2** *Assuming that all hypotheses are equally probable a priori is called _____ prior.*
+**Q5.2** *Assuming that all hypotheses are equally probable a priori is called (blank) prior.*
 ?
 **uniform**
 
@@ -244,7 +244,7 @@ P(D) = P(D|h) * P(D) / P(D|h)
 **P(h|D) = P(D|h) * P(h) / P(D)**
 
 #flashcards/ML/Quiz/L05
-**Q5.5** *MAP stands for Maximum A _____ hypothesis.*
+**Q5.5** *MAP stands for Maximum A (blank) hypothesis.*
 ?
 **Posterior** (Maximum A Posteriori)
 
