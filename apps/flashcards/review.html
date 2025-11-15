@@ -6,6 +6,10 @@
   <title>Review Cards</title>
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="app.css">
+  <!-- KaTeX for LaTeX rendering -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
   <style>
     .review-card {
       background: var(--surface, #1a1a2e);
@@ -83,6 +87,23 @@
       font-family: 'Fira Code', monospace;
       font-size: 0.9em;
       color: var(--text-primary, #fff);
+    }
+
+    .review-content img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 1rem auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .review-content .katex {
+      font-size: 1.1em;
+    }
+
+    .review-content .katex-display {
+      margin: 1rem 0;
     }
 
     .pros-cons-grid {

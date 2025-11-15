@@ -136,6 +136,19 @@ function displayCard(index) {
   container.innerHTML = renderCard(card);
   updateNavigation();
 
+  // Render LaTeX math if KaTeX is available
+  if (typeof renderMathInElement !== 'undefined') {
+    renderMathInElement(container, {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    });
+  }
+
   // Scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -295,10 +308,19 @@ function renderMarkdown(text) {
   // Convert markdown to HTML
   let html = text;
 
-  // Bold
+  // Images - handle both regular markdown images and inline data URIs
+  html = html.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, src) => {
+    // Filter out flag icons and other unwanted images
+    if (src.includes('unflagged') || src.includes('i/unflagged')) {
+      return '';
+    }
+    return `<img src="${src}" alt="${alt || 'Image'}" />`;
+  });
+
+  // Bold (but preserve LaTeX $ symbols)
   html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
 
-  // Code blocks
+  // Code blocks (inline code)
   html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
 
   // Convert bullet lists
