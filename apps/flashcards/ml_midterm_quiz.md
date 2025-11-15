@@ -234,6 +234,12 @@ b) False
 
 #flashcards/ML/Quiz/L05
 **Q5.4** *Which expression corresponds to the Bayes theorem?*
+
+P(D|h) = P(h|D) * P(h) / P(D)
+P(h|D) = P(D|h) * P(h) / P(D)
+P(h|D) = P(D) * P(h)
+P(h|D) + P(D|h) = P(h) / P(D)
+P(D) = P(D|h) * P(D) / P(D|h)
 ?
 **P(h|D) = P(D|h) * P(h) / P(D)**
 
