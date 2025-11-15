@@ -657,6 +657,22 @@ function displayCard() {
   els.cardQuestionRepeat.innerHTML = card.questionHtml;
   els.cardAnswer.innerHTML = card.answerHtml || '<p>No answer recorded.</p>';
 
+  // Render LaTeX math if KaTeX is available
+  if (typeof renderMathInElement !== 'undefined') {
+    const mathOptions = {
+      delimiters: [
+        {left: '$$', right: '$$', display: true},
+        {left: '$', right: '$', display: false},
+        {left: '\\[', right: '\\]', display: true},
+        {left: '\\(', right: '\\)', display: false}
+      ],
+      throwOnError: false
+    };
+    renderMathInElement(els.cardQuestion, mathOptions);
+    renderMathInElement(els.cardQuestionRepeat, mathOptions);
+    renderMathInElement(els.cardAnswer, mathOptions);
+  }
+
   els.sectionMeta.textContent = `Section ${card.sectionIndex + 1} of ${state.sections.length}`;
   els.cardMeta.textContent = `Card ${state.currentIndex + 1} of ${state.order.length}`;
 
