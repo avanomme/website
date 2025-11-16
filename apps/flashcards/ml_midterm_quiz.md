@@ -39,7 +39,7 @@ Choices:
 - **Supervised learning** → Task of learning a function based on example input-output pairs
 
 #flashcards/ML/Quiz/L01
-**Q1.4** *The notation$x^{(i)}$ refers to:*
+**Q1.4** *The notation $x^{(i)}$ refers to:*
 
 a) The prediction of regression for input x
 b) The i-th component of a vector
