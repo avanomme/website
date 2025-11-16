@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Grinch 2025 Rehearsal</title>
-    <!-- Verovio for MusicXML rendering -->
-    <script src="https://www.verovio.org/javascript/develop/verovio-toolkit-wasm.js" defer></script>
+    <!-- Verovio for MusicXML rendering - MUST load before main script -->
+    <script src="https://www.verovio.org/javascript/latest/verovio-toolkit-wasm.js"></script>
     <!-- Tone.js and MIDI parser -->
     <script src="https://cdn.jsdelivr.net/npm/tone@14.8.49/build/Tone.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tonejs/midi@2.0.27/build/Midi.min.js"></script>
-    <!-- Local soundfonts -->
-    <script src="/music_player/soundfonts/acoustic_grand_piano-ogg.js" defer></script>
-    <script src="/music_player/soundfonts/choir_aahs-ogg.js" defer></script>
+    <!-- Local soundfonts - MUST load before playback -->
+    <script src="/music_player/soundfonts/acoustic_grand_piano-ogg.js"></script>
+    <script src="/music_player/soundfonts/choir_aahs-ogg.js"></script>
     <link rel="icon" type="image/png" href="/music_player/assets/favicon.png">
     <style>
         * {
@@ -874,15 +874,14 @@
         // Score library scanner (inline implementation)
         async function scanForMIDIFiles(directory) {
             try {
-                const response = await fetch(directory + '/scores.json');
-                if (!response.ok) {
-                    console.warn('scores.json not found, returning empty library');
-                    return [];
-                }
+                console.log('[Scanner] Loading scores.json from:', directory);
+                const response = await fetchWithTimeout(directory + '/scores.json', 15000);
                 const data = await response.json();
+                console.log('[Scanner] ✓ Loaded', data.scores?.length || 0, 'scores');
                 return data.scores || [];
             } catch (error) {
-                console.error('Error loading scores.json:', error);
+                console.error('[Scanner] Error loading scores.json:', error);
+                console.warn('[Scanner] Returning empty library');
                 return [];
             }
         }
@@ -988,26 +987,81 @@
             { keyword: "acoustic grand piano", soundfont: "acoustic_grand_piano" }
         ];
 
+        // Fetch with timeout utility (mobile connection reliability)
+        async function fetchWithTimeout(url, timeout = 30000) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+            try {
+                console.log('[Fetch] Loading:', url, 'with timeout:', timeout + 'ms');
+                const response = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                console.log('[Fetch] ✓ Successfully loaded:', url);
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    throw new Error(`Request timeout after ${timeout}ms: ${url}`);
+                }
+                throw error;
+            }
+        }
+
         // Initialize audio context on first user interaction (mobile fix)
         let audioUnlocked = false;
         async function unlockAudio() {
-            if (audioUnlocked) return;
+            if (audioUnlocked) return true;
             try {
                 console.log('[Audio] Attempting to unlock audio context...');
+                console.log('[Audio] Current state:', Tone.context.state);
+
                 await Tone.start();
                 if (Tone.context.state !== 'running') {
                     await Tone.context.resume();
+                    console.log('[Audio] Context resumed, new state:', Tone.context.state);
                 }
-                console.log('[Audio] Audio context unlocked, state:', Tone.context.state);
-                audioUnlocked = true;
+
+                // Wait a bit to ensure context is truly running (mobile devices need this)
+                let attempts = 0;
+                while (Tone.context.state !== 'running' && attempts < 10) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                    console.log('[Audio] Waiting for context to run, attempt:', attempts, 'state:', Tone.context.state);
+                }
+
+                if (Tone.context.state === 'running') {
+                    console.log('[Audio] ✓ Audio context unlocked successfully');
+                    audioUnlocked = true;
+                    return true;
+                } else {
+                    console.error('[Audio] ❌ Audio context failed to unlock, final state:', Tone.context.state);
+                    return false;
+                }
             } catch (error) {
                 console.error('[Audio] Failed to unlock audio:', error);
+                return false;
             }
         }
 
         async function init() {
             try {
                 console.log('[App] Initializing Verovio...');
+
+                // Check if soundfonts are loaded
+                console.log('[App] Checking soundfont availability...');
+                if (typeof MIDI === 'undefined') {
+                    console.warn('[App] ⚠️ MIDI object not defined - soundfonts may not be loaded yet');
+                } else if (!MIDI.Soundfont) {
+                    console.warn('[App] ⚠️ MIDI.Soundfont not defined');
+                } else {
+                    console.log('[App] ✓ MIDI.Soundfont available');
+                    console.log('[App] Available soundfonts:', Object.keys(MIDI.Soundfont));
+                }
 
                 // Verovio toolkit will be initialized after WASM loads
                 tk = new verovio.toolkit();
@@ -1030,7 +1084,11 @@
                 loadBtn.addEventListener('click', handleLoad);
                 fileInput.addEventListener('change', handleFileSelect);
                 playBtn.addEventListener('click', async () => {
-                    await unlockAudio(); // Ensure audio is unlocked before playing
+                    const unlocked = await unlockAudio(); // Ensure audio is unlocked before playing
+                    if (!unlocked) {
+                        alert('Unable to start audio. Please try again.');
+                        return;
+                    }
                     await playMIDIHandler();
                 });
                 pauseBtn.addEventListener('click', pauseMIDIHandler);
@@ -1180,6 +1238,15 @@
                     document.addEventListener('click', unlockOnInteraction, { once: true });
                 }
 
+                // Restore normal placeholder after successful init
+                if (scorePlaceholder) {
+                    scorePlaceholder.innerHTML = `
+                        <div class="placeholder-icon">🎵</div>
+                        <div class="placeholder-text">No Score Loaded</div>
+                        <div class="placeholder-subtext">Load a music score to start rehearsing</div>
+                    `;
+                }
+
                 console.log('[App] Initialization complete');
             } catch (error) {
                 console.error('[App] Failed to initialize:', error);
@@ -1255,7 +1322,20 @@
 
         const getFallbackPlayer = () => {
             if (!samplerCache.has(FALLBACK_PLAYER_KEY)) {
-                samplerCache.set(FALLBACK_PLAYER_KEY, new Tone.PolySynth(Tone.Synth).toDestination());
+                console.log('[Fallback] Creating PolySynth as fallback instrument');
+                const synth = new Tone.PolySynth(Tone.Synth, {
+                    oscillator: {
+                        type: 'triangle'
+                    },
+                    envelope: {
+                        attack: 0.005,
+                        decay: 0.1,
+                        sustain: 0.3,
+                        release: 1
+                    }
+                }).toDestination();
+                samplerCache.set(FALLBACK_PLAYER_KEY, synth);
+                console.log('[Fallback] ✓ PolySynth created (this will be used if soundfonts fail)');
             }
             return samplerCache.get(FALLBACK_PLAYER_KEY);
         };
@@ -1268,43 +1348,65 @@
                 return samplerCache.get(soundfontKey);
             }
 
-            if (
-                typeof MIDI !== "undefined" &&
-                MIDI.Soundfont &&
-                MIDI.Soundfont[soundfontKey]
-            ) {
-                console.log('[Sampler] Loading soundfont:', soundfontKey);
-                const soundfontData = MIDI.Soundfont[soundfontKey];
-                console.log('[Sampler] Soundfont data keys:', Object.keys(soundfontData).length, 'samples');
+            // Check if MIDI soundfonts are available
+            if (typeof MIDI === "undefined") {
+                console.error('[Sampler] ❌ MIDI object not defined! Soundfont scripts may have failed to load.');
+                console.error('[Sampler] Check that /music_player/soundfonts/*.js files are accessible');
+                return null;
+            }
 
+            if (!MIDI.Soundfont) {
+                console.error('[Sampler] ❌ MIDI.Soundfont not defined! Soundfont data not available.');
+                return null;
+            }
+
+            if (!MIDI.Soundfont[soundfontKey]) {
+                console.warn(`[Sampler] ⚠️ Soundfont "${soundfontKey}" not found.`);
+                console.warn('[Sampler] Available soundfonts:', Object.keys(MIDI.Soundfont).join(', '));
+                return null;
+            }
+
+            console.log('[Sampler] Loading soundfont:', soundfontKey);
+            const soundfontData = MIDI.Soundfont[soundfontKey];
+            console.log('[Sampler] Soundfont data contains', Object.keys(soundfontData).length, 'samples');
+
+            try {
                 const sampler = new Tone.Sampler({
                     urls: soundfontData,
                     attack: soundfontKey === "acoustic_grand_piano" ? 0.002 : 0.01,
-                    release: soundfontKey === "acoustic_grand_piano" ? 2.5 : 1.5
+                    release: soundfontKey === "acoustic_grand_piano" ? 2.5 : 1.5,
+                    onload: () => {
+                        console.log('[Sampler] ✓ Sampler loaded successfully for', soundfontKey);
+                    }
                 }).toDestination();
 
-                try {
-                    console.log('[Sampler] Waiting for sampler to load...');
-                    await sampler.loaded;
-                    console.log('[Sampler] ✓ Sampler loaded successfully for', soundfontKey);
-                } catch (error) {
-                    console.error(`[Sampler] ❌ Failed to load soundfont "${soundfontKey}":`, error);
-                    if (typeof sampler.dispose === "function") {
-                        sampler.dispose();
-                    }
-                    return null;
-                }
+                console.log('[Sampler] Waiting for sampler to load...');
+                await sampler.loaded;
+                console.log('[Sampler] ✓ Sampler ready for', soundfontKey);
+
                 samplerCache.set(soundfontKey, sampler);
                 return sampler;
+            } catch (error) {
+                console.error(`[Sampler] ❌ Failed to create/load sampler for "${soundfontKey}":`, error);
+                console.error('[Sampler] Error details:', error.message, error.stack);
+                return null;
             }
-            console.warn(`[Sampler] Soundfont "${soundfontKey}" not found in MIDI.Soundfont; using fallback synth.`);
-            return null;
         };
 
         const getPlayerForTrack = async (track) => {
+            const trackName = track.name || track.instrument?.name || 'Unknown';
             const soundfontKey = resolveSoundfontKey(track);
+            console.log(`[Track] Getting player for "${trackName}" using soundfont:`, soundfontKey);
+
             const sampler = await getSamplerForSoundfont(soundfontKey);
-            return sampler || getFallbackPlayer();
+
+            if (!sampler) {
+                console.warn(`[Track] ⚠️ Using fallback PolySynth for "${trackName}" (soundfont "${soundfontKey}" failed)`);
+                return getFallbackPlayer();
+            }
+
+            console.log(`[Track] ✓ Using sampler for "${trackName}"`);
+            return sampler;
         };
 
         function findClosestTimeMapEvent(absSeconds) {
@@ -1644,6 +1746,14 @@
                 console.warn('[Play] Cannot play - not loaded or no MIDI');
                 return;
             }
+
+            // Check if soundfonts are available before attempting playback
+            if (typeof MIDI === 'undefined' || !MIDI.Soundfont) {
+                console.error('[Play] ❌ Soundfonts not loaded! Cannot play audio.');
+                alert('Audio soundfonts failed to load.\n\nPossible causes:\n• Network connection issues\n• Soundfont files not accessible\n• Browser cache issues\n\nPlease refresh the page and try again.');
+                return;
+            }
+
             if (Tone.Transport.state === "started") {
                 console.warn('[Play] Already playing');
                 return;
@@ -2100,11 +2210,10 @@
             updateButtonStates();
 
             try {
-                const response = await fetch(filePath);
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch ${filePath}: ${response.statusText}`);
-                }
+                // Use timeout-enabled fetch for mobile reliability
+                const response = await fetchWithTimeout(filePath, 30000);
                 const meiData = await response.text();
+                console.log('[App] MEI data loaded, size:', meiData.length, 'characters');
 
                 // Store MEI data and JSON path for rebuilding
                 currentMEIData = meiData;
@@ -2125,13 +2234,12 @@
                 let customTimingEvents = null;
                 if (jsonPath) {
                     try {
-                        const jsonResponse = await fetch(jsonPath);
-                        if (jsonResponse.ok) {
-                            customTimingEvents = await jsonResponse.json();
-                            console.log('[App] Loaded custom timing data:', customTimingEvents.length, 'events');
-                        }
+                        const jsonResponse = await fetchWithTimeout(jsonPath, 15000);
+                        customTimingEvents = await jsonResponse.json();
+                        console.log('[App] Loaded custom timing data:', customTimingEvents.length, 'events');
                     } catch (jsonError) {
                         console.warn('[App] Could not load custom timing JSON:', jsonError);
+                        // Continue without custom timing - Verovio timemap will be used
                     }
                 }
 
@@ -2165,12 +2273,29 @@
                 console.log('[App] TimeMap measures count:', timeMap?.measures?.length || 0);
 
                 // Generate MIDI
+                console.log('[App] Generating MIDI from score...');
                 const base64midi = tk.renderToMIDI();
-                const midiByteArray = Uint8Array.from(atob(base64midi), c => c.charCodeAt(0));
-                midi = new Midi(midiByteArray.buffer);
-                totalDuration = midi.duration + 1;
-                isLoaded = true;
-                startMeasureTime = 0; // Reset to beginning for new score
+
+                if (!base64midi || base64midi.length === 0) {
+                    throw new Error('Failed to generate MIDI data from score');
+                }
+
+                console.log('[App] Base64 MIDI length:', base64midi.length);
+
+                try {
+                    const midiByteArray = Uint8Array.from(atob(base64midi), c => c.charCodeAt(0));
+                    console.log('[App] MIDI byte array size:', midiByteArray.length, 'bytes');
+
+                    midi = new Midi(midiByteArray.buffer);
+                    console.log('[App] ✓ MIDI parsed successfully, duration:', midi.duration, 'seconds');
+
+                    totalDuration = midi.duration + 1;
+                    isLoaded = true;
+                    startMeasureTime = 0; // Reset to beginning for new score
+                } catch (midiError) {
+                    console.error('[App] ❌ Failed to parse MIDI data:', midiError);
+                    throw new Error('Failed to parse MIDI data. The score may be too complex or corrupted.');
+                }
 
                 // Initialize track volumes (piano defaults to 70%)
                 midi.tracks.forEach((track, idx) => {
@@ -2601,6 +2726,23 @@
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
+        // Fallback loader for Verovio if primary CDN fails
+        function loadVerovioFallback() {
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/verovio@latest/dist/verovio-toolkit-wasm.js';
+                script.onload = () => {
+                    console.log('[App] Fallback Verovio script loaded');
+                    resolve();
+                };
+                script.onerror = () => {
+                    console.error('[App] Fallback script failed to load');
+                    reject(new Error('Fallback CDN failed'));
+                };
+                document.head.appendChild(script);
+            });
+        }
+
         // Wait for Verovio WASM to be fully initialized
         console.log('[App] Checking Verovio availability...');
 
@@ -2616,7 +2758,27 @@
 
             if (typeof verovio === 'undefined') {
                 console.error('[App] ❌ Verovio script never loaded');
-                return false;
+                console.error('[App] Attempting to load fallback CDN...');
+
+                // Try loading from jsdelivr CDN as fallback
+                try {
+                    await loadVerovioFallback();
+                    // Wait for it to load
+                    attempts = 0;
+                    while (typeof verovio === 'undefined' && attempts < 30) {
+                        await new Promise(resolve => setTimeout(resolve, 100));
+                        attempts++;
+                    }
+
+                    if (typeof verovio === 'undefined') {
+                        console.error('[App] ❌ Fallback CDN also failed');
+                        return false;
+                    }
+                    console.log('[App] ✓ Fallback CDN loaded successfully');
+                } catch (fallbackError) {
+                    console.error('[App] ❌ Failed to load fallback:', fallbackError);
+                    return false;
+                }
             }
 
             console.log('[App] Verovio script loaded, waiting for WASM runtime...');
@@ -2671,26 +2833,57 @@
                     }
                 }, 200);
 
-                // Timeout after 15 seconds
+                // Timeout after 30 seconds (increased for mobile devices)
                 setTimeout(() => {
                     clearInterval(checkInterval);
                     if (!resolved) {
-                        console.error('[App] ❌ Verovio WASM failed to initialize after 15 seconds');
+                        console.error('[App] ❌ Verovio WASM failed to initialize after 30 seconds');
                         console.error('[App] This might be a network issue or WASM compatibility problem');
+                        console.error('[App] User agent:', navigator.userAgent);
                         doResolve(false);
                     }
-                }, 15000);
+                }, 30000);
             });
         }
 
-        // Start initialization
+        // Start initialization - show loading message
+        const scorePlaceholder = document.getElementById('scorePlaceholder');
+        if (scorePlaceholder) {
+            scorePlaceholder.innerHTML = `
+                <div class="placeholder-icon">⏳</div>
+                <div class="placeholder-text">Initializing Player...</div>
+                <div class="placeholder-subtext">Loading music rendering engine</div>
+            `;
+        }
+
         waitForVerovio().then((success) => {
             if (success) {
                 console.log('[App] Starting app initialization...');
                 init();
             } else {
                 console.error('[App] Cannot start - Verovio not available');
-                alert('Failed to load Verovio. Please refresh the page or check your internet connection.');
+
+                // Update placeholder with error message
+                if (scorePlaceholder) {
+                    scorePlaceholder.innerHTML = `
+                        <div class="placeholder-icon" style="color: #e53e3e;">❌</div>
+                        <div class="placeholder-text" style="color: #e53e3e;">Failed to Load Music Engine</div>
+                        <div class="placeholder-subtext">
+                            The Verovio music rendering library failed to load.<br>
+                            This could be due to:<br>
+                            • Slow or unstable internet connection<br>
+                            • CDN (verovio.org) temporarily unavailable<br>
+                            • Browser compatibility issues<br><br>
+                            <strong>Please try:</strong><br>
+                            1. Refresh the page<br>
+                            2. Check your internet connection<br>
+                            3. Try a different browser<br>
+                            4. Check browser console for details
+                        </div>
+                    `;
+                }
+
+                alert('Failed to load Verovio music engine.\n\nPlease:\n1. Refresh the page\n2. Check your internet connection\n3. Try a different browser\n\nSee console for details.');
             }
         });
     </script>
