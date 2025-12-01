@@ -110,3 +110,24 @@ cox_model/
 cox7_clips/
 cox8_clips/
 cloned_voice_samples_elevenlabs/
+cloned_voice_samples_xtts/
+
+# Flashcards heavy directories
+apps/flashcards/archive/
+apps/flashcards/audio_cache/
+apps/flashcards/custom_models/
+apps/flashcards/custom_voices/
+apps/flashcards/voice_previews/
+
+# All local audio files
+*.wav
+*.mp3
+*.ogg
+*.flac
+
+# lib directory (large graphviz)
+lib/
+
+# Old directories
+apps_previous/
+build/

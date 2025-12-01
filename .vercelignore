@@ -1,54 +1,70 @@
-# ========== VERCEL IGNORE (MASTER CLEAN VERSION) ==========
+# ========== VERCEL IGNORE ==========
+# Only deploy essential web files
 
 # Git
 .git/
 .gitignore
+.gitattributes
 
 # Node
 node_modules/
-apps/**/node_modules/
 
-# Python
+# Python environments & cache
 venv/
 .venv/
-*/__pycache__/
+__pycache__/
 *.pyc
+*.pyo
 
-# Build / cache / temp
-dist/
-build/
-*.log
-temp*
-*.tmp
-*.zip
-*.tar.gz
-*.tgz
+# Python files except server files
+apps/**/*.py
+scripts/**/*.py
 
-# Do NOT deploy local models, audio, or external assets
+# Large directories in root
 external/
-lib/graphviz/
 lib/
 sounds/
 cox_model/
 cox7_clips/
 cox8_clips/
+build/
+dist/
+apps_previous/
 cloned_voice_samples_elevenlabs/
 cloned_voice_samples_xtts/
-apps_previous/
-build/
 
-# Flashcards - ignore heavy data
+# All audio/video files
+*.wav
+*.mp3
+*.mp4
+*.ogg
+*.flac
+*.m4a
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Logs and temp
+*.log
+temp*/
+*.tmp
+
+# Heavy flashcards directories
+apps/flashcards/archive/
 apps/flashcards/audio_cache/
 apps/flashcards/audio_samples/
-apps/flashcards/.venv-tts/
-apps/flashcards/.venv-edge-tts/
 apps/flashcards/custom_models/
+apps/flashcards/custom_voices/
 apps/flashcards/voice_previews/
-apps/flashcards/archive/
 apps/flashcards/scripts/
-apps/flashcards/*.py
+apps/flashcards/.venv*/
+apps/flashcards/docs/
 
-# Apps - ignore big app-specific content
+# Heavy app directories
+apps/**/node_modules/
 apps/**/temp/
 apps/**/cache/
 apps/**/soundfonts/
@@ -61,13 +77,13 @@ apps/**/clips/
 apps/**/voices/
 apps/**/models/
 
-# Keep ONLY the necessary web assets:
-#   - HTML, CSS, JS, WASM, JSON
-# Everything else is ignored by default except files outside this ignore list.
+# Museplay heavy stuff
+apps/museplay/
 
-# Ignore large media in root
-/*.wav
-/*.mp3
+# Vercel internal
+.vercel/
 
-# Vercel files
-.vercel
+# Documentation (not needed for deploy)
+*.md
+!apps/flashcards/cards.md
+!apps/flashcards/se_final/**/*.md
