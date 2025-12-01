@@ -27,12 +27,15 @@ temp*
 # Do NOT deploy local models, audio, or external assets
 external/
 lib/graphviz/
+lib/
 sounds/
 cox_model/
 cox7_clips/
 cox8_clips/
 cloned_voice_samples_elevenlabs/
 cloned_voice_samples_xtts/
+apps_previous/
+build/
 
 # Flashcards - ignore heavy data
 apps/flashcards/audio_cache/
@@ -41,6 +44,9 @@ apps/flashcards/.venv-tts/
 apps/flashcards/.venv-edge-tts/
 apps/flashcards/custom_models/
 apps/flashcards/voice_previews/
+apps/flashcards/archive/
+apps/flashcards/scripts/
+apps/flashcards/*.py
 
 # Apps - ignore big app-specific content
 apps/**/temp/
