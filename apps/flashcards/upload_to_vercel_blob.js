@@ -11,8 +11,9 @@ const path = require('path');
 // Load environment variables
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
 
-const CACHE_DIR = path.join(__dirname, 'audio_cache', 'cox_voice');
-const BLOB_PREFIX = 'flashcards/audio/cox_voice';
+const CACHE_DIR = path.join(__dirname, 'audio_cache', 'cox_voice', 'SE_Final_Audio');
+const BLOB_PREFIX = 'Software_final_Audio';
+const BLOB_BASE_URL = 'https://1hmdoc4cfrzddig0.public.blob.vercel-storage.com';
 
 async function uploadAudioFiles() {
     console.log('='.repeat(70));

@@ -1,65 +1,67 @@
-# Ignore git metadata and node_modules
-.git
-node_modules
+# ========== VERCEL IGNORE (MASTER CLEAN VERSION) ==========
 
-# Exclude local virtualenvs and build artifacts
-venv
-.venv
-apps/flashcards/.venv-tts
-apps/flashcards/.venv-edge-tts
-apps/flashcards/.venv-tts.backup
-apps/flashcards/.venv-edge-tts.backup
-build
-dist
+# Git
+.git/
+.gitignore
 
-# Large assets and source trees not required for deployment
-lib/graphviz
-sounds/
-external/
+# Node
+node_modules/
+apps/**/node_modules/
 
-# Large WAV files in root (but NOT audio_cache!)
-/*.wav
-cox7_clips/
-cox8_clips/
-cox_model/
-apps/flashcards/custom_models/
-
-# Flashcards - exclude large audio caches and samples
-apps/flashcards/voice_previews/
-apps/flashcards/audio_samples/
-# DO NOT exclude audio_cache - we need it for deployment
-# apps/flashcards/audio_cache/
-
-# Editor / OS files
-.DS_Store
-*.swp
-*.swo
-
-# temp and generated files
-*.aux
-*.fls
-*.fdb_latexmk
-temp.*
-
-# Optional: do not upload tests/docs heavy folders
-lib/**/tests
-.claude
-
-# Large project directories not needed for deployment
-emsdk/
-MuseScore/
-
-# apps/player - exclude large dependencies but keep core files
-apps/player/node_modules/
-
-# apps/museplay - exclude large dependencies and temp files
-apps/museplay/node_modules/
-apps/museplay/temp/
-apps/museplay/soundfonts/
-
-# Python cache
-__pycache__/
+# Python
+venv/
+.venv/
+*/__pycache__/
 *.pyc
 
-# Archived files
-.archived/
+# Build / cache / temp
+dist/
+build/
+*.log
+temp*
+*.tmp
+*.zip
+*.tar.gz
+*.tgz
+
+# Do NOT deploy local models, audio, or external assets
+external/
+lib/graphviz/
+sounds/
+cox_model/
+cox7_clips/
+cox8_clips/
+cloned_voice_samples_elevenlabs/
+cloned_voice_samples_xtts/
+
+# Flashcards - ignore heavy data
+apps/flashcards/audio_cache/
+apps/flashcards/audio_samples/
+apps/flashcards/.venv-tts/
+apps/flashcards/.venv-edge-tts/
+apps/flashcards/custom_models/
+apps/flashcards/voice_previews/
+
+# Apps - ignore big app-specific content
+apps/**/temp/
+apps/**/cache/
+apps/**/soundfonts/
+apps/**/midi/
+apps/**/timemaps/
+apps/**/samples/
+apps/**/recordings/
+apps/**/data/
+apps/**/clips/
+apps/**/voices/
+apps/**/models/
+
+# Keep ONLY the necessary web assets:
+#   - HTML, CSS, JS, WASM, JSON
+# Everything else is ignored by default except files outside this ignore list.
+
+# Ignore large media in root
+/*.wav
+/*.mp3
+
+# Vercel files
+.vercel
