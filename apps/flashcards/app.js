@@ -77,6 +77,12 @@ const TOPICS = {
     cardTypes: [
       { id: 'cards', label: 'Flash Cards', file: 'cards.md' }
     ]
+  },
+  se_final: {
+    name: 'Software Engineering Final',
+    cardTypes: [
+      { id: 'cards', label: 'Flash Cards', file: 'se_final_cards.md' }
+    ]
   }
 };
 
