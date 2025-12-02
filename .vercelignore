@@ -50,10 +50,8 @@ apps_previous/**
 
 # Documentation (not needed for deployment)
 *.md
-!apps/flashcards/cards.md
+!apps/flashcards/*.md
 !apps/flashcards/se_final/**/*.md
-!apps/flashcards/ML_midterm_final_review.md
-!apps/flashcards/software_engineering_final.md
 
 # MusePlay (under development)
 apps/museplay/**
