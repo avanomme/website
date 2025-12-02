@@ -1,50 +1,25 @@
 {
   "version": 2,
-  "framework": null,
-  "buildCommand": null,
-  "outputDirectory": null,
-
-  "functions": {
-    "app.py": {
-      "runtime": "@vercel/python@3.1"
-    },
-    "api/*.py": {
-      "runtime": "@vercel/python@3.1"
-    }
-  },
-
-  "headers": [
-    {
-      "source": "/apps/flashcards/(.*).js",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    },
-    {
-      "source": "/apps/flashcards/(.*).html",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=0, must-revalidate"
-        }
-      ]
-    }
+  "builds": [
+    { "src": "app.py", "use": "@vercel/python" },
+    { "src": "api/*.py", "use": "@vercel/python" },
+    { "src": "apps/**/*", "use": "@vercel/static" },
+    { "src": "shared/**/*", "use": "@vercel/static" }
   ],
+  "routes": [
+    { "src": "/api/log", "dest": "/api/log.py" },
+    { "src": "/api/logs", "dest": "/api/log.py" },
+    { "src": "/api/logs/stats", "dest": "/api/log.py" },
 
-  "rewrites": [
-    { "source": "/api/log", "destination": "/api/log.py" },
-    { "source": "/api/logs", "destination": "/api/log.py" },
-    { "source": "/api/logs/stats", "destination": "/api/log.py" },
+    { "src": "/api/cards/save", "dest": "/api/cards.py" },
+    { "src": "/api/cards/list", "dest": "/api/cards.py" },
+    { "src": "/api/cards/(.*)", "dest": "/api/cards.py" },
 
-    { "source": "/api/cards/save", "destination": "/api/cards.py" },
-    { "source": "/api/cards/list", "destination": "/api/cards.py" },
-    { "source": "/api/cards/(.*)", "destination": "/api/cards.py" },
+    { "src": "/music_player/(.*)", "dest": "/apps/player/$1" },
 
-    { "source": "/music_player/(.*)", "destination": "/apps/player/$1" },
+    { "src": "/apps/(.*)", "dest": "/apps/$1" },
+    { "src": "/shared/(.*)", "dest": "/shared/$1" },
 
-    { "source": "/((?!apps|api|shared|_next).*)", "destination": "/app.py" }
+    { "src": "/(.*)", "dest": "/app.py" }
   ]
 }
