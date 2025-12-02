@@ -1,89 +1,59 @@
-# ========== VERCEL IGNORE ==========
-# Only deploy essential web files
+# Large model & audio files
+cox_model/**
+cox7_clips/**
+cox8_clips/**
+cloned_voice_samples_elevenlabs/**
+cloned_voice_samples_xtts/**
 
-# Git
-.git/
-.gitignore
-.gitattributes
+# External dependencies (very large)
+external/**
+lib/**
+sounds/**
 
-# Node
-node_modules/
-
-# Python environments & cache
+# Python environments
 venv/
 .venv/
+.venv-tts/
+apps/**/.venv*/
+apps/flashcards/.venv-tts/
 __pycache__/
 *.pyc
-*.pyo
 
-# Python files except server files
-apps/**/*.py
-scripts/**/*.py
+# Node modules
+node_modules/**
+apps/**/node_modules/**
 
-# Large directories in root
-external/
-lib/
-sounds/
-cox_model/
-cox7_clips/
-cox8_clips/
-build/
+# Build artifacts
 dist/
-apps_previous/
-cloned_voice_samples_elevenlabs/
-cloned_voice_samples_xtts/
+build/
+apps/museplay/temp/
+apps/museplay/soundfonts/
+*.sf2
 
-# All audio/video files
-*.wav
-*.mp3
-*.mp4
-*.ogg
-*.flac
-*.m4a
-
-# Archives
-*.zip
-*.tar
-*.tar.gz
-*.tgz
-
-# Logs and temp
-*.log
-temp*/
-*.tmp
-
-# Heavy flashcards directories
-apps/flashcards/archive/
-apps/flashcards/audio_cache/
-apps/flashcards/audio_samples/
-apps/flashcards/custom_models/
-apps/flashcards/custom_voices/
-apps/flashcards/voice_previews/
-apps/flashcards/scripts/
-apps/flashcards/.venv*/
-apps/flashcards/docs/
-
-# Heavy app directories
-apps/**/node_modules/
-apps/**/temp/
-apps/**/cache/
-apps/**/soundfonts/
-apps/**/midi/
-apps/**/timemaps/
-apps/**/samples/
-apps/**/recordings/
-apps/**/data/
-apps/**/clips/
-apps/**/voices/
-apps/**/models/
-
-# Museplay heavy stuff
-apps/museplay/
-
-# Vercel internal
+# Git & Vercel internals
+.git/
 .vercel/
 
-# Documentation (not needed for deploy)
+# Audio cache (served from Vercel Blob instead)
+apps/flashcards/audio_cache/**
+apps/flashcards/archive/**
+apps/flashcards/custom_models/**
+
+# Archived/old files
+.archived/**
+apps_previous/**
+
+# Large audio files
+*.wav
+*.mp3
+*.ogg
+
+# Documentation (not needed for deployment)
 *.md
 !apps/flashcards/cards.md
 !apps/flashcards/se_final/**/*.md
+!apps/flashcards/ML_midterm_final_review.md
+!apps/flashcards/software_engineering_final.md
+
+# MusePlay (under development)
+apps/museplay/**
