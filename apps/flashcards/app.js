@@ -60,6 +60,8 @@ const state = {
   useEdgeTTS: true,  // NEW: Free Edge TTS - No API keys needed!
   usePrecompiled: true,
   audioCacheDir: 'audio_cache_british',  // British voice precompiled audio
+  useCoxVoice: false,  // Cox custom trained voice from Vercel Blob
+  coxVoiceBlobUrl: 'https://1hmdoc4cfrzddig0.public.blob.vercel-storage.com/Software_final_Audio',
 };
 
 // Topic configuration
@@ -1111,12 +1113,29 @@ async function checkPrecompiledAudio(text, voiceName, cardNumber, isAnswer) {
   /**
    * Check if precompiled audio exists and return it
    * Tries MP3 first (smaller, better for web), then WAV
+   * For Cox Voice, uses Vercel Blob storage
    */
   if (!state.usePrecompiled) {
     return null;
   }
 
   try {
+    // Check for Cox Voice - use Vercel Blob
+    if (voiceName === 'Cox Voice' && cardNumber) {
+      const qaType = isAnswer ? 'A' : 'Q';
+      const audioUrl = `${state.coxVoiceBlobUrl}/SE_${cardNumber}_${qaType}.wav`;
+      console.log(`🎤 Cox Voice: Fetching ${audioUrl}`);
+
+      const response = await fetch(audioUrl);
+      if (response.ok) {
+        console.log('✓ Using Cox Voice audio from Vercel Blob:', audioUrl);
+        return await response.blob();
+      } else {
+        console.log('Cox Voice audio not found:', audioUrl);
+      }
+      return null;
+    }
+
     // Try MP3 first (better for web, smaller file size)
     let audioPath = getPrecompiledAudioPath(text, voiceName, cardNumber, isAnswer, 'mp3');
     let response = await fetch(audioPath);
@@ -1549,6 +1568,20 @@ function populateVoicePicker() {
 
   const fragment = document.createDocumentFragment();
 
+  // Add Cox Voice option at the top (for SE Final topic)
+  const { topic } = getUrlParams();
+  if (topic === 'se_final') {
+    const coxOption = document.createElement('option');
+    coxOption.value = 'Cox Voice';
+    coxOption.textContent = '⭐ Cox Voice [Custom Trained]';
+    fragment.append(coxOption);
+
+    const separator = document.createElement('option');
+    separator.disabled = true;
+    separator.textContent = '──────────';
+    fragment.append(separator);
+  }
+
   // Group by preferred accents first
   const preferredAccents = ['British', 'Irish', 'Australian'];
   const preferredVoices = state.voices.filter(v =>
@@ -1605,12 +1638,19 @@ function populateVoicePicker() {
 
   els.voicePicker.append(fragment);
 
-  // Set default to first preferred voice if available
-  const defaultVoice = preferredVoices[0] || state.voices[0];
-  if (defaultVoice) {
-    state.voiceName = defaultVoice.name || defaultVoice.voiceURI;
-    state.voiceURI = state.voiceName;
-    els.voicePicker.value = state.voiceName;
+  // Set default voice - Cox Voice for SE Final, otherwise first preferred voice
+  const { topic: currentTopic } = getUrlParams();
+  if (currentTopic === 'se_final') {
+    state.voiceName = 'Cox Voice';
+    state.voiceURI = 'Cox Voice';
+    els.voicePicker.value = 'Cox Voice';
+  } else {
+    const defaultVoice = preferredVoices[0] || state.voices[0];
+    if (defaultVoice) {
+      state.voiceName = defaultVoice.name || defaultVoice.voiceURI;
+      state.voiceURI = state.voiceName;
+      els.voicePicker.value = state.voiceName;
+    }
   }
 }
 
