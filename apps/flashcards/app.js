@@ -85,6 +85,12 @@ const TOPICS = {
     cardTypes: [
       { id: 'cards', label: 'Flash Cards', file: 'se_final_cards.md' }
     ]
+  },
+  se_final_lydia: {
+    name: 'SE Final - Lydia',
+    cardTypes: [
+      { id: 'cards', label: 'Flash Cards', file: 'se_final_lydia.md' }
+    ]
   }
 };
 
@@ -1128,7 +1134,12 @@ async function checkPrecompiledAudio(text, voiceName, cardNumber, isAnswer) {
     // Check for Cox Voice - use Vercel Blob
     if (voiceName === 'Cox Voice' && cardNumber) {
       const qaType = isAnswer ? 'A' : 'Q';
-      const audioUrl = `${state.coxVoiceBlobUrl}/SE_${cardNumber}_${qaType}.wav`;
+      // Card IDs are like "L11.1" but audio files are "SE_11.1_Q.wav" (strip L prefix)
+      let audioCardNum = cardNumber;
+      if (cardNumber.startsWith('L') && /^L\d/.test(cardNumber)) {
+        audioCardNum = cardNumber.substring(1);  // Remove 'L' prefix
+      }
+      const audioUrl = `${state.coxVoiceBlobUrl}/SE_${audioCardNum}_${qaType}.wav`;
       console.log(`🎤 Cox Voice: Fetching ${audioUrl}`);
 
       const response = await fetch(audioUrl);
