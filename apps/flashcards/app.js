@@ -1133,13 +1133,25 @@ async function checkPrecompiledAudio(text, voiceName, cardNumber, isAnswer) {
   try {
     // Check for Cox Voice - use Vercel Blob
     if (voiceName === 'Cox Voice' && cardNumber) {
-      const qaType = isAnswer ? 'A' : 'Q';
-      // Card IDs are like "L11.1" but audio files are "SE_11.1_Q.wav" (strip L prefix)
+      const { topic } = getUrlParams();
+
+      // Card IDs are like "L11.1" but audio files use "11.1" (strip L prefix)
       let audioCardNum = cardNumber;
       if (cardNumber.startsWith('L') && /^L\d/.test(cardNumber)) {
         audioCardNum = cardNumber.substring(1);  // Remove 'L' prefix
       }
-      const audioUrl = `${state.coxVoiceBlobUrl}/SE_${audioCardNum}_${qaType}.wav`;
+
+      let audioUrl;
+      if (topic === 'se_final_lydia') {
+        // Lydia uses 1Q/2A naming for alphabetical ordering
+        const qaType = isAnswer ? '2A' : '1Q';
+        audioUrl = `https://1hmdoc4cfrzddig0.public.blob.vercel-storage.com/SE_Final_Lydia_Audio/SE_${audioCardNum}_Lydia_${qaType}.wav`;
+      } else {
+        // Original SE Final uses Q/A naming
+        const qaType = isAnswer ? 'A' : 'Q';
+        audioUrl = `${state.coxVoiceBlobUrl}/SE_${audioCardNum}_${qaType}.wav`;
+      }
+
       console.log(`🎤 Cox Voice: Fetching ${audioUrl}`);
 
       const response = await fetch(audioUrl);
@@ -1654,9 +1666,9 @@ function populateVoicePicker() {
 
   els.voicePicker.append(fragment);
 
-  // Set default voice - Cox Voice for SE Final, otherwise first preferred voice
+  // Set default voice - Cox Voice for SE Final topics, otherwise first preferred voice
   const { topic: currentTopic } = getUrlParams();
-  if (currentTopic === 'se_final') {
+  if (currentTopic === 'se_final' || currentTopic === 'se_final_lydia') {
     state.voiceName = 'Cox Voice';
     state.voiceURI = 'Cox Voice';
     state.useCoxVoice = true;
