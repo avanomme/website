@@ -293,9 +293,14 @@ function attachEventHandlers() {
   els.voicePicker.addEventListener('change', (event) => {
     const value = event.target.value;
     state.voiceURI = value;
-    if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
-      state.voiceName = value;
+    state.voiceName = value;  // Always update voiceName for Cox Voice support
+
+    // Enable Cox Voice mode when selected
+    state.useCoxVoice = (value === 'Cox Voice');
+    if (state.useCoxVoice) {
+      console.log('🎤 Cox Voice selected - will use Vercel Blob audio');
     }
+
     restartAutoplayIfPlaying();
   });
 
@@ -919,7 +924,7 @@ function clearTimers() {
 }
 
 function cancelSpeech() {
-  if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
+  if (state.useCoxVoice || state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
     if (state.currentAudio) {
       state.currentAudio.pause();
       state.currentAudio = null;
@@ -935,7 +940,7 @@ async function speak(text, token, cardNumber = null, isAnswer = false) {
     return;
   }
 
-  if (state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
+  if (state.useCoxVoice || state.useCoquiTTS || state.useMeloTTS || state.useEdgeTTS) {
     return speakWithCoqui(text, token, cardNumber, isAnswer);
   } else if (supportsSpeech()) {
     return speakWithBrowser(text, token);
@@ -1643,7 +1648,9 @@ function populateVoicePicker() {
   if (currentTopic === 'se_final') {
     state.voiceName = 'Cox Voice';
     state.voiceURI = 'Cox Voice';
+    state.useCoxVoice = true;
     els.voicePicker.value = 'Cox Voice';
+    console.log('🎤 Cox Voice auto-selected for SE Final');
   } else {
     const defaultVoice = preferredVoices[0] || state.voices[0];
     if (defaultVoice) {
