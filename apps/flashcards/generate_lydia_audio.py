@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/Users/adam/uv-envs/tts/bin/python3
 """
 Generate Cox voice audio files for SE Final Lydia flashcards.
 Loads model ONCE and processes all cards in batch for speed.
