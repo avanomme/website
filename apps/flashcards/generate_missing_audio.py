@@ -64,13 +64,14 @@ def generate_audio(text, output_path):
     """Generate audio using cox-speak."""
     try:
         result = subprocess.run(
-            [COX_SPEAK, text, "-o", str(output_path)],
+            [COX_SPEAK, text, str(output_path)],
             capture_output=True,
             text=True,
             timeout=120
         )
         if output_path.exists() and output_path.stat().st_size > 0:
             return True
+        print(f"  stderr: {result.stderr[:200] if result.stderr else 'none'}")
         return False
     except Exception as e:
         print(f"  Error: {e}")
