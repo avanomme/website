@@ -46,6 +46,14 @@ except ImportError:
     CONVERTER_AVAILABLE = False
     print("Warning: converter module not available. Using fallback regex conversion.")
 
+# Try to import the DFA image recognizer
+try:
+    from apps.dfa.image_to_dfa import DFAImageRecognizer, recognize_dfa_from_image
+    IMAGE_RECOGNIZER_AVAILABLE = True
+except ImportError:
+    IMAGE_RECOGNIZER_AVAILABLE = False
+    print("Warning: image_to_dfa module not available. Image recognition disabled.")
+
 # Get the absolute path to the project directory
 PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -1204,6 +1212,87 @@ def compute_current_regex(gnfa, initial, finals):
 
     except Exception as e:
         return f"(computing... {str(e)})"
+
+@app.route('/api/dfa/recognize', methods=['POST'])
+def recognize_dfa_image_endpoint():
+    """
+    API endpoint to recognize DFA from uploaded image.
+
+    Accepts: multipart/form-data with 'image' file (PNG/JPEG)
+    Optional: 'api_key' field for Anthropic API key
+
+    Returns JSON with:
+    - markdown: Markdown transition table
+    - json: DFA structure as JSON
+    - editor_json: JSON format for visual editor import
+    - success: boolean
+    - warnings: list of any issues detected
+    """
+    if not IMAGE_RECOGNIZER_AVAILABLE:
+        return jsonify({
+            'success': False,
+            'error': 'Image recognition module not available. Install: pip install anthropic pillow'
+        }), 503
+
+    if 'image' not in request.files:
+        return jsonify({
+            'success': False,
+            'error': 'No image file provided. Use multipart/form-data with "image" field.'
+        }), 400
+
+    image_file = request.files['image']
+    if image_file.filename == '':
+        return jsonify({
+            'success': False,
+            'error': 'No image file selected'
+        }), 400
+
+    # Check file type
+    allowed_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
+    ext = os.path.splitext(image_file.filename)[1].lower()
+    if ext not in allowed_extensions:
+        return jsonify({
+            'success': False,
+            'error': f'Unsupported image format: {ext}. Supported: {", ".join(allowed_extensions)}'
+        }), 400
+
+    try:
+        # Get API key from request or environment
+        api_key = request.form.get('api_key') or os.environ.get('OPENROUTER_API_KEY')
+
+        if not api_key:
+            return jsonify({
+                'success': False,
+                'error': 'OpenRouter API key required. Set OPENROUTER_API_KEY environment variable or provide api_key in form data.'
+            }), 400
+
+        # Read image bytes
+        image_bytes = image_file.read()
+
+        # Recognize DFA
+        result = recognize_dfa_from_image(image_bytes, api_key=api_key)
+
+        return jsonify({
+            'success': True,
+            'markdown': result.to_markdown_table(),
+            'json': result.to_json(),
+            'editor_json': result.to_editor_json(),
+            'confidence': result.confidence,
+            'warnings': result.warnings
+        })
+
+    except ValueError as e:
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 400
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'error': f'Recognition failed: {str(e)}'
+        }), 500
 
 @app.route('/study.html')
 def study():
