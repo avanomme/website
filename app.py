@@ -3,9 +3,9 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'dfa', 'lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'dfa'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'wiz'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'freakyfriday'))
-sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'descendants'))
+# NOTE: rehearsal app dirs (wiz, freakyfriday, descendants) are NOT added to
+# sys.path here. They share module names (sections, state, logic) so we add
+# them temporarily in _load_rehearsal_app() to avoid collisions.
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import io
@@ -67,42 +67,47 @@ app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'dfa', 'templates')),
 ])
 
-# Register Wizard of Oz rehearsal planner blueprint
-try:
-    import importlib.util
-    _wiz_spec = importlib.util.spec_from_file_location(
-        "wiz_app", os.path.join(PROJECT_DIR, 'apps', 'wiz', 'app.py')
-    )
-    _wiz_module = importlib.util.module_from_spec(_wiz_spec)
-    _wiz_spec.loader.exec_module(_wiz_module)
-    app.register_blueprint(_wiz_module.wiz_bp, url_prefix='/wiz')
-    print("✓ Wiz rehearsal planner registered at /wiz")
-except Exception as e:
-    print(f"Warning: Could not load wiz app: {e}")
+# Helper: each rehearsal app has identically-named modules (sections, state, logic).
+# We isolate them by temporarily putting only the current app's dir on sys.path
+# and flushing the cached modules before loading each blueprint.
+import importlib.util
+_REHEARSAL_MODULE_NAMES = ['sections', 'state', 'logic']
+_app_state_modules = {}
 
-# Register Freaky Friday rehearsal planner blueprint
-try:
-    _ff_spec = importlib.util.spec_from_file_location(
-        "ff_app", os.path.join(PROJECT_DIR, 'apps', 'freakyfriday', 'app.py')
-    )
-    _ff_module = importlib.util.module_from_spec(_ff_spec)
-    _ff_spec.loader.exec_module(_ff_module)
-    app.register_blueprint(_ff_module.ff_bp, url_prefix='/freaky')
-    print("✓ Freaky Friday rehearsal planner registered at /freaky")
-except Exception as e:
-    print(f"Warning: Could not load freaky friday app: {e}")
+def _load_rehearsal_app(label, app_dir, app_file, bp_attr, url_prefix, state_key):
+    """Load a rehearsal app blueprint with proper module isolation."""
+    try:
+        # Flush cached modules so this app gets its own copies
+        for name in _REHEARSAL_MODULE_NAMES:
+            sys.modules.pop(name, None)
 
-# Register Descendants rehearsal planner blueprint
-try:
-    _desc_spec = importlib.util.spec_from_file_location(
-        "desc_app", os.path.join(PROJECT_DIR, 'apps', 'descendants', 'app.py')
-    )
-    _desc_module = importlib.util.module_from_spec(_desc_spec)
-    _desc_spec.loader.exec_module(_desc_module)
-    app.register_blueprint(_desc_module.desc_bp, url_prefix='/descendants')
-    print("✓ Descendants rehearsal planner registered at /descendants")
-except Exception as e:
-    print(f"Warning: Could not load descendants app: {e}")
+        # Temporarily put this app's dir at the front of sys.path
+        abs_dir = os.path.join(PROJECT_DIR, app_dir)
+        sys.path.insert(0, abs_dir)
+
+        try:
+            spec = importlib.util.spec_from_file_location(
+                f"{state_key}_app", os.path.join(PROJECT_DIR, app_file)
+            )
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            bp = getattr(module, bp_attr)
+            app.register_blueprint(bp, url_prefix=url_prefix)
+            _app_state_modules[state_key] = sys.modules.get('state')
+            print(f"✓ {label} rehearsal planner registered at {url_prefix}")
+        finally:
+            # Remove this app's dir from sys.path so it doesn't interfere
+            try:
+                sys.path.remove(abs_dir)
+            except ValueError:
+                pass
+    except Exception as e:
+        print(f"Warning: Could not load {label} app: {e}")
+        import traceback; traceback.print_exc()
+
+_load_rehearsal_app("Wiz", "apps/wiz", "apps/wiz/app.py", "wiz_bp", "/wiz", "wiz")
+_load_rehearsal_app("Freaky Friday", "apps/freakyfriday", "apps/freakyfriday/app.py", "ff_bp", "/freaky", "freaky")
+_load_rehearsal_app("Descendants", "apps/descendants", "apps/descendants/app.py", "desc_bp", "/descendants", "descendants")
 
 # ============================================================================
 # STATIC FILE ROUTES
@@ -287,29 +292,17 @@ def kv_keys(pattern):
                 keys.append(f"se:project:{filename[:-5]}")
         return keys
 
-# Wire up KV storage for Wiz rehearsal planner
-try:
-    from state import configure_kv as _wiz_configure_kv
-    _wiz_configure_kv(kv_get, kv_set)
-    print("✓ Wiz KV storage configured")
-except Exception as e:
-    print(f"Warning: Could not configure wiz KV storage: {e}")
-
-# Wire up KV storage for Freaky Friday rehearsal planner
-try:
-    from apps.freakyfriday.state import configure_kv as _ff_configure_kv
-    _ff_configure_kv(kv_get, kv_set)
-    print("✓ Freaky Friday KV storage configured")
-except Exception as e:
-    print(f"Warning: Could not configure freaky friday KV storage: {e}")
-
-# Wire up KV storage for Descendants rehearsal planner
-try:
-    from apps.descendants.state import configure_kv as _desc_configure_kv
-    _desc_configure_kv(kv_get, kv_set)
-    print("✓ Descendants KV storage configured")
-except Exception as e:
-    print(f"Warning: Could not configure descendants KV storage: {e}")
+# Wire up KV storage for each rehearsal app using the saved state module refs
+for _label, _key in [("Wiz", "wiz"), ("Freaky Friday", "freaky"), ("Descendants", "descendants")]:
+    try:
+        _state_mod = _app_state_modules.get(_key)
+        if _state_mod and hasattr(_state_mod, 'configure_kv'):
+            _state_mod.configure_kv(kv_get, kv_set)
+            print(f"✓ {_label} KV storage configured")
+        else:
+            print(f"Warning: No state module found for {_label}")
+    except Exception as e:
+        print(f"Warning: Could not configure {_label} KV storage: {e}")
 
 # ============================================================================
 # SE PROJECT MANAGEMENT API
