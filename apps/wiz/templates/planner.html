@@ -81,7 +81,7 @@
         {% if results.full %}
           <table>
             <tr>
-              <th>Song</th><th>Section</th><th>Characters Required</th><th>Match</th><th>Status</th><th>Notes</th><th>Update</th>
+              <th>Song</th><th>Section</th><th>Characters Required</th><th>Vocal</th><th>Harmony</th><th>Priority</th><th>Diff.</th><th>Match</th><th>Status</th><th>Notes</th><th>Update</th>
             </tr>
             {% for sec in results.full %}
               {% set status = state.get(sec.id, 'todo') %}
@@ -96,6 +96,10 @@
                     {% endfor %}
                   </span>
                 </td>
+                <td><span class="tag">{{ sec.vocal_type }}</span></td>
+                <td><span class="tag">{{ sec.harmony_role }}</span></td>
+                <td>{{ sec.audition_priority }}</td>
+                <td>{{ sec.harmony_difficulty }}</td>
                 <td><span class="tag tag-full">FULL</span></td>
                 <td><span class="tag status-{{ status }}">{{ status }}</span></td>
                 <td>
@@ -134,7 +138,7 @@
         {% if results.partial %}
           <table>
             <tr>
-              <th>Song</th><th>Section</th><th>Characters Required</th><th>Match</th><th>Status</th><th>Notes</th><th>Update</th>
+              <th>Song</th><th>Section</th><th>Characters Required</th><th>Vocal</th><th>Harmony</th><th>Priority</th><th>Diff.</th><th>Match</th><th>Status</th><th>Notes</th><th>Update</th>
             </tr>
             {% for sec in results.partial %}
               {% set status = state.get(sec.id, 'todo') %}
@@ -149,6 +153,10 @@
                     {% endfor %}
                   </span>
                 </td>
+                <td><span class="tag">{{ sec.vocal_type }}</span></td>
+                <td><span class="tag">{{ sec.harmony_role }}</span></td>
+                <td>{{ sec.audition_priority }}</td>
+                <td>{{ sec.harmony_difficulty }}</td>
                 <td><span class="tag tag-partial">PARTIAL</span></td>
                 <td><span class="tag status-{{ status }}">{{ status }}</span></td>
                 <td>
@@ -204,7 +212,7 @@
         {% if results.safe %}
           <table>
             <tr>
-              <th>Song</th><th>Section</th><th>Characters Required</th><th>Safe?</th><th>Status</th><th>Notes</th><th>Update</th>
+              <th>Song</th><th>Section</th><th>Characters Required</th><th>Vocal</th><th>Harmony</th><th>Priority</th><th>Diff.</th><th>Safe?</th><th>Status</th><th>Notes</th><th>Update</th>
             </tr>
             {% for sec in results.safe %}
               {% set status = state.get(sec.id, 'todo') %}
@@ -219,6 +227,10 @@
                     {% endfor %}
                   </span>
                 </td>
+                <td><span class="tag">{{ sec.vocal_type }}</span></td>
+                <td><span class="tag">{{ sec.harmony_role }}</span></td>
+                <td>{{ sec.audition_priority }}</td>
+                <td>{{ sec.harmony_difficulty }}</td>
                 <td><span class="tag tag-safe">SAFE</span></td>
                 <td><span class="tag status-{{ status }}">{{ status }}</span></td>
                 <td>
