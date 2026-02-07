@@ -236,6 +236,14 @@ def rehearsal_log_page():
     cast_data = load_cast()
     cast_chars = cast_data["cast"]
 
+    # Format date display for each entry
+    for entry in entries:
+        try:
+            d = datetime.strptime(entry["date"], "%Y-%m-%d")
+            entry["date_display"] = f"{d.strftime('%A')} {d.strftime('%b')} {d.month}/{d.day}"
+        except Exception:
+            entry["date_display"] = entry.get("date", "")
+
     seen = set()
     song_names = []
     for s in SECTIONS:
@@ -252,6 +260,24 @@ def rehearsal_log_page():
         song_names=song_names,
         today=datetime.now().strftime("%Y-%m-%d"),
     )
+
+
+@ff_bp.route("/log/edit", methods=["POST"])
+def edit_log_entry():
+    from datetime import datetime
+
+    entry_id = request.form.get("entry_id")
+    entries = load_rehearsal_log()
+    for entry in entries:
+        if entry["id"] == entry_id:
+            entry["date"] = request.form.get("date", entry["date"])
+            entry["time"] = request.form.get("time", "").strip()
+            entry["songs"] = request.form.getlist("songs")
+            entry["cast_present"] = request.form.getlist("cast_present")
+            entry["notes"] = request.form.get("notes", "").strip()
+            break
+    save_rehearsal_log(entries)
+    return redirect(url_for(".rehearsal_log_page"))
 
 
 # -------------------------------------------------------------------------
