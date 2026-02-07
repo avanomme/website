@@ -1,12 +1,15 @@
 """
 Wizard of Oz Rehearsal Planner — State Management
 
-Handles JSON file persistence for section statuses, cast data, and rehearsal notes.
-All data files live in the data/ subdirectory.
+Supports two storage backends:
+  1. KV (Redis) — used on Vercel, configured via configure_kv()
+  2. Filesystem — local development fallback (JSON files in data/)
 """
 
 import json
 from pathlib import Path
+
+# ---- Filesystem backend (local dev) ----
 
 DATA_DIR = Path(__file__).parent / "data"
 
@@ -33,35 +36,62 @@ def save_json_file(path, data):
     path.write_text(json.dumps(data, indent=2))
 
 
-# --- Section status ---
+# ---- KV backend (Redis on Vercel) ----
+
+_kv_get = None
+_kv_set = None
+
+# Redis key prefix
+_STATE_KEY = "wiz:state"
+_CAST_KEY = "wiz:cast"
+_NOTES_KEY = "wiz:notes"
+
+
+def configure_kv(kv_get_fn, kv_set_fn):
+    """Configure KV storage backend. Called by the parent Flask app."""
+    global _kv_get, _kv_set
+    _kv_get = kv_get_fn
+    _kv_set = kv_set_fn
+
+
+# ---- Public API (unchanged signatures) ----
 
 def load_state():
+    if _kv_get:
+        return _kv_get(_STATE_KEY) or {}
     return load_json_file(STATE_FILE, {})
 
 
 def save_state(state):
-    save_json_file(STATE_FILE, state)
+    if _kv_set:
+        _kv_set(_STATE_KEY, state)
+    else:
+        save_json_file(STATE_FILE, state)
 
 
 def get_status(section_id, state):
     return state.get(section_id, "todo")
 
 
-# --- Rehearsal notes ---
-
 def load_notes():
+    if _kv_get:
+        return _kv_get(_NOTES_KEY) or {}
     return load_json_file(NOTES_FILE, {})
 
 
 def save_notes(notes):
-    save_json_file(NOTES_FILE, notes)
+    if _kv_set:
+        _kv_set(_NOTES_KEY, notes)
+    else:
+        save_json_file(NOTES_FILE, notes)
 
-
-# --- Cast data ---
 
 def load_cast():
     """Return dict with keys: cast (char->actor), actors (actor->meta)."""
-    raw = load_json_file(CAST_FILE, {})
+    if _kv_get:
+        raw = _kv_get(_CAST_KEY) or {}
+    else:
+        raw = load_json_file(CAST_FILE, {})
     # Backward compatibility: if it's just char->actor dict
     if raw and "cast" not in raw and "actors" not in raw:
         return {"cast": raw, "actors": {}}
@@ -73,7 +103,10 @@ def load_cast():
 
 
 def save_cast(cast_data):
-    save_json_file(CAST_FILE, cast_data)
+    if _kv_set:
+        _kv_set(_CAST_KEY, cast_data)
+    else:
+        save_json_file(CAST_FILE, cast_data)
 
 
 def normalize_name(name):

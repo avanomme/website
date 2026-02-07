@@ -23,7 +23,12 @@ from logic import (
     build_song_map,
 )
 
-wiz_bp = Blueprint('wiz', __name__, template_folder='templates')
+import os as _os
+_WIZ_DIR = _os.path.dirname(_os.path.abspath(__file__))
+
+wiz_bp = Blueprint('wiz', __name__,
+                   template_folder='templates',
+                   root_path=_WIZ_DIR)
 
 
 # -------------------------------------------------------------------------
@@ -192,6 +197,7 @@ def cast_page():
         "cast.html",
         active_page="cast",
         all_characters=ALL_CHARACTERS,
+        character_groups=CHARACTER_GROUPS,
         cast_chars=cast_chars,
         actors=actors,
     )

@@ -262,6 +262,14 @@ def kv_keys(pattern):
                 keys.append(f"se:project:{filename[:-5]}")
         return keys
 
+# Wire up KV storage for Wiz rehearsal planner
+try:
+    from state import configure_kv as _wiz_configure_kv
+    _wiz_configure_kv(kv_get, kv_set)
+    print("✓ Wiz KV storage configured")
+except Exception as e:
+    print(f"Warning: Could not configure wiz KV storage: {e}")
+
 # ============================================================================
 # SE PROJECT MANAGEMENT API
 # ============================================================================
