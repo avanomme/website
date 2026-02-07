@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+{% block title %}Wizard of Oz Rehearsal Planner{% endblock %}
+{% block heading %}Wizard of Oz – Rehearsal Planner{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <form method="POST" action="{{ url_for('.index') }}">
+      <div class="flex">
+        <div class="col">
+          <h3>1. Choose Mode</h3>
+          <label class="mode-radio">
+            <input type="radio" name="mode" value="available" {% if mode != 'missing' %}checked{% endif %}>
+            I HAVE these characters (available)
+          </label><br>
+          <label class="mode-radio">
+            <input type="radio" name="mode" value="missing" {% if mode == 'missing' %}checked{% endif %}>
+            I am MISSING these characters
+          </label>
+          <p class="small">
+            Example: 10–12 with leads → use "available".<br>
+            Ensemble-only afternoon → use "missing" and tick the leads.
+          </p>
+        </div>
+
+        <div class="col">
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <h3 style="margin:0;">2. Select Characters</h3>
+            <button type="button" class="secondary" onclick="document.querySelectorAll('.char-list input[type=checkbox]').forEach(c=>c.checked=false)">Clear All</button>
+          </div>
+          <div class="char-list">
+            {% for group_name, group_chars in character_groups %}
+              <div class="char-group-label">{{ group_name }}</div>
+              {% for c in group_chars %}
+                <label class="char">
+                  <input type="checkbox" name="characters" value="{{ c }}"
+                    {% if c in selected_characters %}checked{% endif %}>
+                  {{ c }}
+                  {% if cast_chars.get(c) %}
+                    <span class="small">({{ cast_chars.get(c) }})</span>
+                  {% endif %}
+                </label>
+              {% endfor %}
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="col">
+          <h3>3. Go</h3>
+          <p class="small">
+            Status per section:<br>
+            <b>todo</b> – not worked<br>
+            <b>needs_more</b> – we hit it, needs tightening<br>
+            <b>done</b> – solid for now<br><br>
+            Add quick rehearsal notes under any section.
+          </p>
+          <button type="submit">Update Suggestions</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {# --- RESULTS --- #}
+  {% if mode and results %}
+    {% if mode == 'available' %}
+      <div class="card">
+        <h2>Sections You Can Work WITH These Characters</h2>
+        <p class="small">
+          Selected:
+          {% if selected_characters %}
+            <span class="pill-group">
+              {% for c in selected_characters %}
+                <span class="pill">{{ c }}{% if cast_chars.get(c) %} ({{ cast_chars.get(c) }}){% endif %}</span>
+              {% endfor %}
+            </span>
+          {% else %}
+            (none selected)
+          {% endif %}
+        </p>
+
+        <h3>Full Matches (all required present)</h3>
+        {% if results.full %}
+          <table>
+            <tr>
+              <th>Song</th><th>Section</th><th>Characters Required</th><th>Match</th><th>Status</th><th>Notes</th><th>Update</th>
+            </tr>
+            {% for sec in results.full %}
+              {% set status = state.get(sec.id, 'todo') %}
+              {% set nlist = notes.get(sec.id, []) %}
+              <tr>
+                <td>{{ sec.song }}</td>
+                <td>{{ sec.section }}</td>
+                <td>
+                  <span class="pill-group">
+                    {% for c in sec.characters %}
+                      <span class="pill">{{ c }}{% if cast_chars.get(c) %} ({{ cast_chars.get(c) }}){% endif %}</span>
+                    {% endfor %}
+                  </span>
+                </td>
+                <td><span class="tag tag-full">FULL</span></td>
+                <td><span class="tag status-{{ status }}">{{ status }}</span></td>
+                <td>
+                  {% if nlist %}
+                    <div class="notes-list">
+                      {% for n in nlist[-3:] %}
+                        <div>&bull; {{ n }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <form method="POST" action="{{ url_for('.add_note') }}">
+                    <input type="hidden" name="section_id" value="{{ sec.id }}">
+                    <textarea name="note" placeholder="Add note..."></textarea>
+                    <button type="submit" class="secondary">Add</button>
+                  </form>
+                </td>
+                <td>
+                  <form method="POST" action="{{ url_for('.update_status') }}">
+                    <input type="hidden" name="section_id" value="{{ sec.id }}">
+                    <select name="status">
+                      <option value="todo" {% if status == 'todo' %}selected{% endif %}>todo</option>
+                      <option value="needs_more" {% if status == 'needs_more' %}selected{% endif %}>needs_more</option>
+                      <option value="done" {% if status == 'done' %}selected{% endif %}>done</option>
+                    </select>
+                    <button type="submit" class="secondary">Save</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        {% else %}
+          <p class="small">No full matches for this set of characters.</p>
+        {% endif %}
+
+        <h3>Partial Matches (some of the required characters present)</h3>
+        {% if results.partial %}
+          <table>
+            <tr>
+              <th>Song</th><th>Section</th><th>Characters Required</th><th>Match</th><th>Status</th><th>Notes</th><th>Update</th>
+            </tr>
+            {% for sec in results.partial %}
+              {% set status = state.get(sec.id, 'todo') %}
+              {% set nlist = notes.get(sec.id, []) %}
+              <tr>
+                <td>{{ sec.song }}</td>
+                <td>{{ sec.section }}</td>
+                <td>
+                  <span class="pill-group">
+                    {% for c in sec.characters %}
+                      <span class="pill">{{ c }}{% if cast_chars.get(c) %} ({{ cast_chars.get(c) }}){% endif %}</span>
+                    {% endfor %}
+                  </span>
+                </td>
+                <td><span class="tag tag-partial">PARTIAL</span></td>
+                <td><span class="tag status-{{ status }}">{{ status }}</span></td>
+                <td>
+                  {% if nlist %}
+                    <div class="notes-list">
+                      {% for n in nlist[-3:] %}
+                        <div>&bull; {{ n }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <form method="POST" action="{{ url_for('.add_note') }}">
+                    <input type="hidden" name="section_id" value="{{ sec.id }}">
+                    <textarea name="note" placeholder="Add note..."></textarea>
+                    <button type="submit" class="secondary">Add</button>
+                  </form>
+                </td>
+                <td>
+                  <form method="POST" action="{{ url_for('.update_status') }}">
+                    <input type="hidden" name="section_id" value="{{ sec.id }}">
+                    <select name="status">
+                      <option value="todo" {% if status == 'todo' %}selected{% endif %}>todo</option>
+                      <option value="needs_more" {% if status == 'needs_more' %}selected{% endif %}>needs_more</option>
+                      <option value="done" {% if status == 'done' %}selected{% endif %}>done</option>
+                    </select>
+                    <button type="submit" class="secondary">Save</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        {% else %}
+          <p class="small">No partial matches.</p>
+        {% endif %}
+      </div>
+
+    {% elif mode == 'missing' %}
+      <div class="card">
+        <h2>Sections SAFE WITHOUT These Characters</h2>
+        <p class="small">
+          Missing:
+          {% if selected_characters %}
+            <span class="pill-group">
+              {% for c in selected_characters %}
+                <span class="pill">{{ c }}{% if cast_chars.get(c) %} ({{ cast_chars.get(c) }}){% endif %}</span>
+              {% endfor %}
+            </span>
+          {% else %}
+            (none selected)
+          {% endif %}
+        </p>
+
+        <h3>Safe Sections (none of the missing characters required)</h3>
+        {% if results.safe %}
+          <table>
+            <tr>
+              <th>Song</th><th>Section</th><th>Characters Required</th><th>Safe?</th><th>Status</th><th>Notes</th><th>Update</th>
+            </tr>
+            {% for sec in results.safe %}
+              {% set status = state.get(sec.id, 'todo') %}
+              {% set nlist = notes.get(sec.id, []) %}
+              <tr>
+                <td>{{ sec.song }}</td>
+                <td>{{ sec.section }}</td>
+                <td>
+                  <span class="pill-group">
+                    {% for c in sec.characters %}
+                      <span class="pill">{{ c }}{% if cast_chars.get(c) %} ({{ cast_chars.get(c) }}){% endif %}</span>
+                    {% endfor %}
+                  </span>
+                </td>
+                <td><span class="tag tag-safe">SAFE</span></td>
+                <td><span class="tag status-{{ status }}">{{ status }}</span></td>
+                <td>
+                  {% if nlist %}
+                    <div class="notes-list">
+                      {% for n in nlist[-3:] %}
+                        <div>&bull; {{ n }}</div>
+                      {% endfor %}
+                    </div>
+                  {% endif %}
+                  <form method="POST" action="{{ url_for('.add_note') }}">
+                    <input type="hidden" name="section_id" value="{{ sec.id }}">
+                    <textarea name="note" placeholder="Add note..."></textarea>
+                    <button type="submit" class="secondary">Add</button>
+                  </form>
+                </td>
+                <td>
+                  <form method="POST" action="{{ url_for('.update_status') }}">
+                    <input type="hidden" name="section_id" value="{{ sec.id }}">
+                    <select name="status">
+                      <option value="todo" {% if status == 'todo' %}selected{% endif %}>todo</option>
+                      <option value="needs_more" {% if status == 'needs_more' %}selected{% endif %}>needs_more</option>
+                      <option value="done" {% if status == 'done' %}selected{% endif %}>done</option>
+                    </select>
+                    <button type="submit" class="secondary">Save</button>
+                  </form>
+                </td>
+              </tr>
+            {% endfor %}
+          </table>
+        {% else %}
+          <p class="small">No safe sections for this missing list.</p>
+        {% endif %}
+      </div>
+    {% endif %}
+  {% endif %}
+
+  {# --- SCHEDULE BUILDER --- #}
+  <div class="card">
+    <h2>Quick Schedule Builder (copy & paste)</h2>
+    <form method="POST" action="{{ url_for('.build_schedule') }}">
+      <p class="small">
+        I'll output <code>time | Characters | Song/Section</code> that you can paste into your rehearsal doc.
+      </p>
+      <div>
+        <label>Time block:</label><br>
+        <input type="text" name="time_block" placeholder="10:00-10:20">
+      </div>
+      <div>
+        <label>Characters:</label><br>
+        <input type="text" name="chars" placeholder="Dorothy, Scarecrow">
+      </div>
+      <div>
+        <label>Section (choose known or free text):</label><br>
+        <select name="section_id">
+          <option value="">-- free text (use field below) --</option>
+          {% for sec in all_sections %}
+            <option value="{{ sec.id }}">{{ sec.song }} – {{ sec.section }} ({{ sec.id }})</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label>Or custom song/section text:</label><br>
+        <input type="text" name="custom_label" placeholder="If I Only Had a Brain – verse 1">
+      </div>
+      <br>
+      <button type="submit" class="secondary">Add line</button>
+    </form>
+
+    {% if schedule_lines %}
+      <h3>Schedule (copy below):</h3>
+      <div>
+        <div class="schedule-line"><b>time | Characters | Song/Section</b></div>
+        {% for line in schedule_lines %}
+          <div class="schedule-line">{{ line }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

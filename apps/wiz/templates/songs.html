@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Wizard of Oz – Songs & Singers{% endblock %}
+{% block heading %}Songs & Required Singers{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <p class="small">
+      Each song with all characters who sing in any section, plus current casting if set.
+    </p>
+
+    <table>
+      <tr>
+        <th>Song</th>
+        <th>Characters Required</th>
+      </tr>
+      {% for s in songs %}
+        <tr>
+          <td>{{ s.song }}</td>
+          <td>
+            <span class="pill-group">
+              {% for c in s.characters %}
+                <span class="pill pill-char">
+                  {{ c }}{% if cast_chars.get(c) %} ({{ cast_chars.get(c) }}){% endif %}
+                </span>
+              {% endfor %}
+            </span>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+{% endblock %}

@@ -3,6 +3,7 @@ import os
 sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'dfa', 'lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'dfa'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'wiz'))
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import io
@@ -62,7 +63,21 @@ app = Flask(__name__)
 app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(PROJECT_DIR, 'shared', 'templates')),
     FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'dfa', 'templates')),
+    FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'wiz', 'templates')),
 ])
+
+# Register Wizard of Oz rehearsal planner blueprint
+try:
+    import importlib.util
+    _wiz_spec = importlib.util.spec_from_file_location(
+        "wiz_app", os.path.join(PROJECT_DIR, 'apps', 'wiz', 'app.py')
+    )
+    _wiz_module = importlib.util.module_from_spec(_wiz_spec)
+    _wiz_spec.loader.exec_module(_wiz_module)
+    app.register_blueprint(_wiz_module.wiz_bp, url_prefix='/wiz')
+    print("✓ Wiz rehearsal planner registered at /wiz")
+except Exception as e:
+    print(f"Warning: Could not load wiz app: {e}")
 
 # ============================================================================
 # STATIC FILE ROUTES

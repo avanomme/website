@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Wizard of Oz – Auditions / Crosscasting{% endblock %}
+{% block heading %}Auditions / Crosscasting Helper{% endblock %}
+
+{% block content %}
+  <div class="card">
+    <form method="POST" action="{{ url_for('.auditions_page') }}">
+      <div class="flex">
+        <div class="col">
+          <h3>Role to Test</h3>
+          <select name="role">
+            <option value="">-- choose a character --</option>
+            {% for c in all_characters %}
+              <option value="{{ c }}" {% if c == selected_role %}selected{% endif %}>{{ c }}</option>
+            {% endfor %}
+          </select>
+          <p class="small">
+            e.g. Crows, Trees, Winkie Captain, Beauticians, Manicurists, etc.
+          </p>
+        </div>
+        <div class="col">
+          <h3>Harmony Focus (optional)</h3>
+          <select name="harmony">
+            <option value="any" {% if selected_harmony == 'any' %}selected{% endif %}>Any</option>
+            <option value="high" {% if selected_harmony == 'high' %}selected{% endif %}>High</option>
+            <option value="middle" {% if selected_harmony == 'middle' %}selected{% endif %}>Middle</option>
+            <option value="low" {% if selected_harmony == 'low' %}selected{% endif %}>Low</option>
+            <option value="unison" {% if selected_harmony == 'unison' %}selected{% endif %}>Unison</option>
+            <option value="mixed" {% if selected_harmony == 'mixed' %}selected{% endif %}>Mixed</option>
+          </select>
+          <p class="small">
+            This also pulls in similar sections for crosscasting (e.g. other high harmony lines).
+          </p>
+        </div>
+        <div class="col">
+          <h3>Go</h3>
+          <p class="small">
+            Use this to pick audition cuts for each small part and to sanity-check who can
+            cover which harmony role.
+          </p>
+          <button type="submit">Show Sections</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  {% if selected_role %}
+    <div class="card">
+      <h2>Sections for Role: {{ selected_role }}</h2>
+      {% if role_sections %}
+        <table>
+          <tr>
+            <th>Song</th><th>Section</th><th>Characters</th><th>Vocal</th><th>Harmony</th><th>Priority</th>
+          </tr>
+          {% for sec in role_sections %}
+            <tr>
+              <td>{{ sec.song }}</td>
+              <td>{{ sec.section }}</td>
+              <td>
+                <span class="pill-group">
+                  {% for c in sec.characters %}
+                    <span class="pill">{{ c }}</span>
+                  {% endfor %}
+                </span>
+              </td>
+              <td>{{ sec.vocal_type }}</td>
+              <td>{{ sec.harmony_role }}</td>
+              <td>{{ sec.audition_priority }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <p class="small">No sections found using this character. (Check spelling or character list.)</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Similar Sections by Harmony ({{ selected_harmony }})</h2>
+      {% if similar_sections %}
+        <p class="small">
+          These aren't necessarily for {{ selected_role }}, but they share the same harmony profile.
+          Great for testing if someone cast as {{ selected_role }} can also cover similar parts.
+        </p>
+        <table>
+          <tr>
+            <th>Song</th><th>Section</th><th>Characters</th><th>Vocal</th><th>Harmony</th><th>Priority</th>
+          </tr>
+          {% for sec in similar_sections %}
+            <tr>
+              <td>{{ sec.song }}</td>
+              <td>{{ sec.section }}</td>
+              <td>
+                <span class="pill-group">
+                  {% for c in sec.characters %}
+                    <span class="pill">{{ c }}</span>
+                  {% endfor %}
+                </span>
+              </td>
+              <td>{{ sec.vocal_type }}</td>
+              <td>{{ sec.harmony_role }}</td>
+              <td>{{ sec.audition_priority }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <p class="small">No similar sections found for this harmony filter.</p>
+      {% endif %}
+    </div>
+
+    <div class="card">
+      <h2>Current Actors & Voice Types</h2>
+      {% if actors %}
+        <table>
+          <tr>
+            <th>Actor</th><th>Voice Type</th><th>Notes</th><th>Characters Cast As</th>
+          </tr>
+          {% for name, meta in actors.items() %}
+            <tr>
+              <td>{{ name }}</td>
+              <td>{{ meta.get('voice_type', '') }}</td>
+              <td>{{ meta.get('notes', '') }}</td>
+              <td>
+                <span class="pill-group">
+                  {% for ch, an in cast_chars.items() %}
+                    {% if an == name %}
+                      <span class="pill">{{ ch }}</span>
+                    {% endif %}
+                  {% endfor %}
+                </span>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      {% else %}
+        <p class="small">No actors defined yet. Set them on the Cast List page first.</p>
+      {% endif %}
+    </div>
+  {% endif %}
+{% endblock %}

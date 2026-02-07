@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% block title %}Wizard of Oz – Cross-Casting Guide{% endblock %}
+{% block heading %}Cross-Casting Guide{% endblock %}
+
+{% block content %}
+  <style>
+    .xc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    .xc-role { padding: 1.25rem 1.5rem; }
+    .xc-role h3 { margin: 0 0 0.15rem; font-size: 1.1rem; color: var(--text-normal); }
+    .xc-role .xc-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .xc-role .xc-meta span { margin-right: 1rem; }
+    .xc-list { list-style: none; padding: 0; margin: 0.25rem 0 0; }
+    .xc-list li { font-size: 0.85rem; padding: 0.2rem 0; color: var(--text-normal); }
+    .xc-good { color: var(--green); }
+    .xc-bad { color: var(--red); }
+    .xc-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.6rem; margin-bottom: 0.15rem; }
+    .xc-label.xc-good { color: var(--green); }
+    .xc-label.xc-bad { color: var(--red); }
+
+    .preset-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .preset-table th { text-align: left; padding: 0.5rem 0.6rem; }
+    .preset-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid rgba(255,255,255,0.06); }
+    .preset-table .arrow { color: var(--text-faint); }
+
+    .tab-bar { display: flex; gap: 0.4rem; margin-bottom: 1rem; flex-wrap: wrap; }
+    .tab-bar button {
+      background: rgba(160, 140, 255, 0.1);
+      color: var(--text-muted);
+      border: 1px solid rgba(159, 122, 234, 0.2);
+      font-size: 0.8rem;
+      padding: 0.35rem 0.85rem;
+      font-weight: 600;
+    }
+    .tab-bar button:hover { background: rgba(160, 140, 255, 0.2); transform: none; }
+    .tab-bar button.active-tab {
+      background: rgba(159, 122, 234, 0.25);
+      border-color: rgba(159, 122, 234, 0.5);
+      color: var(--text-normal);
+    }
+    .preset-panel { display: none; }
+    .preset-panel.visible { display: block; }
+  </style>
+
+  {# --- LEAD WARNING --- #}
+  <div class="card">
+    <h2>Lead Quartet — Do Not Cross-Cast</h2>
+    <p style="font-size:0.9rem; color:var(--text-muted);">
+      <strong style="color:var(--text-normal);">Dorothy, Scarecrow, Tinman, Lion</strong> appear too frequently
+      and must stay focused. Do not double them into any ensemble roles.
+    </p>
+    <p class="xc-label xc-bad">Avoid doubling leads as:</p>
+    <div class="pill-group" style="margin-top:0.3rem;">
+      {% for r in ["Trees","Crows","Winkies","Beauticians","Manicurists","Munchkins","Guard","Jitterbug Chorus"] %}
+        <span class="pill" style="border-color:rgba(252,129,129,0.3); color:var(--red);">{{ r }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# --- ROLE CARDS --- #}
+  <div class="card">
+    <h2>Minor Roles — Cross-Cast Chart</h2>
+    <p class="small">Each card shows where a role can be safely doubled and which combos to avoid.</p>
+  </div>
+
+  <div class="xc-grid">
+
+    {# Crows #}
+    <div class="card xc-role">
+      <h3>Crows <span class="small">(3 voices)</span></h3>
+      <div class="xc-meta">
+        <span>Range: High trio (S/A)</span>
+        <span>Load: Light</span>
+        <span>Changes: Easy</span>
+      </div>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Trees, Jitterbug Chorus, Beauticians / Manicurists</li>
+        <li>Ozians, Poppies (Girls), Munchkins (if needed)</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Winkies (opposite vocal colour)</li>
+        <li>Winkie Captain, Emerald City Guard</li>
+      </ul>
+    </div>
+
+    {# Trees #}
+    <div class="card xc-role">
+      <h3>Trees <span class="small">(3 voices)</span></h3>
+      <div class="xc-meta">
+        <span>Range: Middle trio</span>
+        <span>Load: Light</span>
+        <span>Changes: Easy</span>
+      </div>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Crows, Jitterbug Chorus, Polishers / Manicurists</li>
+        <li>Ozians, Poppies (Girls or Boys)</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Munchkin specialty roles (Tots / Tough Kids)</li>
+      </ul>
+    </div>
+
+    {# Munchkin Roles #}
+    <div class="card xc-role">
+      <h3>Munchkin Trio Roles <span class="small">(multiple)</span></h3>
+      <div class="xc-meta">
+        <span>Range: Mixed</span>
+        <span>Load: Single sequence</span>
+        <span>Changes: Very easy</span>
+      </div>
+      <p class="small" style="margin:0 0 0.4rem;">
+        Includes: Three Tots, Three Tough Kids, Braggart, Mayor, Coroner, Barrister, City Fathers
+      </p>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Beauticians, Manicurists, Ozians, Jitterbugs</li>
+        <li>Poppies, Polishers, Trees, Crows</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Winkies (conflicts in Act II)</li>
+        <li>Guard (timing clash)</li>
+      </ul>
+    </div>
+
+    {# Beauticians / Manicurists / Polishers #}
+    <div class="card xc-role">
+      <h3>Beauticians / Manicurists / Polishers</h3>
+      <div class="xc-meta">
+        <span>Beauticians: High</span>
+        <span>Manicurists: Mid-high</span>
+        <span>Polishers: Mid-low</span>
+      </div>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Crows, Trees, Jitterbug Chorus</li>
+        <li>Ozians, Poppies, Munchkins</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Winkie Captain, Emerald City Guard</li>
+        <li>Any lead understudy</li>
+      </ul>
+    </div>
+
+    {# Emerald City Guard #}
+    <div class="card xc-role">
+      <h3>Emerald City Guard</h3>
+      <div class="xc-meta">
+        <span>Range: Mid baritone / alto</span>
+        <span>Presence: Comedic featured</span>
+      </div>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Winkie Captain (if strong belt)</li>
+        <li>Ozians, Polishers</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Crows, Trees</li>
+        <li>Munchkin Trio roles (muddies comic clarity)</li>
+      </ul>
+    </div>
+
+    {# Winkie Captain #}
+    <div class="card xc-role">
+      <h3>Winkie Captain</h3>
+      <div class="xc-meta">
+        <span>Range: Strong soprano / belt</span>
+        <span>Presence: Featured vocal, Act II</span>
+      </div>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Emerald City Guard, Ozians</li>
+        <li>Poppies, Jitterbug Chorus</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Trees, Crows, Munchkinland roles</li>
+        <li>(tonal shift: bright Munchkins vs dark Winkies)</li>
+      </ul>
+    </div>
+
+    {# Jitterbug Chorus #}
+    <div class="card xc-role">
+      <h3>Jitterbug Chorus <span class="small">(3-part)</span></h3>
+      <div class="xc-meta">
+        <span>Range: SAT/SSA flexible</span>
+        <span>Energy: High, dance-heavy</span>
+      </div>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Crows, Trees, Ozians</li>
+        <li>Beauticians, Manicurists</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Guard (timing), Fiddler</li>
+        <li>Featured Munchkin roles</li>
+      </ul>
+    </div>
+
+    {# Fiddler #}
+    <div class="card xc-role">
+      <h3>Fiddler</h3>
+      <div class="xc-meta">
+        <span>Range: Mid-high solo (C4–C5)</span>
+        <span>Load: Two tiny features</span>
+      </div>
+      <div class="xc-label xc-good">Ideal doubles</div>
+      <ul class="xc-list">
+        <li>Munchkinland roles</li>
+        <li>Beauticians / Manicurists / Polishers, Ozians</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Crows (range mismatch), Winkies</li>
+      </ul>
+    </div>
+
+  </div>
+
+  {# --- PRESET PACKAGES --- #}
+  <div class="card">
+    <h2>Preset Cross-Casting Packages</h2>
+    <p class="small">Drop-in casting maps based on your cast's strengths. Click a version to view.</p>
+
+    <div class="tab-bar">
+      <button class="active-tab" onclick="showPreset('a', this)">A: Balanced (12-person)</button>
+      <button onclick="showPreset('b', this)">B: Vocal-Heavy</button>
+      <button onclick="showPreset('c', this)">C: Dance-Heavy</button>
+      <button onclick="showPreset('d', this)">D: Minimal (10–12)</button>
+    </div>
+
+    {# Version A #}
+    <div id="preset-a" class="preset-panel visible">
+      <p class="small" style="margin-bottom:0.75rem;">Best for a balanced 12-person group.</p>
+      <table class="preset-table">
+        <tr><th>Performer Track</th><th>Roles (in show order)</th></tr>
+        <tr><td>Track 1</td><td>Tree 1 <span class="arrow">&rarr;</span> Crow 1 <span class="arrow">&rarr;</span> Jitterbug <span class="arrow">&rarr;</span> Beautician <span class="arrow">&rarr;</span> Ozian</td></tr>
+        <tr><td>Track 2</td><td>Tree 2 <span class="arrow">&rarr;</span> Crow 2 <span class="arrow">&rarr;</span> Jitterbug <span class="arrow">&rarr;</span> Polisher <span class="arrow">&rarr;</span> Ozian</td></tr>
+        <tr><td>Track 3</td><td>Tree 3 <span class="arrow">&rarr;</span> Crow 3 <span class="arrow">&rarr;</span> Jitterbug <span class="arrow">&rarr;</span> Manicurist <span class="arrow">&rarr;</span> Ozian</td></tr>
+        <tr><td>Track 4</td><td>Munchkin Mayor <span class="arrow">&rarr;</span> Ozian <span class="arrow">&rarr;</span> Jitterbug</td></tr>
+        <tr><td>Track 5</td><td>Munchkin Coroner <span class="arrow">&rarr;</span> Polisher <span class="arrow">&rarr;</span> Winkie</td></tr>
+        <tr><td>Track 6</td><td>Munchkin Braggart <span class="arrow">&rarr;</span> Jitterbug <span class="arrow">&rarr;</span> Ozian</td></tr>
+        <tr><td>Track 7</td><td>Three Tots <span class="arrow">&rarr;</span> Beauticians / Jitterbug</td></tr>
+        <tr><td>Track 8</td><td>Three Tough Kids <span class="arrow">&rarr;</span> Manicurists / Jitterbug</td></tr>
+        <tr><td>Track 9</td><td>Emerald City Guard <span class="arrow">&rarr;</span> Winkie Captain <span class="arrow">&rarr;</span> Ozian</td></tr>
+        <tr><td>Remaining</td><td>Ozians / Winkies as needed</td></tr>
+      </table>
+    </div>
+
+    {# Version B #}
+    <div id="preset-b" class="preset-panel">
+      <p class="small" style="margin-bottom:0.75rem;">If you have strong singers — place by voice type.</p>
+      <table class="preset-table">
+        <tr><th>Voice Type</th><th>Place Into</th></tr>
+        <tr><td>High Sopranos</td><td>Beauticians, Lullaby League, Crow 1, Poppies</td></tr>
+        <tr><td>Altos / Mezzos</td><td>Trees, Manicurists, Tots, Jitterbug mid</td></tr>
+        <tr><td>Tenor / Baritone</td><td>Guard, Winkies, Polishers</td></tr>
+        <tr><td>Non-singers</td><td>Ozians only</td></tr>
+      </table>
+    </div>
+
+    {# Version C #}
+    <div id="preset-c" class="preset-panel">
+      <p class="small" style="margin-bottom:0.75rem;">Strong movers who don't hold harmony well.</p>
+      <table class="preset-table">
+        <tr><th>Strength</th><th>Place Into</th></tr>
+        <tr><td>Movers / Dancers</td><td>Jitterbug Chorus, Ozians, Beauticians, Trees</td></tr>
+        <tr><td>Harmony Holders</td><td>Crows, Tots / Tough Kids, Manicurists, Winkie Captain</td></tr>
+      </table>
+    </div>
+
+    {# Version D #}
+    <div id="preset-d" class="preset-panel">
+      <p class="small" style="margin-bottom:0.75rem;">Minimum viable cast (10–12 performers).</p>
+      <table class="preset-table">
+        <tr><th>Count</th><th>Roles</th></tr>
+        <tr><td>4 leads</td><td>Dorothy, Scarecrow, Tinman, Lion</td></tr>
+        <tr><td>1 featured</td><td>Guard / Winkie Captain (same performer)</td></tr>
+        <tr><td>3 ensemble A</td><td>Crows / Trees / Jitterbugs (tripled)</td></tr>
+        <tr><td>3 ensemble B</td><td>Munchkins / Beauticians / Ozians (tripled)</td></tr>
+      </table>
+      <p class="small" style="margin-top:0.5rem;">This covers the entire show cleanly with 11 performers + Glinda.</p>
+    </div>
+  </div>
+
+  {# --- AUDITION TASKS BY ROLE --- #}
+  <div class="card">
+    <h2>Audition Tasks by Role</h2>
+    <p class="small">What to have each group sing at auditions.</p>
+    <table>
+      <tr><th>Auditioning For</th><th>Have Them Sing</th></tr>
+      <tr>
+        <td>Crows / Trees <span class="small">(high harmonies)</span></td>
+        <td>Poppies Round – high line; Merry Old Land – Beautician line</td>
+      </tr>
+      <tr>
+        <td>Winkie Captain / Guard</td>
+        <td>Merry Old Land – Guard section; Poppies – Boys harmony (if needed)</td>
+      </tr>
+      <tr>
+        <td>Munchkin Trio roles</td>
+        <td>Mayor line (spoken + pitch); Three Tots harmony</td>
+      </tr>
+      <tr>
+        <td>Jitterbug Chorus</td>
+        <td>Jitterbug bars 219+; Rhythm repeat patterns</td>
+      </tr>
+    </table>
+  </div>
+
+  {# --- CURRENT CAST --- #}
+  {% if actors %}
+  <div class="card">
+    <h2>Current Cast for Reference</h2>
+    <table>
+      <tr><th>Actor</th><th>Voice Type</th><th>Notes</th><th>Cast As</th></tr>
+      {% for name, meta in actors.items() %}
+        <tr>
+          <td>{{ name }}</td>
+          <td>{{ meta.get('voice_type', '') }}</td>
+          <td>{{ meta.get('notes', '') }}</td>
+          <td>
+            <span class="pill-group">
+              {% for ch, an in cast_chars.items() %}
+                {% if an == name %}
+                  <span class="pill pill-char">{{ ch }}</span>
+                {% endif %}
+              {% endfor %}
+            </span>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+
+  <script>
+    function showPreset(id, btn) {
+      document.querySelectorAll('.preset-panel').forEach(p => p.classList.remove('visible'));
+      document.querySelectorAll('.tab-bar button').forEach(b => b.classList.remove('active-tab'));
+      document.getElementById('preset-' + id).classList.add('visible');
+      btn.classList.add('active-tab');
+    }
+  </script>
+{% endblock %}
