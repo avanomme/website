@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "wiz/base.html" %}
 {% block title %}Wizard of Oz Rehearsal Planner{% endblock %}
 {% block heading %}Wizard of Oz – Rehearsal Planner{% endblock %}
 
@@ -268,46 +268,44 @@
     {% endif %}
   {% endif %}
 
-  {# --- SCHEDULE BUILDER --- #}
+  {# --- ADD TO SCHEDULE --- #}
   <div class="card">
-    <h2>Quick Schedule Builder (copy & paste)</h2>
-    <form method="POST" action="{{ url_for('.build_schedule') }}">
-      <p class="small">
-        I'll output <code>time | Characters | Song/Section</code> that you can paste into your rehearsal doc.
-      </p>
-      <div>
-        <label>Time block:</label><br>
-        <input type="text" name="time_block" placeholder="10:00-10:20">
+    <h2>Add to Schedule</h2>
+    <form method="POST" action="{{ url_for('.add_schedule_item') }}">
+      <div class="flex">
+        <div class="col">
+          <div style="margin-bottom:0.5rem;">
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Date</label>
+            <input type="date" name="date" style="background:rgba(19,16,32,0.65); color:var(--text-normal); border:1px solid rgba(159,122,234,0.3); border-radius:10px; padding:0.4rem 0.7rem; font-size:0.9rem; font-family:inherit;">
+          </div>
+          <div>
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Time block</label>
+            <input type="text" name="time_block" placeholder="10:00-10:20" style="max-width:180px;">
+          </div>
+        </div>
+        <div class="col">
+          <div style="margin-bottom:0.5rem;">
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Characters</label>
+            <input type="text" name="chars" placeholder="Dorothy, Scarecrow">
+          </div>
+          <div style="margin-bottom:0.5rem;">
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Section</label>
+            <select name="section_id">
+              <option value="">-- free text (use field below) --</option>
+              {% for sec in all_sections %}
+                <option value="{{ sec.id }}">{{ sec.song }} – {{ sec.section }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Or custom text</label>
+            <input type="text" name="custom_label" placeholder="If I Only Had a Brain – verse 1">
+          </div>
+        </div>
       </div>
-      <div>
-        <label>Characters:</label><br>
-        <input type="text" name="chars" placeholder="Dorothy, Scarecrow">
+      <div style="margin-top:1rem;">
+        <button type="submit">Add to Schedule</button>
       </div>
-      <div>
-        <label>Section (choose known or free text):</label><br>
-        <select name="section_id">
-          <option value="">-- free text (use field below) --</option>
-          {% for sec in all_sections %}
-            <option value="{{ sec.id }}">{{ sec.song }} – {{ sec.section }} ({{ sec.id }})</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div>
-        <label>Or custom song/section text:</label><br>
-        <input type="text" name="custom_label" placeholder="If I Only Had a Brain – verse 1">
-      </div>
-      <br>
-      <button type="submit" class="secondary">Add line</button>
     </form>
-
-    {% if schedule_lines %}
-      <h3>Schedule (copy below):</h3>
-      <div>
-        <div class="schedule-line"><b>time | Characters | Song/Section</b></div>
-        {% for line in schedule_lines %}
-          <div class="schedule-line">{{ line }}</div>
-        {% endfor %}
-      </div>
-    {% endif %}
   </div>
 {% endblock %}

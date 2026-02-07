@@ -1,0 +1,203 @@
+{% extends "descendants/base.html" %}
+{% block title %}Schedule – Descendants{% endblock %}
+{% block heading %}Descendants – Schedule{% endblock %}
+
+{% block content %}
+  <style>
+    .edit-form { display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle); }
+    .edit-form.visible { display: block; }
+    .date-past h2 { color: var(--red); opacity: 0.7; }
+    input[type="date"] {
+      background: rgba(19,16,32,0.65); color: var(--text-normal);
+      border: 1px solid rgba(124,108,240,0.3); border-radius: 10px;
+      padding: 0.4rem 0.7rem; font-size: 0.9rem; font-family: inherit;
+    }
+  </style>
+
+  <!-- Add to Schedule -->
+  <div class="card">
+    <h2>Add to Schedule</h2>
+    <form method="POST" action="{{ url_for('.add_schedule_item') }}">
+      <div class="flex">
+        <div class="col">
+          <div style="margin-bottom:0.5rem;">
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Date</label>
+            <input type="date" name="date" value="{{ today }}">
+          </div>
+          <div>
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Time block</label>
+            <input type="text" name="time_block" placeholder="10:00-10:20" style="max-width:180px;">
+          </div>
+        </div>
+        <div class="col">
+          <div style="margin-bottom:0.5rem;">
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Characters</label>
+            <input type="text" name="chars" placeholder="Mal, Evie">
+          </div>
+          <div style="margin-bottom:0.5rem;">
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Section</label>
+            <select name="section_id">
+              <option value="">-- free text (use field below) --</option>
+              {% for sec in all_sections %}
+                <option value="{{ sec.id }}">{{ sec.song }} – {{ sec.section }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <label class="small" style="display:block; margin-bottom:0.25rem;">Or custom text</label>
+            <input type="text" name="custom_label" placeholder="Rotten to the Core – VK intros">
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;">
+        <button type="submit">Add to Schedule</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Upcoming Dates -->
+  {% if upcoming %}
+    {% for dg in upcoming %}
+      <div class="card">
+        <h2>{{ dg.date_display }}</h2>
+        <table>
+          <tr><th>Time</th><th>Characters</th><th>Song / Section</th><th></th></tr>
+          {% for item in dg.items %}
+            <tr>
+              <td>{{ item.time }}</td>
+              <td>{{ item.characters }}</td>
+              <td>{{ item.section_label }}</td>
+              <td><button type="button" class="secondary" onclick="toggleEdit('edit-{{ item.id }}')">Edit</button></td>
+            </tr>
+            <tr id="edit-{{ item.id }}" class="edit-form">
+              <td colspan="4">
+                <form method="POST" action="{{ url_for('.edit_schedule_item') }}">
+                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                  <div class="flex" style="gap:0.75rem;">
+                    <div>
+                      <label class="small">Date</label>
+                      <input type="date" name="date" value="{{ item.date }}">
+                    </div>
+                    <div>
+                      <label class="small">Time</label>
+                      <input type="text" name="time_block" value="{{ item.time }}" style="max-width:160px;">
+                    </div>
+                    <div>
+                      <label class="small">Characters</label>
+                      <input type="text" name="chars" value="{{ item.characters }}">
+                    </div>
+                  </div>
+                  <div style="margin-top:0.5rem;">
+                    <label class="small">Section</label>
+                    <select name="section_id">
+                      <option value="">-- free text --</option>
+                      {% for sec in all_sections %}
+                        <option value="{{ sec.id }}" {% if sec.id == item.section_id %}selected{% endif %}>{{ sec.song }} – {{ sec.section }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div style="margin-top:0.5rem;">
+                    <label class="small">Or custom text</label>
+                    <input type="text" name="custom_label" value="{% if not item.section_id %}{{ item.section_label }}{% endif %}">
+                  </div>
+                  <div style="margin-top:0.75rem; display:flex; gap:0.5rem; align-items:center;">
+                    <button type="submit">Save</button>
+                    <button type="button" class="secondary" onclick="toggleEdit('edit-{{ item.id }}')">Cancel</button>
+                    <button type="button" class="secondary" style="margin-left:auto; color:var(--red); border:1px solid rgba(252,129,129,0.3);" onclick="confirmDelete('{{ item.id }}')">Delete</button>
+                  </div>
+                </form>
+                <form id="delete-{{ item.id }}" method="POST" action="{{ url_for('.delete_schedule_item') }}" style="display:none;">
+                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if not upcoming and not past %}
+    <div class="card" style="text-align:center; color:var(--text-muted);">
+      No upcoming schedule items. Add one above!
+    </div>
+  {% elif not upcoming %}
+    <div class="card" style="text-align:center; color:var(--text-muted);">
+      No upcoming schedule items. Add one above!
+    </div>
+  {% endif %}
+
+  <!-- Past Dates -->
+  {% if past %}
+    <h2 style="color:var(--text-muted); font-size:1.1rem; margin:0.5rem 0 0; opacity:0.7;">Past Rehearsals</h2>
+    {% for dg in past %}
+      <div class="card date-past">
+        <h2>{{ dg.date_display }}</h2>
+        <table>
+          <tr><th>Time</th><th>Characters</th><th>Song / Section</th><th></th></tr>
+          {% for item in dg.items %}
+            <tr>
+              <td>{{ item.time }}</td>
+              <td>{{ item.characters }}</td>
+              <td>{{ item.section_label }}</td>
+              <td><button type="button" class="secondary" onclick="toggleEdit('edit-{{ item.id }}')">Edit</button></td>
+            </tr>
+            <tr id="edit-{{ item.id }}" class="edit-form">
+              <td colspan="4">
+                <form method="POST" action="{{ url_for('.edit_schedule_item') }}">
+                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                  <div class="flex" style="gap:0.75rem;">
+                    <div>
+                      <label class="small">Date</label>
+                      <input type="date" name="date" value="{{ item.date }}">
+                    </div>
+                    <div>
+                      <label class="small">Time</label>
+                      <input type="text" name="time_block" value="{{ item.time }}" style="max-width:160px;">
+                    </div>
+                    <div>
+                      <label class="small">Characters</label>
+                      <input type="text" name="chars" value="{{ item.characters }}">
+                    </div>
+                  </div>
+                  <div style="margin-top:0.5rem;">
+                    <label class="small">Section</label>
+                    <select name="section_id">
+                      <option value="">-- free text --</option>
+                      {% for sec in all_sections %}
+                        <option value="{{ sec.id }}" {% if sec.id == item.section_id %}selected{% endif %}>{{ sec.song }} – {{ sec.section }}</option>
+                      {% endfor %}
+                    </select>
+                  </div>
+                  <div style="margin-top:0.5rem;">
+                    <label class="small">Or custom text</label>
+                    <input type="text" name="custom_label" value="{% if not item.section_id %}{{ item.section_label }}{% endif %}">
+                  </div>
+                  <div style="margin-top:0.75rem; display:flex; gap:0.5rem; align-items:center;">
+                    <button type="submit">Save</button>
+                    <button type="button" class="secondary" onclick="toggleEdit('edit-{{ item.id }}')">Cancel</button>
+                    <button type="button" class="secondary" style="margin-left:auto; color:var(--red); border:1px solid rgba(252,129,129,0.3);" onclick="confirmDelete('{{ item.id }}')">Delete</button>
+                  </div>
+                </form>
+                <form id="delete-{{ item.id }}" method="POST" action="{{ url_for('.delete_schedule_item') }}" style="display:none;">
+                  <input type="hidden" name="item_id" value="{{ item.id }}">
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <script>
+    function toggleEdit(id) {
+      document.getElementById(id).classList.toggle('visible');
+    }
+    function confirmDelete(id) {
+      if (confirm('Delete this schedule item? This cannot be undone.')) {
+        document.getElementById('delete-' + id).submit();
+      }
+    }
+  </script>
+{% endblock %}

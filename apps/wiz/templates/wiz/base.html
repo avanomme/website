@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% block title %}Freaky Friday Rehearsal Planner{% endblock %}</title>
+  <title>{% block title %}Wizard of Oz Rehearsal Planner{% endblock %}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -59,7 +59,7 @@
       font-size: clamp(1.75rem, 2.5vw, 2.6rem);
       margin: 0;
       letter-spacing: 0.05em;
-      background: linear-gradient(135deg, var(--pink), var(--purple));
+      background: linear-gradient(135deg, var(--purple), var(--pink));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
@@ -182,7 +182,7 @@
       font-weight: 600;
       cursor: pointer;
       color: #0f0d16;
-      background: linear-gradient(135deg, var(--pink), var(--purple));
+      background: linear-gradient(135deg, var(--purple), var(--pink));
       box-shadow: 0 6px 15px -10px rgba(0, 0, 0, 0.8);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
       font-family: inherit;
@@ -411,7 +411,7 @@
   <div class="app-shell">
     <div class="app-header">
       <div>
-        <h1>{% block heading %}Freaky Friday – Rehearsal Planner{% endblock %}</h1>
+        <h1>{% block heading %}Wizard of Oz – Rehearsal Planner{% endblock %}</h1>
         <p class="subtitle">Character-driven, section-level rehearsal planning</p>
       </div>
     </div>
@@ -420,7 +420,9 @@
       <a href="{{ url_for('.index') }}" {% if active_page == 'planner' %}class="active"{% endif %}>Planner</a>
       <a href="{{ url_for('.songs_page') }}" {% if active_page == 'songs' %}class="active"{% endif %}>Songs</a>
       <a href="{{ url_for('.cast_page') }}" {% if active_page == 'cast' %}class="active"{% endif %}>Cast</a>
+      <a href="{{ url_for('.auditions_page') }}" {% if active_page == 'auditions' %}class="active"{% endif %}>Auditions</a>
       <a href="{{ url_for('.crosscast_page') }}" {% if active_page == 'crosscast' %}class="active"{% endif %}>Cross-Casting</a>
+      <a href="{{ url_for('.schedule_page') }}" {% if active_page == 'schedule' %}class="active"{% endif %}>Schedule</a>
       <a href="{{ url_for('.rehearsal_log_page') }}" {% if active_page == 'log' %}class="active"{% endif %}>Rehearsal Log</a>
     </div>
 

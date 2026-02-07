@@ -14,7 +14,7 @@ Also importable as a Flask Blueprint for integration into a parent app.
 from flask import Blueprint, Flask, render_template, request, redirect, url_for
 
 from sections import SECTIONS, ALL_CHARACTERS, CHARACTER_GROUPS
-from state import load_state, save_state, load_cast, save_cast, load_notes, save_notes, load_rehearsal_log, save_rehearsal_log
+from state import load_state, save_state, load_cast, save_cast, load_notes, save_notes, load_rehearsal_log, save_rehearsal_log, load_schedule, save_schedule
 from logic import (
     sections_with_available,
     sections_safe_without,
@@ -45,7 +45,6 @@ def index():
     mode = None
     selected = []
     results = None
-    schedule_lines = []
 
     if request.method == "POST":
         mode = request.form.get("mode", "available")
@@ -59,7 +58,7 @@ def index():
             results = {"safe": safe, "blocked": blocked}
 
     return render_template(
-        "planner.html",
+        "wiz/planner.html",
         active_page="planner",
         all_characters=ALL_CHARACTERS,
         character_groups=CHARACTER_GROUPS,
@@ -70,7 +69,6 @@ def index():
         notes=notes,
         cast_chars=cast_chars,
         all_sections=SECTIONS,
-        schedule_lines=schedule_lines,
     )
 
 
@@ -98,10 +96,46 @@ def add_note():
     return redirect(ref)
 
 
-@wiz_bp.route("/schedule", methods=["POST"])
-def build_schedule():
-    time_block = request.form.get("time_block", "").strip()
-    chars = request.form.get("chars", "").strip()
+@wiz_bp.route("/schedule")
+def schedule_page():
+    from datetime import date, datetime
+    from itertools import groupby
+
+    items = load_schedule()
+    items.sort(key=lambda x: (x.get("date", ""), x.get("time", "")))
+
+    today = date.today().isoformat()
+    upcoming = []
+    past = []
+
+    for date_key, group in groupby(items, key=lambda x: x.get("date", "")):
+        entries = list(group)
+        try:
+            d = datetime.strptime(date_key, "%Y-%m-%d")
+            date_display = f"{d.strftime('%A')} {d.strftime('%b')} {d.day} {d.year}"
+        except Exception:
+            date_display = date_key
+
+        date_group = {"date": date_key, "date_display": date_display, "items": entries}
+        if date_key < today:
+            past.append(date_group)
+        else:
+            upcoming.append(date_group)
+
+    return render_template(
+        "wiz/schedule.html",
+        active_page="schedule",
+        upcoming=upcoming,
+        past=past,
+        all_sections=SECTIONS,
+        today=date.today().isoformat(),
+    )
+
+
+@wiz_bp.route("/schedule/add", methods=["POST"])
+def add_schedule_item():
+    from datetime import datetime
+
     section_id = request.form.get("section_id", "").strip()
     custom_label = request.form.get("custom_label", "").strip()
 
@@ -113,27 +147,54 @@ def build_schedule():
     if not label:
         label = "(no section)"
 
-    line = f"{time_block} | {chars} | {label}"
+    item = {
+        "id": str(int(datetime.now().timestamp() * 1000)),
+        "date": request.form.get("date", "").strip(),
+        "time": request.form.get("time_block", "").strip(),
+        "characters": request.form.get("chars", "").strip(),
+        "section_label": label,
+        "section_id": section_id,
+        "created_at": datetime.now().isoformat(timespec="seconds"),
+    }
 
-    state = load_state()
-    cast_data = load_cast()
-    cast_chars = cast_data["cast"]
-    notes = load_notes()
+    items = load_schedule()
+    items.append(item)
+    save_schedule(items)
+    return redirect(url_for(".schedule_page"))
 
-    return render_template(
-        "planner.html",
-        active_page="planner",
-        all_characters=ALL_CHARACTERS,
-        character_groups=CHARACTER_GROUPS,
-        selected_characters=[],
-        mode=None,
-        results=None,
-        state=state,
-        notes=notes,
-        cast_chars=cast_chars,
-        all_sections=SECTIONS,
-        schedule_lines=[line],
-    )
+
+@wiz_bp.route("/schedule/edit", methods=["POST"])
+def edit_schedule_item():
+    item_id = request.form.get("item_id")
+    items = load_schedule()
+    for item in items:
+        if item["id"] == item_id:
+            item["date"] = request.form.get("date", item["date"]).strip()
+            item["time"] = request.form.get("time_block", item["time"]).strip()
+            item["characters"] = request.form.get("chars", item["characters"]).strip()
+
+            section_id = request.form.get("section_id", "").strip()
+            custom_label = request.form.get("custom_label", "").strip()
+            label = custom_label
+            if section_id:
+                sec = next((s for s in SECTIONS if s["id"] == section_id), None)
+                if sec:
+                    label = f"{sec['song']} – {sec['section']}"
+            if label:
+                item["section_label"] = label
+                item["section_id"] = section_id
+            break
+    save_schedule(items)
+    return redirect(url_for(".schedule_page"))
+
+
+@wiz_bp.route("/schedule/delete", methods=["POST"])
+def delete_schedule_item():
+    item_id = request.form.get("item_id")
+    items = load_schedule()
+    items = [i for i in items if i["id"] != item_id]
+    save_schedule(items)
+    return redirect(url_for(".schedule_page"))
 
 
 @wiz_bp.route("/songs")
@@ -142,7 +203,7 @@ def songs_page():
     cast_chars = cast_data["cast"]
     songs = build_song_map()
     return render_template(
-        "songs.html",
+        "wiz/songs.html",
         active_page="songs",
         songs=songs,
         cast_chars=cast_chars,
@@ -194,7 +255,7 @@ def cast_page():
         return redirect(url_for(".cast_page"))
 
     return render_template(
-        "cast.html",
+        "wiz/cast.html",
         active_page="cast",
         all_characters=ALL_CHARACTERS,
         character_groups=CHARACTER_GROUPS,
@@ -223,7 +284,7 @@ def auditions_page():
             similar = similar_sections_by_harmony(selected_harmony, exclude_ids=exclude_ids)
 
     return render_template(
-        "auditions.html",
+        "wiz/auditions.html",
         active_page="auditions",
         all_characters=ALL_CHARACTERS,
         selected_role=selected_role,
@@ -241,7 +302,7 @@ def crosscast_page():
     cast_chars = cast_data["cast"]
     actors = cast_data["actors"]
     return render_template(
-        "crosscast.html",
+        "wiz/crosscast.html",
         active_page="crosscast",
         cast_chars=cast_chars,
         actors=actors,
@@ -288,7 +349,7 @@ def rehearsal_log_page():
             song_names.append(s["song"])
 
     return render_template(
-        "rehearsal_log.html",
+        "wiz/rehearsal_log.html",
         active_page="log",
         entries=entries,
         cast_chars=cast_chars,

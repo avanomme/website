@@ -65,9 +65,6 @@ app = Flask(__name__)
 app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(PROJECT_DIR, 'shared', 'templates')),
     FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'dfa', 'templates')),
-    FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'wiz', 'templates')),
-    FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'freakyfriday', 'templates')),
-    FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'descendants', 'templates')),
 ])
 
 # Register Wizard of Oz rehearsal planner blueprint

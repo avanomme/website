@@ -15,6 +15,7 @@ STATE_FILE = DATA_DIR / "desc_state.json"
 CAST_FILE = DATA_DIR / "cast_state.json"
 NOTES_FILE = DATA_DIR / "desc_notes.json"
 LOG_FILE = DATA_DIR / "rehearsal_log.json"
+SCHEDULE_FILE = DATA_DIR / "schedule.json"
 
 
 def _ensure_data_dir():
@@ -42,6 +43,7 @@ _STATE_KEY = "desc:state"
 _CAST_KEY = "desc:cast"
 _NOTES_KEY = "desc:notes"
 _LOG_KEY = "desc:rehearsal_log"
+_SCHEDULE_KEY = "desc:schedule"
 
 
 def configure_kv(kv_get_fn, kv_set_fn):
@@ -112,6 +114,19 @@ def save_rehearsal_log(entries):
         _kv_set(_LOG_KEY, entries)
     else:
         save_json_file(LOG_FILE, entries)
+
+
+def load_schedule():
+    if _kv_get:
+        return _kv_get(_SCHEDULE_KEY) or []
+    return load_json_file(SCHEDULE_FILE, [])
+
+
+def save_schedule(items):
+    if _kv_set:
+        _kv_set(_SCHEDULE_KEY, items)
+    else:
+        save_json_file(SCHEDULE_FILE, items)
 
 
 def normalize_name(name):
