@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """
-Wizard of Oz Rehearsal Planner – Web UI
+Descendants: The Musical — Rehearsal Planner Web UI
 
 Run locally:
     python app.py
 
 Then open:
-    http://localhost:45100
+    http://localhost:45300
 
 Also importable as a Flask Blueprint for integration into a parent app.
 """
@@ -19,23 +19,23 @@ from logic import (
     sections_with_available,
     sections_safe_without,
     sections_for_role,
-    similar_sections_by_harmony,
     build_song_map,
+    build_vocal_breakdown,
 )
 
 import os as _os
-_WIZ_DIR = _os.path.dirname(_os.path.abspath(__file__))
+_DESC_DIR = _os.path.dirname(_os.path.abspath(__file__))
 
-wiz_bp = Blueprint('wiz', __name__,
-                   template_folder='templates',
-                   root_path=_WIZ_DIR)
+desc_bp = Blueprint('descendants', __name__,
+                    template_folder='templates',
+                    root_path=_DESC_DIR)
 
 
 # -------------------------------------------------------------------------
 # ROUTES
 # -------------------------------------------------------------------------
 
-@wiz_bp.route("/", methods=["GET", "POST"])
+@desc_bp.route("/", methods=["GET", "POST"])
 def index():
     state = load_state()
     cast_data = load_cast()
@@ -74,7 +74,7 @@ def index():
     )
 
 
-@wiz_bp.route("/status", methods=["POST"])
+@desc_bp.route("/status", methods=["POST"])
 def update_status():
     section_id = request.form.get("section_id")
     new_status = request.form.get("status", "todo")
@@ -86,7 +86,7 @@ def update_status():
     return redirect(ref)
 
 
-@wiz_bp.route("/note", methods=["POST"])
+@desc_bp.route("/note", methods=["POST"])
 def add_note():
     section_id = request.form.get("section_id")
     note = (request.form.get("note") or "").strip()
@@ -98,7 +98,7 @@ def add_note():
     return redirect(ref)
 
 
-@wiz_bp.route("/schedule", methods=["POST"])
+@desc_bp.route("/schedule", methods=["POST"])
 def build_schedule():
     time_block = request.form.get("time_block", "").strip()
     chars = request.form.get("chars", "").strip()
@@ -136,7 +136,7 @@ def build_schedule():
     )
 
 
-@wiz_bp.route("/songs")
+@desc_bp.route("/songs")
 def songs_page():
     cast_data = load_cast()
     cast_chars = cast_data["cast"]
@@ -149,18 +149,16 @@ def songs_page():
     )
 
 
-@wiz_bp.route("/cast", methods=["GET", "POST"])
+@desc_bp.route("/cast", methods=["GET", "POST"])
 def cast_page():
     cast_data = load_cast()
     cast_chars = cast_data["cast"]
     actors = cast_data["actors"]
 
     if request.method == "POST":
-        new_cast_chars = {}
+        char_to_actor = {}
         new_actors = {}
 
-        # First pass: get all actor names per character
-        char_to_actor = {}
         for key, value in request.form.items():
             if key.startswith("actor::"):
                 character = key.split("::", 1)[1]
@@ -168,7 +166,6 @@ def cast_page():
                 if actor_name:
                     char_to_actor[character] = actor_name
 
-        # Second pass: build actor metadata
         for key, value in request.form.items():
             if key.startswith("voice::"):
                 character = key.split("::", 1)[1]
@@ -203,52 +200,23 @@ def cast_page():
     )
 
 
-@wiz_bp.route("/auditions", methods=["GET", "POST"])
-def auditions_page():
+@desc_bp.route("/vocals")
+def vocals_page():
     cast_data = load_cast()
     cast_chars = cast_data["cast"]
     actors = cast_data["actors"]
-
-    selected_role = ""
-    selected_harmony = "any"
-    role_sections = []
-    similar = []
-
-    if request.method == "POST":
-        selected_role = (request.form.get("role") or "").strip()
-        selected_harmony = (request.form.get("harmony") or "any").strip()
-        if selected_role:
-            role_sections = sections_for_role(selected_role)
-            exclude_ids = {s["id"] for s in role_sections}
-            similar = similar_sections_by_harmony(selected_harmony, exclude_ids=exclude_ids)
-
+    breakdown = build_vocal_breakdown()
     return render_template(
-        "auditions.html",
-        active_page="auditions",
-        all_characters=ALL_CHARACTERS,
-        selected_role=selected_role,
-        selected_harmony=selected_harmony,
-        role_sections=role_sections,
-        similar_sections=similar,
+        "vocal_breakdown.html",
+        active_page="vocals",
+        breakdown=breakdown,
         cast_chars=cast_chars,
         actors=actors,
+        character_groups=CHARACTER_GROUPS,
     )
 
 
-@wiz_bp.route("/crosscast")
-def crosscast_page():
-    cast_data = load_cast()
-    cast_chars = cast_data["cast"]
-    actors = cast_data["actors"]
-    return render_template(
-        "crosscast.html",
-        active_page="crosscast",
-        cast_chars=cast_chars,
-        actors=actors,
-    )
-
-
-@wiz_bp.route("/log", methods=["GET", "POST"])
+@desc_bp.route("/log", methods=["GET", "POST"])
 def rehearsal_log_page():
     from datetime import datetime
 
@@ -271,7 +239,6 @@ def rehearsal_log_page():
     cast_data = load_cast()
     cast_chars = cast_data["cast"]
 
-    # Format date display for each entry
     for entry in entries:
         try:
             d = datetime.strptime(entry["date"], "%Y-%m-%d")
@@ -279,7 +246,6 @@ def rehearsal_log_page():
         except Exception:
             entry["date_display"] = entry.get("date", "")
 
-    # Build unique song names from sections (preserving score order)
     seen = set()
     song_names = []
     for s in SECTIONS:
@@ -298,7 +264,7 @@ def rehearsal_log_page():
     )
 
 
-@wiz_bp.route("/log/edit", methods=["POST"])
+@desc_bp.route("/log/edit", methods=["POST"])
 def edit_log_entry():
     from datetime import datetime
 
@@ -316,7 +282,7 @@ def edit_log_entry():
     return redirect(url_for(".rehearsal_log_page"))
 
 
-@wiz_bp.route("/log/delete", methods=["POST"])
+@desc_bp.route("/log/delete", methods=["POST"])
 def delete_log_entry():
     entry_id = request.form.get("entry_id")
     entries = load_rehearsal_log()
@@ -331,5 +297,5 @@ def delete_log_entry():
 
 if __name__ == "__main__":
     app = Flask(__name__)
-    app.register_blueprint(wiz_bp)
-    app.run(host="0.0.0.0", port=45100, debug=True)
+    app.register_blueprint(desc_bp)
+    app.run(host="0.0.0.0", port=45300, debug=True)

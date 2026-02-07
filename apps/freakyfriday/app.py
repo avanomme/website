@@ -280,6 +280,15 @@ def edit_log_entry():
     return redirect(url_for(".rehearsal_log_page"))
 
 
+@ff_bp.route("/log/delete", methods=["POST"])
+def delete_log_entry():
+    entry_id = request.form.get("entry_id")
+    entries = load_rehearsal_log()
+    entries = [e for e in entries if e["id"] != entry_id]
+    save_rehearsal_log(entries)
+    return redirect(url_for(".rehearsal_log_page"))
+
+
 # -------------------------------------------------------------------------
 # MAIN ENTRY (standalone mode)
 # -------------------------------------------------------------------------

@@ -150,10 +150,14 @@
         <h3>Notes</h3>
         <textarea name="notes" rows="3" style="max-width:100%; width:100%;">{{ entry.notes }}</textarea>
 
-        <div style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+        <div style="margin-top:0.75rem; display:flex; gap:0.5rem; align-items:center;">
           <button type="submit">Save Changes</button>
           <button type="button" class="secondary" onclick="toggleEdit('edit-{{ entry.id }}')">Cancel</button>
+          <button type="button" class="secondary" style="margin-left:auto; color:var(--red); border:1px solid rgba(252,129,129,0.3);" onclick="confirmDelete('{{ entry.id }}')">Delete Entry</button>
         </div>
+      </form>
+      <form id="delete-{{ entry.id }}" method="POST" action="{{ url_for('.delete_log_entry') }}" style="display:none;">
+        <input type="hidden" name="entry_id" value="{{ entry.id }}">
       </form>
     </div>
   </div>
@@ -168,6 +172,11 @@
   <script>
     function toggleEdit(id) {
       document.getElementById(id).classList.toggle('visible');
+    }
+    function confirmDelete(id) {
+      if (confirm('Delete this rehearsal log entry? This cannot be undone.')) {
+        document.getElementById('delete-' + id).submit();
+      }
     }
   </script>
 {% endblock %}

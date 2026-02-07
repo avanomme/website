@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Descendants – Character Vocal Breakdown{% endblock %}
+{% block heading %}Character Vocal Breakdown{% endblock %}
+
+{% block content %}
+  <style>
+    .vb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    .vb-card { padding: 1.25rem 1.5rem; }
+    .vb-card h3 { margin: 0 0 0.15rem; font-size: 1.1rem; color: var(--text-normal); }
+    .vb-card .vb-actor { font-size: 0.85rem; color: var(--accent); margin-bottom: 0.5rem; }
+    .vb-card .vb-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+    .vb-card .vb-meta span { margin-right: 1rem; }
+    .vb-songs { list-style: none; padding: 0; margin: 0.25rem 0 0; }
+    .vb-songs li { font-size: 0.82rem; padding: 0.15rem 0; color: var(--text-muted); }
+    .vb-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.6rem; margin-bottom: 0.15rem; color: var(--purple); }
+    .vb-stars { color: var(--yellow); letter-spacing: 0.1em; }
+  </style>
+
+  <div class="card">
+    <p class="small">
+      Each character's vocal demands across the show — types, harmony roles, difficulty, and which songs they appear in.
+      Sorted by rehearsal priority (highest first).
+    </p>
+  </div>
+
+  <div class="vb-grid">
+    {% for char in breakdown %}
+    <div class="card vb-card">
+      <h3>{{ char.name }}</h3>
+      {% if cast_chars.get(char.name) %}
+        <div class="vb-actor">{{ cast_chars.get(char.name) }}</div>
+      {% endif %}
+
+      <div class="vb-meta">
+        <span>Sections: <strong>{{ char.section_count }}</strong></span>
+        <span>Priority: <strong>{{ char.max_priority }}</strong></span>
+        <span class="vb-stars">
+          {% for i in range(char.max_difficulty) %}&#9733;{% endfor %}{% for i in range(3 - char.max_difficulty) %}&#9734;{% endfor %}
+        </span>
+      </div>
+
+      <div style="display:flex; gap:0.3rem; flex-wrap:wrap; margin-bottom:0.5rem;">
+        {% for vt in char.vocal_types %}
+          <span class="tag">{{ vt }}</span>
+        {% endfor %}
+        {% for hr in char.harmony_roles %}
+          <span class="tag" style="border:1px solid rgba(99,179,237,0.3); color:var(--blue);">{{ hr }}</span>
+        {% endfor %}
+      </div>
+
+      <div class="vb-label">Songs ({{ char.songs|length }})</div>
+      <ul class="vb-songs">
+        {% for song in char.songs %}
+          <li>&bull; {{ song }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if actors %}
+  <div class="card">
+    <h2>Current Cast for Reference</h2>
+    <table>
+      <tr><th>Actor</th><th>Voice Type</th><th>Notes</th><th>Cast As</th></tr>
+      {% for name, meta in actors.items() %}
+        <tr>
+          <td>{{ name }}</td>
+          <td>{{ meta.get('voice_type', '') }}</td>
+          <td>{{ meta.get('notes', '') }}</td>
+          <td>
+            <span class="pill-group">
+              {% for ch, an in cast_chars.items() %}
+                {% if an == name %}<span class="pill pill-char">{{ ch }}</span>{% endif %}
+              {% endfor %}
+            </span>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+{% endblock %}
