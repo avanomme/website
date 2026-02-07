@@ -422,6 +422,7 @@
       <a href="{{ url_for('.cast_page') }}" {% if active_page == 'cast' %}class="active"{% endif %}>Cast</a>
       <a href="{{ url_for('.auditions_page') }}" {% if active_page == 'auditions' %}class="active"{% endif %}>Auditions</a>
       <a href="{{ url_for('.crosscast_page') }}" {% if active_page == 'crosscast' %}class="active"{% endif %}>Cross-Casting</a>
+      <a href="{{ url_for('.rehearsal_log_page') }}" {% if active_page == 'log' %}class="active"{% endif %}>Rehearsal Log</a>
     </div>
 
     {% block content %}{% endblock %}

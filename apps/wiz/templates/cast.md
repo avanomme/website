@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Wizard of Oz – Cast List{% endblock %}
+{% block heading %}Cast List (Character → Actor){% endblock %}
+
+{% block content %}
+  <div class="card">
+    <form method="POST" action="{{ url_for('.cast_page') }}">
+      <p class="small">
+        For each character, set the actor name. You can also set that actor's voice type (S/A/T/B/etc.)
+        and any notes (ear, blend, range). If the same actor appears multiple times, their last-entered
+        type & notes will be used.
+      </p>
+      <table>
+        <tr>
+          <th>Character</th>
+          <th>Actor Name</th>
+          <th>Actor Voice Type</th>
+          <th>Actor Notes</th>
+        </tr>
+        {% for group_name, group_chars in character_groups %}
+          <tr>
+            <td colspan="4" style="background: rgba(159, 122, 234, 0.08); padding: 0.6rem 0.6rem 0.4rem;">
+              <span class="char-group-label" style="margin:0; border:none; padding:0;">{{ group_name }}</span>
+            </td>
+          </tr>
+          {% for c in group_chars %}
+            {% set actor_name = cast_chars.get(c, '') %}
+            {% set actor_meta = actors.get(actor_name, {}) if actor_name else {} %}
+            <tr>
+              <td>{{ c }}</td>
+              <td>
+                <input type="text" name="actor::{{ c }}" value="{{ actor_name }}">
+              </td>
+              <td>
+                <input type="text" name="voice::{{ c }}" value="{{ actor_meta.get('voice_type', '') }}">
+              </td>
+              <td>
+                <input type="text" name="anotes::{{ c }}" value="{{ actor_meta.get('notes', '') }}">
+              </td>
+            </tr>
+          {% endfor %}
+        {% endfor %}
+      </table>
+      <br>
+      <button type="submit">Save Cast</button>
+    </form>
+  </div>
+{% endblock %}

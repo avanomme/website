@@ -16,6 +16,7 @@ DATA_DIR = Path(__file__).parent / "data"
 STATE_FILE = DATA_DIR / "oz_state.json"
 CAST_FILE = DATA_DIR / "cast_state.json"
 NOTES_FILE = DATA_DIR / "oz_notes.json"
+LOG_FILE = DATA_DIR / "rehearsal_log.json"
 
 
 def _ensure_data_dir():
@@ -45,6 +46,7 @@ _kv_set = None
 _STATE_KEY = "wiz:state"
 _CAST_KEY = "wiz:cast"
 _NOTES_KEY = "wiz:notes"
+_LOG_KEY = "wiz:rehearsal_log"
 
 
 def configure_kv(kv_get_fn, kv_set_fn):
@@ -107,6 +109,19 @@ def save_cast(cast_data):
         _kv_set(_CAST_KEY, cast_data)
     else:
         save_json_file(CAST_FILE, cast_data)
+
+
+def load_rehearsal_log():
+    if _kv_get:
+        return _kv_get(_LOG_KEY) or []
+    return load_json_file(LOG_FILE, [])
+
+
+def save_rehearsal_log(entries):
+    if _kv_set:
+        _kv_set(_LOG_KEY, entries)
+    else:
+        save_json_file(LOG_FILE, entries)
 
 
 def normalize_name(name):

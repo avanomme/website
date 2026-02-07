@@ -14,7 +14,7 @@ Also importable as a Flask Blueprint for integration into a parent app.
 from flask import Blueprint, Flask, render_template, request, redirect, url_for
 
 from sections import SECTIONS, ALL_CHARACTERS, CHARACTER_GROUPS
-from state import load_state, save_state, load_cast, save_cast, load_notes, save_notes
+from state import load_state, save_state, load_cast, save_cast, load_notes, save_notes, load_rehearsal_log, save_rehearsal_log
 from logic import (
     sections_with_available,
     sections_safe_without,
@@ -245,6 +245,48 @@ def crosscast_page():
         active_page="crosscast",
         cast_chars=cast_chars,
         actors=actors,
+    )
+
+
+@wiz_bp.route("/log", methods=["GET", "POST"])
+def rehearsal_log_page():
+    from datetime import datetime
+
+    if request.method == "POST":
+        entries = load_rehearsal_log()
+        entry = {
+            "id": str(int(datetime.now().timestamp())),
+            "date": request.form.get("date", ""),
+            "time": request.form.get("time", "").strip(),
+            "songs": request.form.getlist("songs"),
+            "cast_present": request.form.getlist("cast_present"),
+            "notes": request.form.get("notes", "").strip(),
+            "created_at": datetime.now().isoformat(timespec="seconds"),
+        }
+        entries.insert(0, entry)
+        save_rehearsal_log(entries)
+        return redirect(url_for(".rehearsal_log_page"))
+
+    entries = load_rehearsal_log()
+    cast_data = load_cast()
+    cast_chars = cast_data["cast"]
+
+    # Build unique song names from sections (preserving score order)
+    seen = set()
+    song_names = []
+    for s in SECTIONS:
+        if s["song"] not in seen:
+            seen.add(s["song"])
+            song_names.append(s["song"])
+
+    return render_template(
+        "rehearsal_log.html",
+        active_page="log",
+        entries=entries,
+        cast_chars=cast_chars,
+        character_groups=CHARACTER_GROUPS,
+        song_names=song_names,
+        today=datetime.now().strftime("%Y-%m-%d"),
     )
 
 
