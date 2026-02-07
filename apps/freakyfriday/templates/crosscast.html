@@ -1,0 +1,275 @@
+{% extends "base.html" %}
+{% block title %}Freaky Friday – Cross-Casting Guide{% endblock %}
+{% block heading %}Cross-Casting Guide{% endblock %}
+
+{% block content %}
+  <style>
+    .xc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    .xc-role { padding: 1.25rem 1.5rem; }
+    .xc-role h3 { margin: 0 0 0.15rem; font-size: 1.1rem; color: var(--text-normal); }
+    .xc-role .xc-meta { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 0.75rem; }
+    .xc-role .xc-meta span { margin-right: 1rem; }
+    .xc-list { list-style: none; padding: 0; margin: 0.25rem 0 0; }
+    .xc-list li { font-size: 0.85rem; padding: 0.2rem 0; color: var(--text-normal); }
+    .xc-good { color: var(--green); }
+    .xc-bad { color: var(--red); }
+    .xc-label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.6rem; margin-bottom: 0.15rem; }
+    .xc-label.xc-good { color: var(--green); }
+    .xc-label.xc-bad { color: var(--red); }
+  </style>
+
+  {# --- LEAD WARNING --- #}
+  <div class="card">
+    <h2>Leads — Do Not Cross-Cast</h2>
+    <p style="font-size:0.9rem; color:var(--text-muted);">
+      <strong style="color:var(--text-normal);">Ellie &amp; Katherine</strong> appear in nearly every number and
+      must stay focused. <strong style="color:var(--text-normal);">Fletcher &amp; Mike</strong> also appear frequently
+      across both acts.
+    </p>
+    <p class="xc-label xc-bad">Do not double these leads into ensemble</p>
+    <div class="pill-group" style="margin-top:0.3rem;">
+      {% for r in ["Ellie", "Katherine", "Fletcher", "Mike"] %}
+        <span class="pill" style="border-color:rgba(252,129,129,0.3); color:var(--red);">{{ r }}</span>
+      {% endfor %}
+    </div>
+    <p style="font-size:0.85rem; color:var(--text-muted); margin-top:0.75rem;">
+      <strong style="color:var(--text-normal);">Adam, Savannah, Torrey</strong> appear in multiple numbers
+      but have some gaps — double cautiously and check scene timing.
+    </p>
+  </div>
+
+  {# --- FEATURED ADULTS DOUBLING --- #}
+  <div class="card">
+    <h2>Featured Adults — Easy Doubles</h2>
+    <p class="small">
+      Most Featured Adults appear in only one or two scenes. They can safely double as ensemble
+      in other scenes. Grouped by when they appear:
+    </p>
+  </div>
+
+  <div class="xc-grid">
+
+    {# Danielle & Louis #}
+    <div class="card xc-role">
+      <h3>Danielle &amp; Louis</h3>
+      <div class="xc-meta">
+        <span>Appear in: What You Got only</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Students, Parents, Wedding Guests, Company</li>
+        <li>Any ensemble section except What You Got</li>
+      </ul>
+    </div>
+
+    {# School Faculty #}
+    <div class="card xc-role">
+      <h3>Dr. Ehrin / Se&ntilde;or O'Brien / Mrs. Luckenbill</h3>
+      <div class="xc-meta">
+        <span>Appear in: Somebody Has Got to Take the Blame</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Parents, Wedding Guests, Company</li>
+        <li>Catering Staff (different scene)</li>
+      </ul>
+      <div class="xc-label xc-bad">Watch out</div>
+      <ul class="xc-list">
+        <li>Teachers (same actors may be recognizable)</li>
+      </ul>
+    </div>
+
+    {# Ms. Meyers #}
+    <div class="card xc-role">
+      <h3>Ms. Meyers</h3>
+      <div class="xc-meta">
+        <span>Appear in: Watch Your Back only</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Parents, Wedding Guests, Company, Catering Staff</li>
+      </ul>
+    </div>
+
+    {# Officers #}
+    <div class="card xc-role">
+      <h3>Officer Sitz &amp; Officer Kowalski</h3>
+      <div class="xc-meta">
+        <span>Appear in: Bring My Baby Home (Act II) only</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Students, Teachers, Parents (Act I scenes)</li>
+        <li>Catering Staff, Wedding Guests</li>
+        <li>Any Act I ensemble role</li>
+      </ul>
+    </div>
+
+    {# Mrs. Time #}
+    <div class="card xc-role">
+      <h3>Mrs. Time</h3>
+      <div class="xc-meta">
+        <span>Appear in: No More Fear (Act II) only</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Any Act I Featured Adult role (Danielle, Louis, etc.)</li>
+        <li>Parents, Wedding Guests, Catering Staff</li>
+      </ul>
+    </div>
+
+    {# Pastor Bruno #}
+    <div class="card xc-role">
+      <h3>Pastor Bruno</h3>
+      <div class="xc-meta">
+        <span>Appear in: Today and Ev'ry Day (finale) only</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Any Act I or early Act II Featured Adult</li>
+        <li>Teachers, Catering Staff</li>
+      </ul>
+    </div>
+
+    {# Grandparents #}
+    <div class="card xc-role">
+      <h3>Grandpa Gordon &amp; Grandma Helen</h3>
+      <div class="xc-meta">
+        <span>Appear in: Scene work / wedding only</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Teachers, Catering Staff</li>
+        <li>Any non-wedding ensemble scene</li>
+      </ul>
+    </div>
+
+  </div>
+
+  {# --- ENSEMBLE GROUPS --- #}
+  <div class="card">
+    <h2>Ensemble Groups — Overlap Chart</h2>
+    <p class="small">
+      Ensemble bucket roles and where they can safely share performers.
+    </p>
+  </div>
+
+  <div class="xc-grid">
+
+    {# Students #}
+    <div class="card xc-role">
+      <h3>Students</h3>
+      <div class="xc-meta">
+        <span>Appear in: Multiple Act I &amp; II numbers</span>
+        <span>Load: Heavy</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Wedding Guests (different context/costume)</li>
+        <li>Catering Staff (if not in kitchen scene)</li>
+      </ul>
+      <div class="xc-label xc-bad">Avoid</div>
+      <ul class="xc-list">
+        <li>Teachers, Parents (would break the age split)</li>
+      </ul>
+    </div>
+
+    {# Teachers #}
+    <div class="card xc-role">
+      <h3>Teachers</h3>
+      <div class="xc-meta">
+        <span>Appear in: I Got This sections</span>
+        <span>Load: Light</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Parents, Wedding Guests, Catering Staff</li>
+        <li>Company (non-school scenes)</li>
+      </ul>
+    </div>
+
+    {# Parents #}
+    <div class="card xc-role">
+      <h3>Parents</h3>
+      <div class="xc-meta">
+        <span>Appear in: Busted, Just One Day Reprise, Not Myself Today, Finale</span>
+        <span>Load: Medium</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Teachers, Catering Staff</li>
+        <li>Wedding Guests (natural overlap — many parents attend the wedding)</li>
+      </ul>
+    </div>
+
+    {# Catering Staff #}
+    <div class="card xc-role">
+      <h3>Catering Staff</h3>
+      <div class="xc-meta">
+        <span>Appear in: What You Got only</span>
+        <span>Load: Very light</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Students, Teachers, Parents, Wedding Guests</li>
+        <li>Essentially any other ensemble group</li>
+      </ul>
+    </div>
+
+    {# Savannah's Minions #}
+    <div class="card xc-role">
+      <h3>Savannah's Minions</h3>
+      <div class="xc-meta">
+        <span>Appear in: Go (Act II) only</span>
+        <span>Load: Very light</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Students (natural fit — they ARE students)</li>
+        <li>Wedding Guests, Company</li>
+      </ul>
+    </div>
+
+    {# Wedding Guests #}
+    <div class="card xc-role">
+      <h3>Wedding Guests</h3>
+      <div class="xc-meta">
+        <span>Appear in: Just One Day Reprise, Not Myself Today, Finale</span>
+        <span>Load: Medium</span>
+      </div>
+      <div class="xc-label xc-good">Safe doubles</div>
+      <ul class="xc-list">
+        <li>Students (costume change between school/wedding)</li>
+        <li>Parents (many parents are also guests)</li>
+        <li>Catering Staff, Teachers</li>
+      </ul>
+    </div>
+
+  </div>
+
+  {# --- CURRENT CAST --- #}
+  {% if actors %}
+  <div class="card">
+    <h2>Current Cast for Reference</h2>
+    <table>
+      <tr><th>Actor</th><th>Voice Type</th><th>Notes</th><th>Cast As</th></tr>
+      {% for name, meta in actors.items() %}
+        <tr>
+          <td>{{ name }}</td>
+          <td>{{ meta.get('voice_type', '') }}</td>
+          <td>{{ meta.get('notes', '') }}</td>
+          <td>
+            <span class="pill-group">
+              {% for ch, an in cast_chars.items() %}
+                {% if an == name %}
+                  <span class="pill pill-char">{{ ch }}</span>
+                {% endif %}
+              {% endfor %}
+            </span>
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+  </div>
+  {% endif %}
+{% endblock %}

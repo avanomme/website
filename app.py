@@ -4,6 +4,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'dfa', 'lib'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'dfa'))
 sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'wiz'))
+sys.path.append(os.path.join(os.path.dirname(__file__), 'apps', 'freakyfriday'))
 
 from flask import Flask, render_template, request, jsonify, send_from_directory
 import io
@@ -64,6 +65,7 @@ app.jinja_loader = ChoiceLoader([
     FileSystemLoader(os.path.join(PROJECT_DIR, 'shared', 'templates')),
     FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'dfa', 'templates')),
     FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'wiz', 'templates')),
+    FileSystemLoader(os.path.join(PROJECT_DIR, 'apps', 'freakyfriday', 'templates')),
 ])
 
 # Register Wizard of Oz rehearsal planner blueprint
@@ -78,6 +80,18 @@ try:
     print("✓ Wiz rehearsal planner registered at /wiz")
 except Exception as e:
     print(f"Warning: Could not load wiz app: {e}")
+
+# Register Freaky Friday rehearsal planner blueprint
+try:
+    _ff_spec = importlib.util.spec_from_file_location(
+        "ff_app", os.path.join(PROJECT_DIR, 'apps', 'freakyfriday', 'app.py')
+    )
+    _ff_module = importlib.util.module_from_spec(_ff_spec)
+    _ff_spec.loader.exec_module(_ff_module)
+    app.register_blueprint(_ff_module.ff_bp, url_prefix='/freaky')
+    print("✓ Freaky Friday rehearsal planner registered at /freaky")
+except Exception as e:
+    print(f"Warning: Could not load freaky friday app: {e}")
 
 # ============================================================================
 # STATIC FILE ROUTES
@@ -269,6 +283,14 @@ try:
     print("✓ Wiz KV storage configured")
 except Exception as e:
     print(f"Warning: Could not configure wiz KV storage: {e}")
+
+# Wire up KV storage for Freaky Friday rehearsal planner
+try:
+    from apps.freakyfriday.state import configure_kv as _ff_configure_kv
+    _ff_configure_kv(kv_get, kv_set)
+    print("✓ Freaky Friday KV storage configured")
+except Exception as e:
+    print(f"Warning: Could not configure freaky friday KV storage: {e}")
 
 # ============================================================================
 # SE PROJECT MANAGEMENT API
