@@ -3,6 +3,11 @@
 {% block heading %}Wizard of Oz – Rehearsal Log{% endblock %}
 
 {% block content %}
+  <style>
+    .edit-form { display: none; margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border-subtle); }
+    .edit-form.visible { display: block; }
+  </style>
+
   <!-- Add Entry Form -->
   <div class="card">
     <h2>Add Entry</h2>
@@ -64,8 +69,10 @@
   {% for entry in entries %}
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:0.5rem;">
-      <h2 style="margin-bottom:0.25rem;">{{ entry.date }}{% if entry.time %} &middot; {{ entry.time }}{% endif %}</h2>
-      <span class="small">{{ entry.created_at }}</span>
+      <h2 style="margin-bottom:0.25rem;">{{ entry.date_display }}{% if entry.time %} &middot; {{ entry.time }}{% endif %}</h2>
+      <div style="display:flex; gap:0.5rem; align-items:baseline;">
+        <button type="button" class="secondary" onclick="toggleEdit('edit-{{ entry.id }}')">Edit</button>
+      </div>
     </div>
 
     {% if entry.songs %}
@@ -96,6 +103,59 @@
       <div style="white-space:pre-wrap; font-size:0.9rem; line-height:1.5;">{{ entry.notes }}</div>
     </div>
     {% endif %}
+
+    <!-- Edit Form (hidden by default) -->
+    <div id="edit-{{ entry.id }}" class="edit-form">
+      <form method="POST" action="{{ url_for('.edit_log_entry') }}">
+        <input type="hidden" name="entry_id" value="{{ entry.id }}">
+        <div class="flex">
+          <div class="col">
+            <h3>Date &amp; Time</h3>
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:flex-start;">
+              <div>
+                <input type="date" name="date" value="{{ entry.date }}" style="background:rgba(19,16,32,0.65); color:var(--text-normal); border:1px solid rgba(159,122,234,0.3); border-radius:10px; padding:0.4rem 0.7rem; font-size:0.9rem; font-family:inherit;">
+              </div>
+              <div>
+                <input type="text" name="time" value="{{ entry.time }}" placeholder="10:00–11:00" style="max-width:160px;">
+              </div>
+            </div>
+
+            <h3>Songs</h3>
+            <div class="char-list" style="max-height:180px;">
+              {% for song in song_names %}
+                <label class="char">
+                  <input type="checkbox" name="songs" value="{{ song }}" {% if song in entry.songs %}checked{% endif %}>
+                  {{ song }}
+                </label>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div class="col">
+            <h3>Cast Present</h3>
+            <div class="char-list" style="max-height:220px;">
+              {% for group_name, group_chars in character_groups %}
+                <div class="char-group-label">{{ group_name }}</div>
+                {% for c in group_chars %}
+                  <label class="char">
+                    <input type="checkbox" name="cast_present" value="{{ c }}" {% if c in entry.cast_present %}checked{% endif %}>
+                    {{ c }}
+                  </label>
+                {% endfor %}
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+
+        <h3>Notes</h3>
+        <textarea name="notes" rows="3" style="max-width:100%; width:100%;">{{ entry.notes }}</textarea>
+
+        <div style="margin-top:0.75rem; display:flex; gap:0.5rem;">
+          <button type="submit">Save Changes</button>
+          <button type="button" class="secondary" onclick="toggleEdit('edit-{{ entry.id }}')">Cancel</button>
+        </div>
+      </form>
+    </div>
   </div>
   {% endfor %}
 
@@ -104,4 +164,10 @@
     No rehearsal log entries yet. Add one above!
   </div>
   {% endif %}
+
+  <script>
+    function toggleEdit(id) {
+      document.getElementById(id).classList.toggle('visible');
+    }
+  </script>
 {% endblock %}
