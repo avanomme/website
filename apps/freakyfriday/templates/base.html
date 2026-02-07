@@ -1,0 +1,430 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Freaky Friday Rehearsal Planner{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg-primary: #12101a;
+      --bg-card: rgba(22, 18, 32, 0.72);
+      --border-card: hsla(270, 40%, 60%, 0.3);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --text-normal: #f0eaff;
+      --text-muted: rgba(255, 255, 255, 0.6);
+      --text-faint: rgba(255, 255, 255, 0.4);
+      --purple: #9f7aea;
+      --pink: #f687b3;
+      --green: #68d391;
+      --blue: #63b3ed;
+      --yellow: #fbd38d;
+      --red: #fc8181;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-normal);
+      font-family: 'Fira Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      margin: 0;
+      min-height: 100vh;
+    }
+
+    .app-shell {
+      margin: 0 auto;
+      max-width: 1100px;
+      padding: 2.5rem clamp(1.5rem, 5vw, 3rem);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* --- Header --- */
+    .app-header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: 1rem;
+    }
+
+    .app-header h1 {
+      font-size: clamp(1.75rem, 2.5vw, 2.6rem);
+      margin: 0;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .app-header .subtitle {
+      margin: 0.25rem 0 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* --- Navigation --- */
+    .nav {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .nav a {
+      text-decoration: none;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .nav a:hover {
+      color: var(--text-normal);
+      background: rgba(159, 122, 234, 0.1);
+      border-color: rgba(159, 122, 234, 0.2);
+    }
+
+    .nav a.active {
+      background: rgba(159, 122, 234, 0.15);
+      border-color: rgba(159, 122, 234, 0.4);
+      color: var(--text-normal);
+    }
+
+    /* --- Cards --- */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: 18px;
+      padding: 1.5rem 2rem;
+      margin-bottom: 0;
+      box-shadow: 0 18px 40px -30px rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(16px);
+    }
+
+    .card h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1.3rem;
+      color: var(--purple);
+    }
+
+    .card h3 {
+      margin: 1rem 0 0.5rem;
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    /* --- Layout --- */
+    .flex { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .col { flex: 1 1 280px; }
+
+    /* --- Character list --- */
+    .char-list {
+      max-height: 260px;
+      overflow-y: auto;
+      border: 1px solid rgba(159, 122, 234, 0.2);
+      border-radius: 12px;
+      padding: 0.5rem 0.75rem;
+      background: rgba(20, 16, 32, 0.55);
+    }
+
+    .char-list::-webkit-scrollbar { width: 6px; }
+    .char-list::-webkit-scrollbar-track { background: transparent; }
+    .char-list::-webkit-scrollbar-thumb { background: rgba(159, 122, 234, 0.3); border-radius: 3px; }
+
+    .char-group-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--purple);
+      margin: 0.6rem 0 0.2rem;
+      padding-bottom: 0.15rem;
+      border-bottom: 1px solid rgba(159, 122, 234, 0.2);
+    }
+
+    .char-group-label:first-child {
+      margin-top: 0;
+    }
+
+    label.char {
+      display: block;
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      color: var(--text-normal);
+      cursor: pointer;
+      padding: 0.15rem 0;
+    }
+
+    label.char:hover { color: #fff; }
+
+    .mode-radio {
+      margin-right: 1rem;
+      color: var(--text-normal);
+    }
+
+    /* --- Buttons --- */
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 0.55rem 1.2rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      color: #0f0d16;
+      background: linear-gradient(135deg, var(--pink), var(--purple));
+      box-shadow: 0 6px 15px -10px rgba(0, 0, 0, 0.8);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      font-family: inherit;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px -18px rgba(0, 0, 0, 0.9);
+    }
+
+    button:active { transform: translateY(0); }
+
+    button.secondary {
+      background: rgba(160, 140, 255, 0.12);
+      color: var(--text-normal);
+      box-shadow: none;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.9rem;
+    }
+
+    button.secondary:hover {
+      background: rgba(160, 140, 255, 0.22);
+      transform: none;
+    }
+
+    /* --- Tables --- */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 0.5rem 0.6rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      vertical-align: top;
+    }
+
+    th {
+      text-align: left;
+      background: rgba(20, 16, 32, 0.6);
+      position: sticky;
+      top: 0;
+      color: var(--text-muted);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    tr:hover td {
+      background: rgba(159, 122, 234, 0.04);
+    }
+
+    /* --- Tags --- */
+    .tag {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-full {
+      background: rgba(104, 211, 145, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(104, 211, 145, 0.3);
+    }
+
+    .tag-partial {
+      background: rgba(251, 211, 141, 0.15);
+      color: var(--yellow);
+      border: 1px solid rgba(251, 211, 141, 0.3);
+    }
+
+    .tag-safe {
+      background: rgba(104, 211, 145, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(104, 211, 145, 0.3);
+    }
+
+    .tag-blocked {
+      background: rgba(252, 129, 129, 0.15);
+      color: var(--red);
+      border: 1px solid rgba(252, 129, 129, 0.3);
+    }
+
+    .status-todo {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text-faint);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .status-needs_more {
+      background: rgba(251, 211, 141, 0.12);
+      color: var(--yellow);
+      border: 1px solid rgba(251, 211, 141, 0.25);
+    }
+
+    .status-done {
+      background: rgba(104, 211, 145, 0.12);
+      color: var(--green);
+      border: 1px solid rgba(104, 211, 145, 0.25);
+    }
+
+    /* --- Pills --- */
+    .pill-group { display: flex; gap: 0.3rem; flex-wrap: wrap; }
+
+    .pill {
+      padding: 0.1rem 0.5rem;
+      border-radius: 999px;
+      background: rgba(159, 122, 234, 0.12);
+      border: 1px solid rgba(159, 122, 234, 0.2);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    .pill-char {
+      background: rgba(99, 179, 237, 0.25);
+      border-color: rgba(99, 179, 237, 0.45);
+      color: #fff;
+    }
+
+    /* --- Form inputs --- */
+    input[type="text"], textarea, select {
+      background: rgba(19, 16, 32, 0.65);
+      color: var(--text-normal);
+      border: 1px solid rgba(159, 122, 234, 0.3);
+      border-radius: 10px;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.9rem;
+      font-family: inherit;
+      width: 100%;
+      max-width: 260px;
+      transition: border-color 0.2s ease;
+    }
+
+    input[type="text"]:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: rgba(159, 122, 234, 0.6);
+      box-shadow: 0 0 0 3px rgba(159, 122, 234, 0.1);
+    }
+
+    textarea { min-height: 50px; resize: vertical; }
+
+    select {
+      border-radius: 999px;
+      padding: 0.35rem 0.7rem;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"], input[type="radio"] {
+      accent-color: var(--purple);
+    }
+
+    /* --- Misc --- */
+    .small {
+      font-size: 0.8rem;
+      color: var(--text-faint);
+    }
+
+    .schedule-line {
+      font-family: "SF Mono", Menlo, Consolas, monospace;
+      font-size: 0.85rem;
+      color: var(--text-normal);
+      padding: 0.15rem 0;
+    }
+
+    .notes-list {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .notes-list div {
+      margin-bottom: 0.15rem;
+      padding-left: 0.25rem;
+      border-left: 2px solid rgba(159, 122, 234, 0.2);
+      padding: 0.1rem 0 0.1rem 0.5rem;
+    }
+
+    code {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 0.15rem 0.35rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 720px) {
+      .app-shell {
+        padding: 1.75rem 1.25rem 2.5rem;
+      }
+
+      .app-header {
+        align-items: flex-start;
+      }
+
+      .nav {
+        gap: 0.35rem;
+      }
+
+      .nav a {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.75rem;
+      }
+
+      .card {
+        padding: 1.25rem;
+        border-radius: 14px;
+      }
+
+      input[type="text"], textarea, select {
+        max-width: 100%;
+      }
+
+      table {
+        font-size: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <div class="app-header">
+      <div>
+        <h1>{% block heading %}Freaky Friday – Rehearsal Planner{% endblock %}</h1>
+        <p class="subtitle">Character-driven, section-level rehearsal planning</p>
+      </div>
+    </div>
+
+    <div class="nav">
+      <a href="{{ url_for('.index') }}" {% if active_page == 'planner' %}class="active"{% endif %}>Planner</a>
+      <a href="{{ url_for('.songs_page') }}" {% if active_page == 'songs' %}class="active"{% endif %}>Songs</a>
+      <a href="{{ url_for('.cast_page') }}" {% if active_page == 'cast' %}class="active"{% endif %}>Cast</a>
+      <a href="{{ url_for('.crosscast_page') }}" {% if active_page == 'crosscast' %}class="active"{% endif %}>Cross-Casting</a>
+      <a href="{{ url_for('.rehearsal_log_page') }}" {% if active_page == 'log' %}class="active"{% endif %}>Rehearsal Log</a>
+    </div>
+
+    {% block content %}{% endblock %}
+  </div>
+</body>
+</html>
