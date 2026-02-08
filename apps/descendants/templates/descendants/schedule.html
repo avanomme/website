@@ -62,7 +62,7 @@
         <h2>{{ dg.date_display }}</h2>
         <table>
           <tr><th>Time</th><th>Characters</th><th>Song / Section</th><th></th></tr>
-          {% for item in dg.items %}
+          {% for item in dg.entries %}
             <tr>
               <td>{{ item.time }}</td>
               <td>{{ item.characters }}</td>
@@ -135,7 +135,7 @@
         <h2>{{ dg.date_display }}</h2>
         <table>
           <tr><th>Time</th><th>Characters</th><th>Song / Section</th><th></th></tr>
-          {% for item in dg.items %}
+          {% for item in dg.entries %}
             <tr>
               <td>{{ item.time }}</td>
               <td>{{ item.characters }}</td>

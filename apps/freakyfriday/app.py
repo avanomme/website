@@ -115,7 +115,7 @@ def schedule_page():
         except Exception:
             date_display = date_key
 
-        date_group = {"date": date_key, "date_display": date_display, "items": entries}
+        date_group = {"date": date_key, "date_display": date_display, "entries": entries}
         if date_key < today:
             past.append(date_group)
         else:
