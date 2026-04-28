@@ -9,12 +9,91 @@
             background-color: #000;
             color: #fff;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100vh;
             margin: 0;
             font-family: Arial, sans-serif;
+        }
+
+        .hero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        /* ── Contact form section ── */
+        .contact-section {
+            width: 100%;
+            max-width: 560px;
+            padding: 60px 24px 80px;
+            box-sizing: border-box;
+        }
+        .contact-section h2 {
+            color: #00ff00;
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 1.6em;
+        }
+        .contact-section .lede {
+            text-align: center;
+            color: #aaa;
+            margin-bottom: 24px;
+            font-size: 0.95em;
+        }
+        .contact-form label {
+            display: block;
+            color: #ccc;
+            font-size: 0.85em;
+            margin: 12px 0 4px;
+        }
+        .contact-form input,
+        .contact-form textarea {
+            width: 100%;
+            padding: 10px;
+            background: #111;
+            color: #fff;
+            border: 1px solid #333;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .contact-form textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .contact-form button {
+            margin-top: 16px;
+            width: 100%;
+            padding: 12px;
+            background: #008800;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .contact-form button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .contact-form .status {
+            margin-top: 12px;
+            text-align: center;
+            font-size: 0.9em;
+            min-height: 1.2em;
+        }
+        /* Honeypot: invisible to humans, bots fill it */
+        .contact-form .hp {
+            position: absolute;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
         }
 
         .container {
@@ -102,25 +181,113 @@
     <script src="/shared/static/analytics.js" defer></script>
 </head>
 <body>
-    <div class="container">
-        <a href="/grinch" class="grinch-link">
-            <div>
-                <img src="https://upload.wikimedia.org/wikipedia/en/e/e8/The_Grinch_%282018_film%29_poster.jpg"
-                     alt="The Grinch"
-                     class="grinch-image"
-                     onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23165016%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22%3EGrinch Rehearsal%3C/text%3E%3C/svg%3E'">
-                <div class="grinch-caption">Grinch 2025 Rehearsal</div>
-            </div>
-        </a>
+    <div class="hero">
+        <div class="container">
+            <a href="/grinch" class="grinch-link">
+                <div>
+                    <img src="https://upload.wikimedia.org/wikipedia/en/e/e8/The_Grinch_%282018_film%29_poster.jpg"
+                         alt="The Grinch"
+                         class="grinch-image"
+                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22300%22 height=%22300%22%3E%3Crect fill=%22%23165016%22 width=%22300%22 height=%22300%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 font-size=%2224%22 fill=%22%23fff%22 text-anchor=%22middle%22 dy=%22.3em%22%3EGrinch Rehearsal%3C/text%3E%3C/svg%3E'">
+                    <div class="grinch-caption">Grinch 2025 Rehearsal</div>
+                </div>
+            </a>
 
-        <div class="spiral">
-            <span style="transform: rotate(0deg) translate(0, 0);">T</span>
-            <span style="transform: rotate(36deg) translate(10px, 10px);">h</span>
-            <span style="transform: rotate(72deg) translate(20px, 20px);">e</span>
-            <span style="transform: rotate(108deg) translate(30px, 30px);">o</span>
-            <span style="transform: rotate(144deg) translate(40px, 40px);">r</span>
-            <span style="transform: rotate(180deg) translate(50px, 50px);">y</span>
+            <div class="spiral">
+                <span style="transform: rotate(0deg) translate(0, 0);">T</span>
+                <span style="transform: rotate(36deg) translate(10px, 10px);">h</span>
+                <span style="transform: rotate(72deg) translate(20px, 20px);">e</span>
+                <span style="transform: rotate(108deg) translate(30px, 30px);">o</span>
+                <span style="transform: rotate(144deg) translate(40px, 40px);">r</span>
+                <span style="transform: rotate(180deg) translate(50px, 50px);">y</span>
+            </div>
         </div>
     </div>
+
+    <section class="contact-section" id="contact">
+        <h2>Contact</h2>
+        <p class="lede">Question, request, or feedback? Send a note.</p>
+
+        <form class="contact-form" id="contactForm" novalidate>
+            <label for="cName">Name <span style="color:#f87171;">*</span></label>
+            <input type="text" id="cName" name="name" required maxlength="200">
+
+            <label for="cEmail">Email <span style="color:#f87171;">*</span></label>
+            <input type="email" id="cEmail" name="email" required>
+
+            <label for="cMessage">Message <span style="color:#f87171;">*</span></label>
+            <textarea id="cMessage" name="message" required maxlength="5000"></textarea>
+
+            <!-- Honeypot: real users never see/fill this -->
+            <div class="hp" aria-hidden="true">
+                <label>Website
+                    <input type="text" id="cHoneypot" name="_hp" tabindex="-1" autocomplete="off">
+                </label>
+            </div>
+
+            <button type="submit" id="cSubmit">Send</button>
+            <div class="status" id="cStatus"></div>
+        </form>
+    </section>
+
+    <script>
+    (function () {
+        const form = document.getElementById('contactForm');
+        const status = document.getElementById('cStatus');
+        const submitBtn = document.getElementById('cSubmit');
+        const nameEl = document.getElementById('cName');
+        const emailEl = document.getElementById('cEmail');
+        const messageEl = document.getElementById('cMessage');
+        const hpEl = document.getElementById('cHoneypot');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            status.style.color = '';
+            status.textContent = '';
+
+            const name = nameEl.value.trim();
+            const email = emailEl.value.trim();
+            const message = messageEl.value.trim();
+            if (!name || !email || !message) {
+                status.style.color = '#f87171';
+                status.textContent = 'Please fill in name, email, and message.';
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                status.style.color = '#f87171';
+                status.textContent = 'That email address doesn’t look right.';
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Sending…';
+            try {
+                const res = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, message, _hp: hpEl.value || '' })
+                });
+                let data = {};
+                try { data = await res.json(); } catch {}
+
+                if (res.ok && data.ok) {
+                    status.style.color = '#34d399';
+                    status.textContent = 'Message sent. Thanks!';
+                    form.reset();
+                } else {
+                    status.style.color = '#f87171';
+                    status.textContent = data.error || `Failed (${res.status}). Try again later.`;
+                }
+            } catch (err) {
+                console.error('contact submit failed', err);
+                status.style.color = '#f87171';
+                status.textContent = 'Network error. Try again later.';
+            } finally {
+                submitBtn.disabled = false;
+                if (submitBtn.textContent === 'Sending…') submitBtn.textContent = 'Send';
+            }
+        });
+    })();
+    </script>
 </body>
 </html>
